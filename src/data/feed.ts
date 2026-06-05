@@ -4,10 +4,9 @@ export const feedItems: FeedItem[] = [
   {
     id: "1",
     author: { name: "Mira Okafor", handle: "mira" },
-    time: "Today · 8:14",
+    time: "8:14",
     title: "On making small things, slowly.",
-    body: "I keep returning to the idea that the work which matters is rarely the work which shouts. A short essay on craft, patience, and the quiet hours between drafts.",
-    tag: "Essay",
+    body: "I keep returning to the idea that the work which matters is rarely the work which shouts. A short essay on craft, patience, and the hours between drafts.",
     likes: 248,
     comments: 32,
   },
@@ -24,17 +23,16 @@ export const feedItems: FeedItem[] = [
   {
     id: "3",
     author: { name: "Aïcha Devereaux", handle: "aicha" },
-    time: "2 days ago",
+    time: "2d",
     title: "A field guide to noticing.",
     body: "Three small practices that have changed the way I move through a week. The first is the easiest: keep a single notebook, and only one.",
-    tag: "Journal",
     likes: 412,
     comments: 58,
   },
   {
     id: "4",
     author: { name: "Idris Vahn", handle: "idris" },
-    time: "3 days ago",
+    time: "3d",
     body: "New piece up in the studio. Walnut, linseed oil, a great deal of sanding.",
     image:
       "https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?auto=format&fit=crop&w=1200&q=80",

@@ -1,41 +1,59 @@
 import { AppShell } from "@/components/meku/AppShell";
-import { ScreenHeader } from "@/components/meku/ScreenHeader";
+import { TopBar, IconButton } from "@/components/meku/TopBar";
 import { FeedCard } from "@/components/meku/FeedCard";
+import { Logo } from "@/components/meku/Logo";
 import { feedItems } from "@/data/feed";
-import { Bell } from "lucide-react";
+import { Bell, Search } from "lucide-react";
 import { Link } from "react-router-dom";
+
+const filters = ["For you", "Following", "Essays", "Photography", "Notes"];
 
 const Home = () => {
   return (
     <AppShell>
-      <ScreenHeader
-        eyebrow="Friday, June 5"
-        title={<span><span className="font-serif-display italic">Today</span> on Meku</span>}
+      <TopBar
+        left={
+          <div className="pl-3">
+            <Logo size={22} />
+          </div>
+        }
         right={
-          <Link
-            to="/notifications"
-            aria-label="Notifications"
-            className="meku-tap relative inline-flex h-10 w-10 items-center justify-center rounded-full border hairline bg-surface"
-          >
-            <Bell className="h-[18px] w-[18px]" strokeWidth={1.5} />
-            <span className="absolute right-2.5 top-2.5 h-1.5 w-1.5 rounded-full bg-primary" />
-          </Link>
+          <>
+            <IconButton ariaLabel="Search">
+              <Search className="h-[20px] w-[20px]" strokeWidth={1.4} />
+            </IconButton>
+            <Link to="/notifications" aria-label="Notifications" className="relative">
+              <IconButton ariaLabel="Notifications">
+                <Bell className="h-[20px] w-[20px]" strokeWidth={1.4} />
+              </IconButton>
+              <span className="pointer-events-none absolute right-[10px] top-[10px] h-[6px] w-[6px] rounded-full bg-primary" />
+            </Link>
+          </>
         }
       />
 
-      <div className="px-5 pb-2">
-        <div className="flex gap-2 overflow-x-auto -mx-5 px-5 [&::-webkit-scrollbar]:hidden">
-          {["For you", "Following", "Essays", "Photography", "Notes", "Studio"].map((t, i) => (
+      {/* Editorial header — the room before the content */}
+      <section className="px-3 pb-3 pt-6">
+        <p className="t-eyebrow text-muted-foreground">Friday, June 5</p>
+        <h1 className="mt-3 font-serif text-[44px] leading-[1.02] tracking-[-0.025em] text-foreground">
+          Today, <span className="font-serif-italic">quietly.</span>
+        </h1>
+      </section>
+
+      {/* Filters — single hairline row, no pills overdose */}
+      <div className="hairline-b px-3">
+        <div className="-mx-3 flex gap-5 overflow-x-auto px-3 pb-3 pt-1">
+          {filters.map((f, i) => (
             <button
-              key={t}
+              key={f}
               className={
-                "meku-tap whitespace-nowrap rounded-full border px-3.5 py-1.5 text-xs " +
+                "tap shrink-0 t-caption " +
                 (i === 0
-                  ? "bg-foreground text-background border-foreground"
-                  : "hairline bg-surface text-muted-foreground")
+                  ? "text-foreground"
+                  : "text-muted-foreground")
               }
             >
-              {t}
+              {f}
             </button>
           ))}
         </div>
@@ -43,7 +61,7 @@ const Home = () => {
 
       <section>
         {feedItems.map((item, i) => (
-          <FeedCard key={item.id} item={item} variant={i % 2 === 0 ? "editorial" : "default"} />
+          <FeedCard key={item.id} item={item} variant={item.title && i % 2 === 0 ? "editorial" : "default"} />
         ))}
       </section>
     </AppShell>

@@ -10,39 +10,34 @@ interface ScreenHeaderProps {
   className?: string;
 }
 
+/**
+ * Editorial screen header. Serif headlines are reserved for hero moments.
+ */
 export const ScreenHeader = ({
   eyebrow,
   title,
   subtitle,
   right,
-  serif,
+  serif = true,
   className,
-}: ScreenHeaderProps) => {
-  return (
-    <header className={cn("px-5 pt-8 pb-5", className)}>
-      <div className="flex items-end justify-between gap-4">
-        <div className="min-w-0">
-          {eyebrow && (
-            <p className="mb-2 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-              {eyebrow}
-            </p>
+}: ScreenHeaderProps) => (
+  <header className={cn("px-3 pt-6 pb-5", className)}>
+    <div className="flex items-end justify-between gap-4">
+      <div className="min-w-0">
+        {eyebrow && <p className="t-eyebrow text-muted-foreground">{eyebrow}</p>}
+        <h1
+          className={cn(
+            "mt-3 text-foreground",
+            serif
+              ? "font-serif text-[44px] leading-[1.02] tracking-[-0.025em]"
+              : "t-h1 font-medium"
           )}
-          <h1
-            className={cn(
-              "text-foreground",
-              serif
-                ? "font-serif-display text-[42px] leading-[1.05] tracking-tightish"
-                : "text-[28px] font-semibold leading-tight tracking-tightish"
-            )}
-          >
-            {title}
-          </h1>
-          {subtitle && (
-            <p className="mt-2 text-sm text-muted-foreground">{subtitle}</p>
-          )}
-        </div>
-        {right && <div className="shrink-0">{right}</div>}
+        >
+          {title}
+        </h1>
+        {subtitle && <p className="mt-2 t-body text-muted-foreground">{subtitle}</p>}
       </div>
-    </header>
-  );
-};
+      {right && <div className="shrink-0">{right}</div>}
+    </div>
+  </header>
+);
