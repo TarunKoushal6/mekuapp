@@ -1,23 +1,22 @@
 import { AppShell } from "@/components/meku/AppShell";
-import { ScreenHeader } from "@/components/meku/ScreenHeader";
+import { TopBar, IconButton } from "@/components/meku/TopBar";
 import { Avatar } from "@/components/meku/Avatar";
+import { ChevronLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
 
 const groups = [
   {
     label: "Today",
     items: [
-      { name: "Mira Okafor", action: "liked your essay", target: "On making small things, slowly.", time: "8m" },
-      { name: "Sōta Lin", action: "started following you", time: "1h" },
-      { name: "Aïcha Devereaux", action: "replied to your note", target: "Three small practices.", time: "3h" },
+      { name: "Mira Okafor", action: "replied to your essay", target: "On making small things, slowly.", time: "8m" },
+      { name: "Sōta Lin", action: "saved your post", target: "A field guide to noticing.", time: "1h" },
     ],
   },
   {
     label: "This week",
     items: [
-      { name: "Idris Vahn", action: "saved your post", target: "A field guide to noticing.", time: "Tue" },
-      { name: "Lina Park", action: "mentioned you in a note", time: "Mon" },
+      { name: "Aïcha Devereaux", action: "started following you", target: "", time: "Mon" },
+      { name: "Idris Vahn", action: "mentioned you in", target: "Studio Notes", time: "Sun" },
     ],
   },
 ];
@@ -26,45 +25,39 @@ const Notifications = () => {
   const navigate = useNavigate();
   return (
     <AppShell>
-      <header className="flex items-center gap-3 px-5 pt-6">
-        <button
-          onClick={() => navigate(-1)}
-          aria-label="Back"
-          className="meku-tap inline-flex h-10 w-10 items-center justify-center rounded-full border hairline bg-surface"
-        >
-          <ArrowLeft className="h-[18px] w-[18px]" strokeWidth={1.5} />
-        </button>
-      </header>
-      <ScreenHeader
-        title={<span className="font-serif-display italic">Notifications</span>}
-        subtitle="A gentle digest of what's new."
-        className="pt-4"
+      <TopBar
+        left={
+          <IconButton ariaLabel="Back" onClick={() => navigate(-1)}>
+            <ChevronLeft className="h-[22px] w-[22px]" strokeWidth={1.4} />
+          </IconButton>
+        }
+        title="Notifications"
       />
 
+      <section className="px-3 pb-5 pt-6">
+        <h1 className="font-serif text-[44px] leading-[1.02] tracking-[-0.025em] text-foreground">
+          Activity
+        </h1>
+      </section>
+
       {groups.map((g) => (
-        <section key={g.label} className="mt-2">
-          <h2 className="px-5 pb-2 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-            {g.label}
-          </h2>
-          <ul className="divide-y hairline border-y hairline">
-            {g.items.map((it, i) => (
-              <li key={i} className="flex items-start gap-3 px-5 py-4">
-                <Avatar name={it.name} size="md" />
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm text-foreground">
-                    <span className="font-medium">{it.name}</span>{" "}
-                    <span className="text-muted-foreground">{it.action}</span>
-                    {it.target && (
-                      <>
-                        {" "}
-                        <span className="font-serif-display italic">{it.target}</span>
-                      </>
-                    )}
-                  </p>
-                  <p className="mt-1 text-[11px] uppercase tracking-wider text-muted-foreground">
-                    {it.time}
-                  </p>
+        <section key={g.label} className="mb-6 px-3">
+          <p className="t-eyebrow mb-2 text-muted-foreground">{g.label}</p>
+          <ul>
+            {g.items.map((n, i) => (
+              <li key={i}>
+                <div className="flex items-start gap-3 py-4">
+                  <Avatar name={n.name} size="md" />
+                  <div className="min-w-0 flex-1">
+                    <p className="t-body text-foreground">
+                      <span className="font-medium">{n.name}</span>{" "}
+                      <span className="text-muted-foreground">{n.action}</span>
+                      {n.target && <span className="font-serif-italic"> {n.target}</span>}
+                    </p>
+                    <p className="mt-1 t-caption text-muted-foreground">{n.time}</p>
+                  </div>
                 </div>
+                {i < g.items.length - 1 && <div className="ml-[52px] hairline-b" />}
               </li>
             ))}
           </ul>

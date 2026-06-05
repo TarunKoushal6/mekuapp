@@ -1,4 +1,4 @@
-import { Heart, MessageCircle, Bookmark, Share } from "lucide-react";
+import { Heart, MessageCircle, Bookmark } from "lucide-react";
 import { Avatar } from "./Avatar";
 
 export interface FeedItem {
@@ -18,61 +18,70 @@ interface FeedCardProps {
   variant?: "default" | "editorial";
 }
 
+/**
+ * Feed card — content is hero.
+ * No card chrome. No badges. Minimal metadata.
+ * Read.cv meets Apple Notes.
+ */
 export const FeedCard = ({ item, variant = "default" }: FeedCardProps) => {
+  const isEditorial = variant === "editorial";
   return (
-    <article className="px-5 py-6 border-b hairline meku-fade-in">
-      <header className="flex items-center gap-3">
-        <Avatar name={item.author.name} size="md" />
-        <div className="min-w-0 flex-1">
-          <div className="flex items-baseline gap-2">
-            <p className="truncate text-sm font-medium text-foreground">{item.author.name}</p>
-            <span className="truncate text-xs text-muted-foreground">@{item.author.handle}</span>
-          </div>
-          <p className="text-[11px] uppercase tracking-wider text-muted-foreground">{item.time}</p>
-        </div>
-        {item.tag && (
-          <span className="rounded-full border hairline px-2.5 py-1 text-[10px] uppercase tracking-wider text-muted-foreground">
-            {item.tag}
-          </span>
-        )}
-      </header>
+    <article className="hairline-b fade-in px-3 py-4">
+      {/* Meta line — one row, dot-separated, ultra quiet */}
+      <div className="flex items-center gap-[10px]">
+        <Avatar name={item.author.name} size="sm" />
+        <p className="t-caption text-foreground">{item.author.name}</p>
+        <span className="t-caption text-muted-foreground">·</span>
+        <p className="t-caption text-muted-foreground">{item.time}</p>
+      </div>
 
-      <div className="mt-5">
+      <div className="mt-[18px]">
         {item.title && (
           <h2
             className={
-              variant === "editorial"
-                ? "font-serif-display text-[28px] leading-[1.1] tracking-tightish text-foreground"
-                : "text-lg font-semibold leading-snug tracking-tightish text-foreground"
+              isEditorial
+                ? "font-serif text-[34px] leading-[1.06] tracking-[-0.02em] text-foreground"
+                : "text-[20px] font-medium leading-[1.25] tracking-[-0.015em] text-foreground"
             }
           >
             {item.title}
           </h2>
         )}
-        <p className="mt-3 text-[15px] leading-relaxed text-foreground/85">{item.body}</p>
+        <p
+          className={
+            (item.title ? "mt-[10px] " : "") +
+            "t-body text-foreground/80"
+          }
+        >
+          {item.body}
+        </p>
+
         {item.image && (
-          <div className="mt-5 overflow-hidden rounded-md border hairline bg-surface-muted">
-            <img src={item.image} alt="" className="aspect-[4/3] w-full object-cover" />
+          <div className="mt-[18px] overflow-hidden rounded-[12px] bg-surface-2">
+            <img
+              src={item.image}
+              alt=""
+              loading="lazy"
+              className="aspect-[5/4] w-full object-cover"
+            />
           </div>
         )}
       </div>
 
-      <footer className="mt-5 flex items-center gap-6 text-muted-foreground">
-        <button className="meku-tap flex items-center gap-2 text-xs">
-          <Heart className="h-[18px] w-[18px]" strokeWidth={1.5} />
-          <span>{item.likes}</span>
+      {/* Actions — hairline-thin, almost invisible */}
+      <div className="mt-[18px] flex items-center gap-6 text-muted-foreground">
+        <button className="tap flex items-center gap-2" aria-label="Like">
+          <Heart className="h-[17px] w-[17px]" strokeWidth={1.4} />
+          <span className="t-caption">{item.likes}</span>
         </button>
-        <button className="meku-tap flex items-center gap-2 text-xs">
-          <MessageCircle className="h-[18px] w-[18px]" strokeWidth={1.5} />
-          <span>{item.comments}</span>
+        <button className="tap flex items-center gap-2" aria-label="Reply">
+          <MessageCircle className="h-[17px] w-[17px]" strokeWidth={1.4} />
+          <span className="t-caption">{item.comments}</span>
         </button>
-        <button className="meku-tap ml-auto flex items-center gap-2 text-xs">
-          <Bookmark className="h-[18px] w-[18px]" strokeWidth={1.5} />
+        <button className="tap ml-auto" aria-label="Save">
+          <Bookmark className="h-[17px] w-[17px]" strokeWidth={1.4} />
         </button>
-        <button className="meku-tap flex items-center gap-2 text-xs">
-          <Share className="h-[18px] w-[18px]" strokeWidth={1.5} />
-        </button>
-      </footer>
+      </div>
     </article>
   );
 };
