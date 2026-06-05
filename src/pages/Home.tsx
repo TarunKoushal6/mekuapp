@@ -5,26 +5,29 @@ import { Logo } from "@/components/meku/Logo";
 import { feedItems } from "@/data/feed";
 import { Bell, Search } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
 
-const filters = ["For you", "Following", "Essays", "Photography", "Notes"];
+const tabs = ["For you", "Following", "Popular"] as const;
 
 const Home = () => {
+  const [tab, setTab] = useState<(typeof tabs)[number]>("For you");
   return (
     <AppShell>
       <TopBar
         left={
-          <div className="pl-3">
-            <Logo size={22} />
+          <div className="pl-1">
+            <Logo size={26} />
           </div>
         }
         right={
           <>
             <IconButton ariaLabel="Search">
-              <Search className="h-[20px] w-[20px]" strokeWidth={1.4} />
+              <Search className="h-[20px] w-[20px]" strokeWidth={1.6} />
             </IconButton>
             <Link to="/notifications" aria-label="Notifications" className="relative">
               <IconButton ariaLabel="Notifications">
-                <Bell className="h-[20px] w-[20px]" strokeWidth={1.4} />
+                <Bell className="h-[20px] w-[20px]" strokeWidth={1.6} />
               </IconButton>
               <span className="pointer-events-none absolute right-[10px] top-[10px] h-[6px] w-[6px] rounded-full bg-primary" />
             </Link>
@@ -32,36 +35,27 @@ const Home = () => {
         }
       />
 
-      {/* Editorial header — the room before the content */}
-      <section className="px-3 pb-3 pt-6">
-        <p className="t-eyebrow text-muted-foreground">Friday, June 5</p>
-        <h1 className="mt-3 font-serif text-[44px] leading-[1.02] tracking-[-0.025em] text-foreground">
-          Today, <span className="font-serif-italic">quietly.</span>
-        </h1>
-      </section>
-
-      {/* Filters — single hairline row, no pills overdose */}
-      <div className="hairline-b px-3">
-        <div className="-mx-3 flex gap-5 overflow-x-auto px-3 pb-3 pt-1">
-          {filters.map((f, i) => (
+      {/* Segmented control — pill, dark active */}
+      <div className="px-4 pb-3 pt-2">
+        <div className="inline-flex w-full items-center gap-1 rounded-full border border-border bg-surface p-1">
+          {tabs.map((t) => (
             <button
-              key={f}
-              className={
-                "tap shrink-0 t-caption " +
-                (i === 0
-                  ? "text-foreground"
-                  : "text-muted-foreground")
-              }
+              key={t}
+              onClick={() => setTab(t)}
+              className={cn(
+                "tap flex-1 rounded-full px-3 py-[8px] text-[13px] font-medium",
+                tab === t ? "bg-foreground text-background" : "text-muted-foreground"
+              )}
             >
-              {f}
+              {t}
             </button>
           ))}
         </div>
       </div>
 
       <section>
-        {feedItems.map((item, i) => (
-          <FeedCard key={item.id} item={item} variant={item.title && i % 2 === 0 ? "editorial" : "default"} />
+        {feedItems.map((item) => (
+          <FeedCard key={item.id} item={item} />
         ))}
       </section>
     </AppShell>
