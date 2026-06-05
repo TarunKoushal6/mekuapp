@@ -1,9 +1,9 @@
-import { Heart, MessageCircle, Bookmark } from "lucide-react";
+import { Heart, MessageCircle, Send, Bookmark, MoreHorizontal, BadgeCheck } from "lucide-react";
 import { Avatar } from "./Avatar";
 
 export interface FeedItem {
   id: string;
-  author: { name: string; handle: string };
+  author: { name: string; handle: string; verified?: boolean };
   time: string;
   title?: string;
   body: string;
@@ -11,6 +11,7 @@ export interface FeedItem {
   tag?: string;
   likes: number;
   comments: number;
+  shares?: number;
 }
 
 interface FeedCardProps {
@@ -19,45 +20,45 @@ interface FeedCardProps {
 }
 
 /**
- * Feed card — content is hero.
- * No card chrome. No badges. Minimal metadata.
- * Read.cv meets Apple Notes.
+ * Feed card — content-first, hairline-separated.
+ * Header: avatar · name · @handle · time · …
+ * Footer: like, comment, share, bookmark with inline counts.
  */
-export const FeedCard = ({ item, variant = "default" }: FeedCardProps) => {
-  const isEditorial = variant === "editorial";
+export const FeedCard = ({ item }: FeedCardProps) => {
   return (
-    <article className="hairline-b fade-in px-3 py-4">
-      {/* Meta line — one row, dot-separated, ultra quiet */}
-      <div className="flex items-center gap-[10px]">
-        <Avatar name={item.author.name} size="sm" />
-        <p className="t-caption text-foreground">{item.author.name}</p>
-        <span className="t-caption text-muted-foreground">·</span>
-        <p className="t-caption text-muted-foreground">{item.time}</p>
-      </div>
+    <article className="hairline-b fade-in px-4 py-4">
+      {/* Meta row */}
+      <header className="flex items-center gap-3">
+        <Avatar name={item.author.name} size="md" />
+        <div className="flex min-w-0 flex-1 items-center gap-1.5">
+          <p className="truncate t-body font-semibold text-foreground">{item.author.name}</p>
+          {item.author.verified && (
+            <BadgeCheck className="h-[14px] w-[14px] fill-primary text-background" strokeWidth={2.2} />
+          )}
+          <span className="t-caption text-muted-foreground">@{item.author.handle}</span>
+          <span className="t-caption text-muted-foreground">·</span>
+          <span className="t-caption text-muted-foreground">{item.time}</span>
+        </div>
+        <button aria-label="More" className="tap -mr-2 inline-flex h-8 w-8 items-center justify-center text-muted-foreground">
+          <MoreHorizontal className="h-[18px] w-[18px]" strokeWidth={1.6} />
+        </button>
+      </header>
 
-      <div className="mt-[18px]">
+      {/* Body */}
+      <div className="ml-[52px] mt-2">
         {item.title && (
-          <h2
-            className={
-              isEditorial
-                ? "font-serif text-[34px] leading-[1.06] tracking-[-0.02em] text-foreground"
-                : "text-[20px] font-medium leading-[1.25] tracking-[-0.015em] text-foreground"
-            }
-          >
+          <h2 className="text-[17px] font-semibold leading-[1.32] tracking-[-0.012em] text-foreground">
             {item.title}
           </h2>
         )}
-        <p
-          className={
-            (item.title ? "mt-[10px] " : "") +
-            "t-body text-foreground/80"
-          }
-        >
-          {item.body}
-        </p>
+        {item.body && (
+          <p className={(item.title ? "mt-1.5 " : "") + "text-[15px] leading-[1.55] text-foreground/85"}>
+            {item.body}
+          </p>
+        )}
 
         {item.image && (
-          <div className="mt-[18px] overflow-hidden rounded-[12px] bg-surface-2">
+          <div className="mt-3 overflow-hidden rounded-[14px] border border-border bg-surface-2">
             <img
               src={item.image}
               alt=""
@@ -66,21 +67,25 @@ export const FeedCard = ({ item, variant = "default" }: FeedCardProps) => {
             />
           </div>
         )}
-      </div>
 
-      {/* Actions — hairline-thin, almost invisible */}
-      <div className="mt-[18px] flex items-center gap-6 text-muted-foreground">
-        <button className="tap flex items-center gap-2" aria-label="Like">
-          <Heart className="h-[17px] w-[17px]" strokeWidth={1.4} />
-          <span className="t-caption">{item.likes}</span>
-        </button>
-        <button className="tap flex items-center gap-2" aria-label="Reply">
-          <MessageCircle className="h-[17px] w-[17px]" strokeWidth={1.4} />
-          <span className="t-caption">{item.comments}</span>
-        </button>
-        <button className="tap ml-auto" aria-label="Save">
-          <Bookmark className="h-[17px] w-[17px]" strokeWidth={1.4} />
-        </button>
+        {/* Action row */}
+        <div className="mt-3 flex items-center justify-between pr-1 text-muted-foreground">
+          <button className="tap inline-flex items-center gap-1.5" aria-label="Like">
+            <Heart className="h-[18px] w-[18px]" strokeWidth={1.6} />
+            <span className="t-caption tabular-nums">{item.likes}</span>
+          </button>
+          <button className="tap inline-flex items-center gap-1.5" aria-label="Comment">
+            <MessageCircle className="h-[18px] w-[18px]" strokeWidth={1.6} />
+            <span className="t-caption tabular-nums">{item.comments}</span>
+          </button>
+          <button className="tap inline-flex items-center gap-1.5" aria-label="Share">
+            <Send className="h-[17px] w-[17px]" strokeWidth={1.6} />
+            {item.shares !== undefined && <span className="t-caption tabular-nums">{item.shares}</span>}
+          </button>
+          <button className="tap" aria-label="Save">
+            <Bookmark className="h-[18px] w-[18px]" strokeWidth={1.6} />
+          </button>
+        </div>
       </div>
     </article>
   );
