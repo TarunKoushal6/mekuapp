@@ -47,8 +47,8 @@ const Profile = () => {
         </div>
         {/* Avatar overlay — mascot ring */}
         <div className="absolute -bottom-10 left-4">
-          <div className="flex h-[88px] w-[88px] items-center justify-center rounded-full border-[3px] border-background bg-surface-2 overflow-hidden">
-            <Mascot size={84} pose="waving" />
+          <div className="flex h-[96px] w-[96px] items-center justify-center rounded-full border-[3px] border-background bg-surface overflow-hidden">
+            <Mascot size={78} pose="waving" />
           </div>
         </div>
       </div>
