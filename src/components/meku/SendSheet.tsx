@@ -27,7 +27,12 @@ export const SendSheet = ({ open, onOpenChange, defaults, recipientLabel, title 
     if (busy) return;
     setBusy(true);
     try {
-      const start = await startSend({ ...defaults, amount, kind: defaults?.kind ?? "send" });
+      const start = await startSend({
+        ...defaults,
+        amount,
+        destinationAddress: needsAddress ? address : defaults?.destinationAddress,
+        kind: defaults?.kind ?? "send",
+      });
       await executeChallenge({
         challengeId: start.challengeId,
         userToken: start.userToken,
