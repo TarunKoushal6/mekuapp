@@ -12,8 +12,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Geist', 'ui-sans-serif', 'system-ui', '-apple-system', 'sans-serif'],
-        serif: ['"Instrument Serif"', 'Times New Roman', 'serif'],
+        sans: ['Satoshi', 'ui-sans-serif', 'system-ui', '-apple-system', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -21,6 +20,7 @@ export default {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        "primary-soft": "hsl(var(--primary-soft))",
         surface: {
           DEFAULT: "hsl(var(--surface))",
           2: "hsl(var(--surface-2))",
