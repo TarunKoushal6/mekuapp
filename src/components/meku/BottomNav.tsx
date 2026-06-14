@@ -1,13 +1,19 @@
 import { NavLink, useLocation } from "react-router-dom";
-import { Home, Users, Plus, Wallet, User } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  IconHome,
+  IconCommunity,
+  IconPlus,
+  IconWallet,
+  IconProfile,
+} from "./MekuIcon";
 
 const items = [
-  { to: "/home", label: "Home", icon: Home },
-  { to: "/explore", label: "Friends", icon: Users },
-  { to: "/create", label: "Create", icon: Plus, primary: true },
-  { to: "/wallet", label: "Wallet", icon: Wallet },
-  { to: "/profile", label: "Profile", icon: User },
+  { to: "/home", label: "Home", icon: IconHome },
+  { to: "/explore", label: "Friends", icon: IconCommunity },
+  { to: "/create", label: "Create", icon: IconPlus, primary: true },
+  { to: "/wallet", label: "Wallet", icon: IconWallet },
+  { to: "/profile", label: "Profile", icon: IconProfile },
 ];
 
 export const BottomNav = () => {
@@ -28,9 +34,9 @@ export const BottomNav = () => {
                   <NavLink
                     to={to}
                     aria-label={label}
-                    className="tap inline-flex h-[44px] w-[44px] items-center justify-center rounded-[12px] gradient-purple text-primary-foreground shadow-purple"
+                    className="tap inline-flex h-[44px] w-[44px] items-center justify-center rounded-[14px] gradient-purple text-primary-foreground shadow-purple"
                   >
-                    <Icon className="h-[22px] w-[22px]" strokeWidth={2.2} />
+                    <Icon size={22} />
                   </NavLink>
                 </li>
               );
@@ -42,10 +48,10 @@ export const BottomNav = () => {
                   aria-label={label}
                   className={cn(
                     "tap inline-flex h-[40px] w-[40px] items-center justify-center rounded-full",
-                    active ? "text-primary" : "text-muted-foreground"
+                    active ? "text-primary" : "text-muted-foreground",
                   )}
                 >
-                  <Icon className="h-[22px] w-[22px]" strokeWidth={active ? 2.2 : 1.7} />
+                  <Icon size={22} />
                 </NavLink>
               </li>
             );

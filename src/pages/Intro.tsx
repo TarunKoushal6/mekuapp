@@ -1,30 +1,36 @@
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
-import mPurple from "@/assets/meku_m_purple.png.asset.json";
+import mMark from "@/assets/meku_m.png.asset.json";
+import wordmark from "@/assets/meku_wordmark.png.asset.json";
 
 /**
- * Intro / welcome screen — dark, big purple M, "Connect. Share. Own."
- * Matches reference UI #1.
+ * Intro / welcome — clean white canvas, purple M, "Connect. Share. Own."
  */
 const Intro = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="relative mx-auto flex min-h-screen w-full max-w-[440px] flex-col px-7 pb-10 pt-[72px]">
-        {/* Big M logo */}
+        {/* Mark + wordmark, balanced spacing */}
         <div className="mt-6 flex flex-col items-center">
-          <MLogo />
-          <p
-            className="mt-5 text-foreground"
-            style={{ fontWeight: 500, fontSize: 22, letterSpacing: "0.42em" }}
-            aria-label="MEKU"
-          >
-            M E K U
-          </p>
+          <img
+            src={mMark.url}
+            alt=""
+            className="h-[168px] w-[168px] select-none object-contain"
+            draggable={false}
+          />
+          <img
+            src={wordmark.url}
+            alt="MEKU"
+            className="wordmark-img mt-6 h-[26px] w-auto select-none object-contain"
+            draggable={false}
+          />
         </div>
 
-        {/* Tagline */}
         <div className="mt-auto">
-          <h1 className="text-foreground" style={{ fontWeight: 700, fontSize: 38, lineHeight: 1.1, letterSpacing: "-0.02em" }}>
+          <h1
+            className="text-foreground"
+            style={{ fontWeight: 700, fontSize: 38, lineHeight: 1.1, letterSpacing: "-0.02em" }}
+          >
             Connect.<br />Share.<br />Own.
           </h1>
           <p className="mt-5 text-[15px] leading-[1.55] text-muted-foreground">
@@ -44,14 +50,5 @@ const Intro = () => {
     </div>
   );
 };
-
-const MLogo = () => (
-  <img
-    src={mPurple.url}
-    alt="MEKU"
-    className="h-[200px] w-[200px] select-none object-contain"
-    draggable={false}
-  />
-);
 
 export default Intro;

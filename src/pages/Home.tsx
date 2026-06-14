@@ -1,7 +1,9 @@
 import { AppShell } from "@/components/meku/AppShell";
 import { FeedCard } from "@/components/meku/FeedCard";
 import { EmptyState } from "@/components/meku/EmptyState";
-import { Bell, Plus, Loader2, ArrowUp, ArrowDown, ArrowLeftRight, Clock, Eye } from "lucide-react";
+import { Loader2, Eye } from "lucide-react";
+import { IconBell, IconSend, IconAssets, IconSwap, IconActivity, IconPlus } from "@/components/meku/MekuIcon";
+import { Logo } from "@/components/meku/Logo";
 import { Link } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
 import { cn } from "@/lib/utils";
@@ -35,9 +37,9 @@ const Home = () => {
     <AppShell>
       {/* Top header */}
       <header className="flex items-center justify-between px-5 pb-2 pt-4">
-        <p className="text-foreground" style={{ fontWeight: 500, fontSize: 18, letterSpacing: "0.38em" }}>M E K U</p>
-        <Link to="/notifications" aria-label="Notifications" className="tap relative inline-flex h-10 w-10 items-center justify-center rounded-full">
-          <Bell className="h-[20px] w-[20px]" strokeWidth={1.7} />
+        <Logo size={22} />
+        <Link to="/notifications" aria-label="Notifications" className="tap relative inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground">
+          <IconBell size={20} />
           <span className="absolute right-2 top-2 h-[7px] w-[7px] rounded-full bg-primary" />
         </Link>
       </header>
@@ -69,10 +71,10 @@ const Home = () => {
           </div>
 
           <div className="mt-5 grid grid-cols-4 gap-2">
-            <QuickAction to="/onchain" icon={ArrowUp} label="Send" />
-            <QuickAction to="/onchain" icon={ArrowDown} label="Receive" />
-            <QuickAction to="/onchain" icon={ArrowLeftRight} label="Swap" />
-            <QuickAction to="/wallet" icon={Clock} label="History" />
+            <QuickAction to="/wallet" icon={IconSend} label="Send" />
+            <QuickAction to="/wallet" icon={IconAssets} label="Receive" />
+            <QuickAction to="/onchain" icon={IconSwap} label="Swap" />
+            <QuickAction to="/wallet" icon={IconActivity} label="History" />
           </div>
 
           {/* decorative wave */}
@@ -109,7 +111,7 @@ const Home = () => {
             description="Share your first post to bring it to life."
             action={
               <Link to="/create" className="tap inline-flex h-[44px] items-center gap-2 rounded-full gradient-purple px-5 text-[14px] font-semibold text-primary-foreground">
-                <Plus className="h-[16px] w-[16px]" strokeWidth={2.2} />
+                <IconPlus size={16} />
                 New post
               </Link>
             }
@@ -125,8 +127,8 @@ const Home = () => {
 const StoryItem = ({ add, label }: { add?: boolean; label: string }) => (
   <div className="flex w-[68px] shrink-0 flex-col items-center gap-1.5">
     <button className={cn("tap relative h-[60px] w-[60px] rounded-full p-[2px]", add ? "bg-border" : "gradient-purple")}>
-      <div className="flex h-full w-full items-center justify-center rounded-full bg-surface-2">
-        {add && <Plus className="h-[20px] w-[20px] text-foreground" strokeWidth={2} />}
+      <div className="flex h-full w-full items-center justify-center rounded-full bg-surface-2 text-foreground">
+        {add && <IconPlus size={20} />}
       </div>
     </button>
     <span className="truncate text-[11px] text-muted-foreground">{label}</span>
@@ -136,7 +138,7 @@ const StoryItem = ({ add, label }: { add?: boolean; label: string }) => (
 const QuickAction = ({ to, icon: Icon, label }: { to: string; icon: any; label: string }) => (
   <Link to={to} className="tap flex flex-col items-center gap-1.5 text-white">
     <span className="inline-flex h-[44px] w-[44px] items-center justify-center rounded-full bg-white/15 backdrop-blur">
-      <Icon className="h-[18px] w-[18px]" strokeWidth={2} />
+      <Icon size={18} />
     </span>
     <span className="text-[11px] font-medium">{label}</span>
   </Link>

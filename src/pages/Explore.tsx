@@ -2,7 +2,7 @@ import { AppShell } from "@/components/meku/AppShell";
 import { TopBar } from "@/components/meku/TopBar";
 import { Logo } from "@/components/meku/Logo";
 import { EmptyState } from "@/components/meku/EmptyState";
-import { Search } from "lucide-react";
+import { IconSearch } from "@/components/meku/MekuIcon";
 import { useState } from "react";
 
 const Explore = () => {
@@ -11,7 +11,7 @@ const Explore = () => {
 
   return (
     <AppShell>
-      <TopBar left={<div className="pl-2"><Logo size={36} wordmark={false} appIcon /></div>} />
+      <TopBar left={<div className="pl-3"><Logo size={20} /></div>} />
 
       <section className="px-4 pb-4 pt-4">
         <h1 className="t-h2 text-foreground">Explore</h1>
@@ -19,7 +19,7 @@ const Explore = () => {
 
       <div className="px-4">
         <label className="flex h-[48px] items-center gap-3 rounded-full bg-surface-2 px-4">
-          <Search className="h-[18px] w-[18px] text-muted-foreground" strokeWidth={1.8} />
+          <IconSearch size={18} />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}

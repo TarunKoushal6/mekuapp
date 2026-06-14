@@ -1,8 +1,7 @@
 import { AppShell } from "@/components/meku/AppShell";
 import { TopBar, IconButton } from "@/components/meku/TopBar";
-import { Logo } from "@/components/meku/Logo";
 import { EmptyState } from "@/components/meku/EmptyState";
-import { ChevronLeft } from "lucide-react";
+import { IconBack, IconBell } from "@/components/meku/MekuIcon";
 import { useNavigate } from "react-router-dom";
 
 const Notifications = () => {
@@ -14,10 +13,15 @@ const Notifications = () => {
       <TopBar
         left={
           <IconButton ariaLabel="Back" onClick={() => navigate(-1)}>
-            <ChevronLeft className="h-[22px] w-[22px]" strokeWidth={1.6} />
+            <IconBack size={22} />
           </IconButton>
         }
         title={<span className="text-[15px] font-bold">Notifications</span>}
+        right={
+          <IconButton ariaLabel="Notifications">
+            <IconBell size={20} />
+          </IconButton>
+        }
       />
 
       <section className="px-4 pb-4 pt-4">

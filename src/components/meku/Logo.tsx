@@ -1,66 +1,49 @@
 import { cn } from "@/lib/utils";
-import logoFull from "@/assets/meku_logo_full.png.asset.json";
-import appIcon from "@/assets/meku_app_icon.png.asset.json";
+import mMark from "@/assets/meku_m.png.asset.json";
+import wordmark from "@/assets/meku_wordmark.png.asset.json";
 
 interface LogoProps {
-  /** Height in px of the logo lockup. */
+  /** Height in px. Wordmark or mark height depending on `wordmark`. */
   size?: number;
   className?: string;
-  /** Show the full mark + wordmark stack. Default true. */
+  /** Show the wordmark lockup ("MEKU"). Default true. */
   wordmark?: boolean;
-  /** Use the colored app-icon variant (dark gradient tile with purple M). */
+  /** Show the purple M mark (alias for !wordmark). */
   appIcon?: boolean;
 }
 
 /**
- * MEKU brand logo — official locked asset. Do not redraw.
+ * MEKU brand — official locked assets.
+ * - wordmark = full "MEKU" text in brand font
+ * - mark     = purple gradient M
  */
 export const Logo = ({
   size = 28,
   className,
-  wordmark = true,
-  appIcon: useAppIcon = false,
+  wordmark: showWordmark = true,
+  appIcon,
 }: LogoProps) => {
-  if (useAppIcon) {
+  const useMark = appIcon === true || showWordmark === false;
+  if (useMark) {
     return (
       <img
-        src={appIcon.url}
+        src={mMark.url}
         alt="MEKU"
         height={size}
         className={cn("block select-none", className)}
-        style={{ height: size, width: "auto" }}
+        style={{ height: size, width: size }}
         draggable={false}
       />
     );
   }
-
-  if (wordmark) {
-    return (
-      <img
-        src={logoFull.url}
-        alt="MEKU"
-        height={size}
-        className={cn("block select-none", className)}
-        style={{ height: size, width: "auto" }}
-        draggable={false}
-      />
-    );
-  }
-
-  // Mark-only: crop the top portion of the lockup via aspect-ratio + object-position.
   return (
-    <div
-      className={cn("inline-block overflow-hidden", className)}
-      style={{ height: size, width: size, aspectRatio: "1 / 1" }}
-      aria-label="MEKU"
-    >
-      <img
-        src={logoFull.url}
-        alt="MEKU"
-        className="block select-none object-cover object-top"
-        style={{ height: size * 1.55, width: size * 1.55, marginLeft: -size * 0.275 }}
-        draggable={false}
-      />
-    </div>
+    <img
+      src={wordmark.url}
+      alt="MEKU"
+      height={size}
+      className={cn("wordmark-img block select-none", className)}
+      style={{ height: size, width: "auto" }}
+      draggable={false}
+    />
   );
 };
