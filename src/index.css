@@ -125,14 +125,24 @@
   .gradient-card { background: var(--gradient-card); }
   .shadow-purple { box-shadow: var(--shadow-purple); }
 
-  /* Asset protection: disable long-press save, drag, selection on brand media */
-  .no-save {
-    -webkit-user-select: none;
-    user-select: none;
-    -webkit-user-drag: none;
-    -webkit-touch-callout: none;
+  /* Asset protection: block long-press save, drag, iOS callout, selection */
+  .no-save,
+  .no-save * {
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    user-select: none !important;
+    -webkit-user-drag: none !important;
+    -webkit-touch-callout: none !important;
+    -webkit-tap-highlight-color: transparent;
+    pointer-events: auto;
   }
-  img { -webkit-touch-callout: none; -webkit-user-drag: none; }
+  img {
+    -webkit-touch-callout: none;
+    -webkit-user-drag: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
 
   .wordmark-img { filter: none; }
   .dark .wordmark-img { filter: invert(1); }
