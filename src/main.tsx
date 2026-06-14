@@ -4,12 +4,14 @@ import "./index.css";
 import { AuthProvider } from "./hooks/useAuth.tsx";
 import { ThemeProvider } from "./hooks/useTheme.tsx";
 import { WalletProvider } from "./hooks/useWallet.tsx";
+import { PinChallengeModal } from "./components/meku/PinChallengeModal.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <ThemeProvider>
     <AuthProvider>
       <WalletProvider>
         <App />
+        <PinChallengeModal />
       </WalletProvider>
     </AuthProvider>
   </ThemeProvider>
