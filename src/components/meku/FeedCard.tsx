@@ -2,113 +2,105 @@ import { Heart, MessageCircle, Repeat2, Upload, MoreHorizontal, BadgeCheck } fro
 import { Avatar } from "./Avatar";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-
-export interface FeedItem {
-  id: string;
-  author: { name: string; handle: string; verified?: boolean };
-  time: string;
-  title?: string;
-  body: string;
-  image?: string;
-  tag?: string;
-  likes: number;
-  comments: number;
-  shares?: number;
-}
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
+import { toggleLike, type Post, timeAgo } from "@/lib/social";
 
 interface FeedCardProps {
-  item: FeedItem;
+  post: Post;
+  onChanged?: () => void;
 }
 
-/**
- * Feed card matched to MEKU reference frames:
- * header — avatar · name @handle · time · …
- * body  — title (optional) + body, then optional image (rounded 14)
- * actions — comment, repost, like, share (counts inline, share has no count)
- */
-export const FeedCard = ({ item }: FeedCardProps) => {
-  const [liked, setLiked] = useState(false);
+export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [liked, setLiked] = useState(post.liked_by_me);
+  const [likeCount, setLikeCount] = useState(post.like_count);
+  const author = post.author;
+  const name = author?.display_name || author?.username || "Anonymous";
+  const handle = author?.username || "anon";
+
+  const handleLike = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+    const next = !liked;
+    setLiked(next);
+    setLikeCount((c) => c + (next ? 1 : -1));
+    try {
+      await toggleLike(post.id, user.id, liked);
+      onChanged?.();
+    } catch (err: any) {
+      setLiked(!next);
+      setLikeCount((c) => c + (next ? -1 : 1));
+      toast.error(err.message ?? "Could not update like");
+    }
+  };
+
+  const handleShare = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const url = `${window.location.origin}/p/${post.id}`;
+    try {
+      if (navigator.share) await navigator.share({ url, title: post.title || "MEKU post" });
+      else {
+        await navigator.clipboard.writeText(url);
+        toast.success("Link copied");
+      }
+    } catch {}
+  };
 
   return (
-    <article className="hairline-b fade-in px-4 py-4">
-      {/* Meta row */}
+    <article
+      onClick={() => navigate(`/p/${post.id}`)}
+      className="hairline-b fade-in cursor-pointer px-4 py-4 transition-colors hover:bg-surface/40"
+    >
       <header className="flex items-start gap-3">
-        <Avatar name={item.author.name} size="md" />
+        <Link to={`/u/${handle}`} onClick={(e) => e.stopPropagation()}>
+          <Avatar name={name} src={author?.avatar_url ?? undefined} size="md" />
+        </Link>
         <div className="flex min-w-0 flex-1 items-center gap-1.5">
-          <p className="truncate text-[15px] font-semibold text-foreground">{item.author.name}</p>
-          {item.author.verified && (
+          <p className="truncate text-[15px] font-semibold text-foreground">{name}</p>
+          {author?.verified && (
             <BadgeCheck className="h-[14px] w-[14px] shrink-0 fill-primary text-background" strokeWidth={2.2} />
           )}
-          <span className="truncate text-[14px] text-muted-foreground">@{item.author.handle}</span>
+          <span className="truncate text-[14px] text-muted-foreground">@{handle}</span>
           <span className="text-[14px] text-muted-foreground">·</span>
-          <span className="shrink-0 text-[14px] text-muted-foreground">{item.time}</span>
+          <span className="shrink-0 text-[14px] text-muted-foreground">{timeAgo(post.created_at)}</span>
         </div>
-        <button
-          aria-label="More"
-          className="tap -mr-2 -mt-1 inline-flex h-8 w-8 items-center justify-center text-muted-foreground"
-        >
+        <button aria-label="More" onClick={(e) => e.stopPropagation()} className="tap -mr-2 -mt-1 inline-flex h-8 w-8 items-center justify-center text-muted-foreground">
           <MoreHorizontal className="h-[18px] w-[18px]" strokeWidth={1.6} />
         </button>
       </header>
 
-      {/* Body */}
       <div className="ml-[52px] mt-1.5">
-        {item.title && (
-          <h2 className="text-[15.5px] font-semibold leading-[1.4] tracking-[-0.005em] text-foreground">
-            {item.title}
-          </h2>
-        )}
-        {item.body && (
-          <p className={(item.title ? "mt-1 " : "") + "text-[15px] leading-[1.5] text-foreground/90"}>
-            {item.body}
-          </p>
-        )}
-
-        {item.image && (
+        {post.title && <h2 className="text-[15.5px] font-semibold leading-[1.4] tracking-[-0.005em] text-foreground">{post.title}</h2>}
+        {post.body && <p className={(post.title ? "mt-1 " : "") + "whitespace-pre-wrap text-[15px] leading-[1.5] text-foreground/90"}>{post.body}</p>}
+        {post.image_url && (
           <div className="mt-3 overflow-hidden rounded-[14px] border border-border bg-surface-2">
-            <img
-              src={item.image}
-              alt=""
-              loading="lazy"
-              className="aspect-[5/4] w-full object-cover"
-            />
+            <img src={post.image_url} alt="" loading="lazy" className="aspect-[5/4] w-full object-cover" />
           </div>
         )}
 
-        {/* Action row — order: comment, repost, like, share */}
         <div className="mt-3 flex items-center justify-between pr-1 text-muted-foreground">
-          <button className="tap inline-flex items-center gap-1.5" aria-label="Comment">
-            <MessageCircle className="h-[18px] w-[18px]" strokeWidth={1.6} />
-            <span className="text-[13px] tabular-nums">{item.comments}</span>
-          </button>
-          <button className="tap inline-flex items-center gap-1.5" aria-label="Repost">
-            <Repeat2 className="h-[18px] w-[18px]" strokeWidth={1.6} />
-            {item.shares !== undefined && (
-              <span className="text-[13px] tabular-nums">{item.shares}</span>
-            )}
-          </button>
           <button
-            onClick={() => setLiked((v) => !v)}
+            onClick={(e) => { e.stopPropagation(); navigate(`/p/${post.id}`); }}
             className="tap inline-flex items-center gap-1.5"
-            aria-label="Like"
+            aria-label="Comment"
           >
-            <Heart
-              className={cn(
-                "h-[18px] w-[18px] transition-colors",
-                liked ? "fill-[#ef3b6b] text-[#ef3b6b]" : ""
-              )}
-              strokeWidth={1.6}
-            />
-            <span
-              className={cn(
-                "text-[13px] tabular-nums",
-                liked ? "text-[#ef3b6b]" : ""
-              )}
-            >
-              {item.likes + (liked ? 1 : 0)}
-            </span>
+            <MessageCircle className="h-[18px] w-[18px]" strokeWidth={1.6} />
+            <span className="text-[13px] tabular-nums">{post.comment_count}</span>
           </button>
-          <button className="tap" aria-label="Share">
+          <button onClick={(e) => e.stopPropagation()} className="tap inline-flex items-center gap-1.5" aria-label="Repost">
+            <Repeat2 className="h-[18px] w-[18px]" strokeWidth={1.6} />
+          </button>
+          <button onClick={handleLike} className="tap inline-flex items-center gap-1.5" aria-label="Like">
+            <Heart className={cn("h-[18px] w-[18px] transition-colors", liked && "fill-[#ef3b6b] text-[#ef3b6b]")} strokeWidth={1.6} />
+            <span className={cn("text-[13px] tabular-nums", liked && "text-[#ef3b6b]")}>{likeCount}</span>
+          </button>
+          <button onClick={handleShare} className="tap" aria-label="Share">
             <Upload className="h-[18px] w-[18px]" strokeWidth={1.6} />
           </button>
         </div>

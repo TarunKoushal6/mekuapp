@@ -1,0 +1,155 @@
+import { supabase } from "@/integrations/supabase/client";
+
+export interface Profile {
+  id: string;
+  username: string | null;
+  display_name: string | null;
+  bio: string | null;
+  avatar_url: string | null;
+  verified: boolean;
+}
+
+export interface Post {
+  id: string;
+  user_id: string;
+  title: string | null;
+  body: string;
+  image_url: string | null;
+  created_at: string;
+  author: Profile | null;
+  like_count: number;
+  comment_count: number;
+  liked_by_me: boolean;
+}
+
+export interface CommentRow {
+  id: string;
+  post_id: string;
+  user_id: string;
+  parent_id: string | null;
+  body: string;
+  created_at: string;
+  author: Profile | null;
+}
+
+export const timeAgo = (iso: string) => {
+  const s = (Date.now() - new Date(iso).getTime()) / 1000;
+  if (s < 60) return `${Math.floor(s)}s`;
+  if (s < 3600) return `${Math.floor(s / 60)}m`;
+  if (s < 86400) return `${Math.floor(s / 3600)}h`;
+  if (s < 604800) return `${Math.floor(s / 86400)}d`;
+  return new Date(iso).toLocaleDateString();
+};
+
+export async function fetchPosts(viewerId?: string | null): Promise<Post[]> {
+  const { data: posts, error } = await supabase
+    .from("posts")
+    .select("id, user_id, title, body, image_url, created_at")
+    .order("created_at", { ascending: false })
+    .limit(50);
+  if (error) throw error;
+  if (!posts || posts.length === 0) return [];
+
+  const ids = posts.map((p) => p.id);
+  const userIds = Array.from(new Set(posts.map((p) => p.user_id)));
+
+  const [{ data: profiles }, { data: likes }, { data: comments }, { data: myLikes }] = await Promise.all([
+    supabase.from("profiles").select("*").in("id", userIds),
+    supabase.from("post_likes").select("post_id").in("post_id", ids),
+    supabase.from("comments").select("post_id").in("post_id", ids),
+    viewerId
+      ? supabase.from("post_likes").select("post_id").eq("user_id", viewerId).in("post_id", ids)
+      : Promise.resolve({ data: [] as { post_id: string }[] }),
+  ]);
+
+  const pMap = new Map((profiles ?? []).map((p: any) => [p.id, p as Profile]));
+  const likeCount = new Map<string, number>();
+  (likes ?? []).forEach((l: any) => likeCount.set(l.post_id, (likeCount.get(l.post_id) ?? 0) + 1));
+  const cmtCount = new Map<string, number>();
+  (comments ?? []).forEach((c: any) => cmtCount.set(c.post_id, (cmtCount.get(c.post_id) ?? 0) + 1));
+  const liked = new Set((myLikes ?? []).map((l: any) => l.post_id));
+
+  return posts.map((p: any) => ({
+    ...p,
+    author: pMap.get(p.user_id) ?? null,
+    like_count: likeCount.get(p.id) ?? 0,
+    comment_count: cmtCount.get(p.id) ?? 0,
+    liked_by_me: liked.has(p.id),
+  }));
+}
+
+export async function fetchPost(id: string, viewerId?: string | null): Promise<Post | null> {
+  const { data, error } = await supabase
+    .from("posts")
+    .select("id, user_id, title, body, image_url, created_at")
+    .eq("id", id)
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+  const [{ data: author }, { count: lc }, { count: cc }, mine] = await Promise.all([
+    supabase.from("profiles").select("*").eq("id", data.user_id).maybeSingle(),
+    supabase.from("post_likes").select("*", { count: "exact", head: true }).eq("post_id", id),
+    supabase.from("comments").select("*", { count: "exact", head: true }).eq("post_id", id),
+    viewerId
+      ? supabase.from("post_likes").select("post_id").eq("post_id", id).eq("user_id", viewerId).maybeSingle()
+      : Promise.resolve({ data: null }),
+  ]);
+  return {
+    ...data,
+    author: (author as Profile) ?? null,
+    like_count: lc ?? 0,
+    comment_count: cc ?? 0,
+    liked_by_me: !!(mine as any)?.data,
+  };
+}
+
+export async function toggleLike(postId: string, userId: string, currentlyLiked: boolean) {
+  if (currentlyLiked) {
+    const { error } = await supabase.from("post_likes").delete().eq("post_id", postId).eq("user_id", userId);
+    if (error) throw error;
+  } else {
+    const { error } = await supabase.from("post_likes").insert({ post_id: postId, user_id: userId });
+    if (error) throw error;
+  }
+}
+
+export async function fetchComments(postId: string): Promise<CommentRow[]> {
+  const { data, error } = await supabase
+    .from("comments")
+    .select("*")
+    .eq("post_id", postId)
+    .order("created_at", { ascending: true });
+  if (error) throw error;
+  const userIds = Array.from(new Set((data ?? []).map((c: any) => c.user_id)));
+  if (userIds.length === 0) return [];
+  const { data: profiles } = await supabase.from("profiles").select("*").in("id", userIds);
+  const pMap = new Map((profiles ?? []).map((p: any) => [p.id, p as Profile]));
+  return (data ?? []).map((c: any) => ({ ...c, author: pMap.get(c.user_id) ?? null }));
+}
+
+export async function createComment(postId: string, userId: string, body: string, parentId?: string | null) {
+  const { error } = await supabase
+    .from("comments")
+    .insert({ post_id: postId, user_id: userId, body, parent_id: parentId ?? null });
+  if (error) throw error;
+}
+
+export async function createPost(userId: string, body: string, title?: string) {
+  const { data, error } = await supabase
+    .from("posts")
+    .insert({ user_id: userId, body, title: title || null })
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function getProfile(userId: string): Promise<Profile | null> {
+  const { data } = await supabase.from("profiles").select("*").eq("id", userId).maybeSingle();
+  return (data as Profile) ?? null;
+}
+
+export async function updateProfile(userId: string, patch: Partial<Profile>) {
+  const { error } = await supabase.from("profiles").update(patch).eq("id", userId);
+  if (error) throw error;
+}
