@@ -3,7 +3,7 @@ import { Home, Globe, Plus, MessageSquare, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const items = [
-  { to: "/", label: "Home", icon: Home },
+  { to: "/home", label: "Home", icon: Home },
   { to: "/explore", label: "Explore", icon: Globe },
   { to: "/create", label: "Create", icon: Plus, primary: true },
   { to: "/inbox", label: "Messages", icon: MessageSquare },
