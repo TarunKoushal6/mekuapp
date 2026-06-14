@@ -2,58 +2,51 @@
 @tailwind components;
 @tailwind utilities;
 
-/* MEKU — first-principles design system.
-   Tokens lifted verbatim from the brief:
-   bg #FAFAF8 · surface #FFFFFF · ink #111111 · secondary #666666 · border #EAEAEA · accent #7C5CFF
-   Ratio 85% off-white · 10% charcoal · 5% purple. */
+/* MEKU — strict white + purple system. No cream, no serif. */
 
 @layer base {
   :root {
-    /* surfaces & ink */
-    --background: 60 14% 98%;        /* #FAFAF8 */
-    --foreground: 0 0% 7%;           /* #111111 */
-    --surface: 0 0% 100%;            /* #FFFFFF */
-    --surface-2: 60 10% 96%;         /* subtle press state */
+    --background: 0 0% 100%;          /* pure white */
+    --foreground: 0 0% 7%;            /* near-black ink */
+    --surface: 0 0% 100%;
+    --surface-2: 220 14% 96%;         /* very subtle cool grey */
 
-    --muted: 60 10% 96%;
-    --muted-foreground: 0 0% 40%;    /* #666666 */
-    --secondary-ink: 0 0% 40%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
 
     --card: 0 0% 100%;
     --card-foreground: 0 0% 7%;
-
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 7%;
 
-    --primary: 249 100% 68%;         /* #7C5CFF */
+    --primary: 252 95% 67%;           /* MEKU purple */
     --primary-foreground: 0 0% 100%;
+    --primary-soft: 252 100% 96%;     /* tint for badges/halos */
 
-    --secondary: 60 10% 96%;
+    --secondary: 220 14% 96%;
     --secondary-foreground: 0 0% 7%;
 
-    --accent: 249 100% 68%;
+    --accent: 252 95% 67%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 6 78% 56%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Single hairline. Used sparingly. */
-    --border: 60 6% 92%;             /* #EAEAEA */
-    --input: 60 6% 92%;
-    --ring: 249 100% 68%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 252 95% 67%;
 
     --radius: 14px;
 
-    --sidebar-background: 60 14% 98%;
+    --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 0 0% 7%;
-    --sidebar-primary: 249 100% 68%;
+    --sidebar-primary: 252 95% 67%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 60 10% 96%;
+    --sidebar-accent: 220 14% 96%;
     --sidebar-accent-foreground: 0 0% 7%;
-    --sidebar-border: 60 6% 92%;
-    --sidebar-ring: 249 100% 68%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 252 95% 67%;
 
-    /* Motion — Apple-quality timings from the brief */
     --ease: cubic-bezier(0.32, 0.72, 0, 1);
     --d1: 120ms;
     --d2: 180ms;
@@ -62,88 +55,62 @@
   }
 
   .dark {
-    --background: 0 0% 6%;
-    --foreground: 60 14% 98%;
-    --surface: 0 0% 9%;
+    --background: 0 0% 5%;
+    --foreground: 0 0% 98%;
+    --surface: 0 0% 8%;
     --surface-2: 0 0% 12%;
-    --card: 0 0% 9%;
-    --card-foreground: 60 14% 98%;
-    --popover: 0 0% 9%;
-    --popover-foreground: 60 14% 98%;
-    --primary: 249 100% 72%;
-    --primary-foreground: 0 0% 6%;
+    --card: 0 0% 8%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 252 95% 72%;
+    --primary-foreground: 0 0% 5%;
+    --primary-soft: 252 60% 18%;
     --secondary: 0 0% 12%;
-    --secondary-foreground: 60 14% 98%;
+    --secondary-foreground: 0 0% 98%;
     --muted: 0 0% 12%;
     --muted-foreground: 0 0% 64%;
-    --accent: 249 100% 72%;
-    --accent-foreground: 0 0% 6%;
+    --accent: 252 95% 72%;
+    --accent-foreground: 0 0% 5%;
     --border: 0 0% 16%;
     --input: 0 0% 16%;
-    --ring: 249 100% 72%;
+    --ring: 252 95% 72%;
   }
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
+  * { @apply border-border; }
 
   html, body, #root { height: 100%; }
-
-  html {
-    -webkit-text-size-adjust: 100%;
-    text-size-adjust: 100%;
-  }
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Satoshi', ui-sans-serif, system-ui, -apple-system, 'SF Pro Text', 'Segoe UI', sans-serif;
-    font-feature-settings: "ss01", "ss03", "cv11";
-    font-variant-ligatures: common-ligatures;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
-    letter-spacing: -0.005em;
+    letter-spacing: -0.01em;
   }
 
-  ::selection {
-    background: hsl(var(--foreground));
-    color: hsl(var(--background));
-  }
-
-  /* Scrollbar — invisible by default, calm. */
+  ::selection { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); }
   ::-webkit-scrollbar { width: 0; height: 0; }
 }
 
 @layer components {
-  .font-serif {
-    font-family: 'Instrument Serif', 'Times New Roman', serif;
-    font-weight: 400;
-    font-style: normal;
-    letter-spacing: -0.015em;
-  }
-  .font-serif-italic {
-    font-family: 'Instrument Serif', 'Times New Roman', serif;
-    font-style: italic;
-    font-weight: 400;
-  }
+  /* Bold type scale — no serif, no calligraphy. */
+  .t-display { font-size: 56px; line-height: 1.02; letter-spacing: -0.035em; font-weight: 700; }
+  .t-h1      { font-size: 40px; line-height: 1.05; letter-spacing: -0.03em; font-weight: 700; }
+  .t-h2      { font-size: 32px; line-height: 1.08; letter-spacing: -0.025em; font-weight: 700; }
+  .t-h3      { font-size: 24px; line-height: 1.18; letter-spacing: -0.02em; font-weight: 700; }
+  .t-lg      { font-size: 18px; line-height: 1.5; letter-spacing: -0.01em; }
+  .t-body    { font-size: 16px; line-height: 1.55; }
+  .t-caption { font-size: 13px; line-height: 1.45; }
+  .t-eyebrow { font-size: 11px; line-height: 1; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 600; }
 
-  /* Type scale from brief (px → leading) */
-  .t-display { font-size: 56px; line-height: 1.02; letter-spacing: -0.025em; }
-  .t-h1      { font-size: 40px; line-height: 1.05; letter-spacing: -0.022em; }
-  .t-h2      { font-size: 32px; line-height: 1.08; letter-spacing: -0.02em; }
-  .t-h3      { font-size: 24px; line-height: 1.18; letter-spacing: -0.015em; }
-  .t-lg      { font-size: 18px; line-height: 1.55; letter-spacing: -0.005em; }
-  .t-body    { font-size: 16px; line-height: 1.6; }
-  .t-caption { font-size: 13px; line-height: 1.45; letter-spacing: 0; }
-  .t-eyebrow { font-size: 11px; line-height: 1; letter-spacing: 0.14em; text-transform: uppercase; }
-
-  /* Hairline = single pixel, single color. Never decorative. */
   .hairline-t { border-top: 1px solid hsl(var(--border)); }
   .hairline-b { border-bottom: 1px solid hsl(var(--border)); }
 
-  /* Apple-style press: subtle scale + ms feedback. No bounce. */
   .tap {
     -webkit-tap-highlight-color: transparent;
     transition: transform var(--d2) var(--ease), opacity var(--d2) var(--ease), background-color var(--d2) var(--ease), color var(--d2) var(--ease);
@@ -154,5 +121,17 @@
   @keyframes m-fade {
     from { opacity: 0; transform: translateY(2px); }
     to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Purple wave — slow, organic drift used on the intro screen. */
+  .wave-spin { animation: wave-spin 24s linear infinite; transform-origin: 50% 50%; }
+  @keyframes wave-spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+  .wave-pulse { animation: wave-pulse 6s var(--ease) infinite; }
+  @keyframes wave-pulse {
+    0%, 100% { opacity: 0.85; transform: scale(1); }
+    50%      { opacity: 1;    transform: scale(1.04); }
   }
 }
