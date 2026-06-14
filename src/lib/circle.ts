@@ -1,15 +1,7 @@
-// Client-side Circle wrapper. Talks to our edge functions and the Circle web SDK.
-import { W3SSdk } from "@circle-fin/w3s-pw-web-sdk";
+// Client-side Circle wrapper. Talks to our edge functions and lazy-loads the
+// Circle web SDK so that its Node-only deps (jsonwebtoken/safe-buffer) don't
+// break the app on initial load.
 import { supabase } from "@/integrations/supabase/client";
-
-let sdk: W3SSdk | null = null;
-
-function getSdk(appId = "meku"): W3SSdk {
-  if (!sdk) {
-    sdk = new W3SSdk({ appSettings: { appId } });
-  }
-  return sdk;
-}
 
 async function invoke<T = any>(name: string, body?: unknown): Promise<T> {
   const { data, error } = await supabase.functions.invoke(name, { body });
@@ -60,19 +52,36 @@ export async function startSend(args: SendArgs) {
   }>("circle-send", args);
 }
 
+// Lazy-loaded SDK instance. Importing the SDK eagerly crashes the bundle
+// because it pulls jsonwebtoken which expects Node's Buffer global.
+let sdkPromise: Promise<any> | null = null;
+async function getSdk() {
+  if (!sdkPromise) {
+    sdkPromise = (async () => {
+      // Polyfill Buffer for the SDK's transitive deps before importing it.
+      const { Buffer } = await import("buffer");
+      (globalThis as any).Buffer ??= Buffer;
+      const mod = await import("@circle-fin/w3s-pw-web-sdk");
+      const W3SSdk = (mod as any).W3SSdk ?? (mod as any).default;
+      return new W3SSdk({ appSettings: { appId: "meku" } });
+    })();
+  }
+  return sdkPromise;
+}
+
 // Runs the Circle PIN UI for a given challenge id. Resolves on completion.
-export function executeChallenge(opts: {
+export async function executeChallenge(opts: {
   userToken: string;
   encryptionKey: string;
   challengeId: string;
 }): Promise<void> {
+  const s = await getSdk();
   return new Promise((resolve, reject) => {
-    const s = getSdk();
     s.setAuthentication({
       userToken: opts.userToken,
       encryptionKey: opts.encryptionKey,
     });
-    s.execute(opts.challengeId, (error) => {
+    s.execute(opts.challengeId, (error: unknown) => {
       if (error) return reject(error);
       resolve();
     });
