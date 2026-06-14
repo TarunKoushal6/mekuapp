@@ -18,8 +18,10 @@ const PRESETS = ["1", "5", "10", "25"];
 
 export const SendSheet = ({ open, onOpenChange, defaults, recipientLabel, title = "Send USDC" }: Props) => {
   const [amount, setAmount] = useState(defaults?.amount ?? "1");
+  const [address, setAddress] = useState(defaults?.destinationAddress ?? "");
   const [busy, setBusy] = useState(false);
   const { refresh, wallet } = useWallet();
+  const needsAddress = !defaults?.recipientUserId && !defaults?.destinationAddress;
 
   const submit = async () => {
     if (busy) return;
