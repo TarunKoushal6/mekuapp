@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import mPurple from "@/assets/meku_m_purple.png.asset.json";
 
 /**
  * Intro / welcome screen — dark, big purple M, "Connect. Share. Own."
