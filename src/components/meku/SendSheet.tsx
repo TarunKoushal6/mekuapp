@@ -77,6 +77,15 @@ export const SendSheet = ({ open, onOpenChange, defaults, recipientLabel, title 
           className="mt-4 h-12 w-full rounded-2xl border border-border bg-surface px-4 text-center text-[15px] outline-none focus:border-primary"
         />
 
+        {needsAddress && (
+          <input
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            placeholder="Recipient address (0x…)"
+            className="mt-3 h-12 w-full rounded-2xl border border-border bg-surface px-4 text-[13px] outline-none focus:border-primary font-mono"
+          />
+        )}
+
         <div className="mt-3 grid grid-cols-4 gap-2">
           {PRESETS.map((p) => (
             <button
