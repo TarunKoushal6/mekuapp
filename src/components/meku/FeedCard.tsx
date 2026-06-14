@@ -6,6 +6,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { toggleLike, type Post, timeAgo } from "@/lib/social";
+import { IconSend } from "./MekuIcon";
+import { SendSheet } from "./SendSheet";
 
 interface FeedCardProps {
   post: Post;
@@ -17,6 +19,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
   const navigate = useNavigate();
   const [liked, setLiked] = useState(post.liked_by_me);
   const [likeCount, setLikeCount] = useState(post.like_count);
+  const [tipOpen, setTipOpen] = useState(false);
   const author = post.author;
   const name = author?.display_name || author?.username || "Anonymous";
   const handle = author?.username || "anon";
@@ -100,11 +103,27 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
             <Heart className={cn("h-[18px] w-[18px] transition-colors", liked && "fill-[#ef3b6b] text-[#ef3b6b]")} strokeWidth={1.6} />
             <span className={cn("text-[13px] tabular-nums", liked && "text-[#ef3b6b]")}>{likeCount}</span>
           </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); if (!user) return navigate("/auth"); setTipOpen(true); }}
+            className="tap inline-flex items-center gap-1.5 text-primary"
+            aria-label="Tip USDC"
+          >
+            <IconSend size={18} />
+          </button>
           <button onClick={handleShare} className="tap" aria-label="Share">
             <Upload className="h-[18px] w-[18px]" strokeWidth={1.6} />
           </button>
         </div>
       </div>
+      {tipOpen && author && (
+        <SendSheet
+          open={tipOpen}
+          onOpenChange={setTipOpen}
+          defaults={{ recipientUserId: post.user_id, postId: post.id, kind: "tip", amount: "1" }}
+          recipientLabel={`@${handle}`}
+          title="Tip USDC"
+        />
+      )}
     </article>
   );
 };

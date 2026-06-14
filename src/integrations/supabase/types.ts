@@ -16,27 +16,39 @@ export type Database = {
     Tables: {
       comments: {
         Row: {
+          amount_usdc: number | null
           body: string
           created_at: string
           id: string
+          kind: string
           parent_id: string | null
           post_id: string
+          recipient_user_id: string | null
+          token: string | null
           user_id: string
         }
         Insert: {
+          amount_usdc?: number | null
           body: string
           created_at?: string
           id?: string
+          kind?: string
           parent_id?: string | null
           post_id: string
+          recipient_user_id?: string | null
+          token?: string | null
           user_id: string
         }
         Update: {
+          amount_usdc?: number | null
           body?: string
           created_at?: string
           id?: string
+          kind?: string
           parent_id?: string | null
           post_id?: string
+          recipient_user_id?: string | null
+          token?: string | null
           user_id?: string
         }
         Relationships: [
@@ -52,6 +64,13 @@ export type Database = {
             columns: ["post_id"]
             isOneToOne: false
             referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_recipient_user_id_fkey"
+            columns: ["recipient_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -84,30 +103,50 @@ export type Database = {
       }
       posts: {
         Row: {
+          amount_usdc: number | null
           body: string
           created_at: string
           id: string
           image_url: string | null
+          kind: string
+          recipient_user_id: string | null
           title: string | null
+          token: string | null
           user_id: string
         }
         Insert: {
+          amount_usdc?: number | null
           body: string
           created_at?: string
           id?: string
           image_url?: string | null
+          kind?: string
+          recipient_user_id?: string | null
           title?: string | null
+          token?: string | null
           user_id: string
         }
         Update: {
+          amount_usdc?: number | null
           body?: string
           created_at?: string
           id?: string
           image_url?: string | null
+          kind?: string
+          recipient_user_id?: string | null
           title?: string | null
+          token?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "posts_recipient_user_id_fkey"
+            columns: ["recipient_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -139,6 +178,111 @@ export type Database = {
           updated_at?: string
           username?: string | null
           verified?: boolean
+        }
+        Relationships: []
+      }
+      transactions: {
+        Row: {
+          amount: number
+          chain: string
+          circle_tx_id: string | null
+          comment_id: string | null
+          counterparty_address: string | null
+          counterparty_user_id: string | null
+          created_at: string
+          id: string
+          kind: string
+          metadata: Json | null
+          post_id: string | null
+          status: string
+          token: string
+          tx_hash: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          chain?: string
+          circle_tx_id?: string | null
+          comment_id?: string | null
+          counterparty_address?: string | null
+          counterparty_user_id?: string | null
+          created_at?: string
+          id?: string
+          kind: string
+          metadata?: Json | null
+          post_id?: string | null
+          status?: string
+          token?: string
+          tx_hash?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          chain?: string
+          circle_tx_id?: string | null
+          comment_id?: string | null
+          counterparty_address?: string | null
+          counterparty_user_id?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          metadata?: Json | null
+          post_id?: string | null
+          status?: string
+          token?: string
+          tx_hash?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wallets: {
+        Row: {
+          address: string | null
+          chain: string
+          circle_user_id: string
+          created_at: string
+          status: string
+          updated_at: string
+          user_id: string
+          wallet_id: string | null
+        }
+        Insert: {
+          address?: string | null
+          chain?: string
+          circle_user_id: string
+          created_at?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+          wallet_id?: string | null
+        }
+        Update: {
+          address?: string | null
+          chain?: string
+          circle_user_id?: string
+          created_at?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+          wallet_id?: string | null
         }
         Relationships: []
       }
