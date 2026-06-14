@@ -19,6 +19,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
   const navigate = useNavigate();
   const [liked, setLiked] = useState(post.liked_by_me);
   const [likeCount, setLikeCount] = useState(post.like_count);
+  const [tipOpen, setTipOpen] = useState(false);
   const author = post.author;
   const name = author?.display_name || author?.username || "Anonymous";
   const handle = author?.username || "anon";
