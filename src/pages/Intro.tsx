@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import mPurple from "@/assets/meku_m_purple.png.asset.json";
 
 /**
  * Intro / welcome screen — dark, big purple M, "Connect. Share. Own."
@@ -45,25 +46,12 @@ const Intro = () => {
 };
 
 const MLogo = () => (
-  <svg viewBox="0 0 200 220" className="h-[200px] w-[180px]" aria-hidden>
-    <defs>
-      <linearGradient id="m-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="hsl(252 95% 80%)" />
-        <stop offset="60%" stopColor="hsl(260 90% 62%)" />
-        <stop offset="100%" stopColor="hsl(268 85% 45%)" />
-      </linearGradient>
-      <linearGradient id="m-grad-2" x1="0%" y1="100%" x2="100%" y2="0%">
-        <stop offset="0%" stopColor="hsl(258 90% 55%)" />
-        <stop offset="100%" stopColor="hsl(252 95% 78%)" />
-      </linearGradient>
-    </defs>
-    {/* Left blade */}
-    <path d="M10 10 L10 210 L50 210 L50 90 L95 175 L100 165 L60 90 L60 10 Z" fill="url(#m-grad)" />
-    {/* Right blade */}
-    <path d="M190 10 L190 210 L150 210 L150 90 L105 175 L100 165 L140 90 L140 10 Z" fill="url(#m-grad-2)" />
-    {/* Center notch */}
-    <path d="M100 165 L70 50 L100 100 L130 50 Z" fill="hsl(252 95% 72%)" opacity="0.85" />
-  </svg>
+  <img
+    src={mPurple.url}
+    alt="MEKU"
+    className="h-[200px] w-[200px] select-none object-contain"
+    draggable={false}
+  />
 );
 
 export default Intro;
