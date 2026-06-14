@@ -47,7 +47,7 @@ Deno.serve(async (req) => {
   if (status) {
     await admin
       .from("transactions")
-      .update({ status, tx_hash: txHash ?? undefined })
+      .update({ status })
       .eq("circle_tx_id", circleTxId);
   }
 
