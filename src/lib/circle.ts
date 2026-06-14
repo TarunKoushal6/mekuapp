@@ -72,9 +72,8 @@ export function executeChallenge(opts: {
       userToken: opts.userToken,
       encryptionKey: opts.encryptionKey,
     });
-    s.execute(opts.challengeId, (error, result) => {
+    s.execute(opts.challengeId, (error) => {
       if (error) return reject(error);
-      if (result?.resultType) return resolve();
       resolve();
     });
   });
