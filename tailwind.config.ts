@@ -15,14 +15,12 @@ export default {
         sans: ['Satoshi', 'ui-sans-serif', 'system-ui', '-apple-system', 'sans-serif'],
       },
       colors: {
-        'primary-soft': 'hsl(var(--primary-soft))',
-      } as any,
-      colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        "primary-soft": "hsl(var(--primary-soft))",
         surface: {
           DEFAULT: "hsl(var(--surface))",
           2: "hsl(var(--surface-2))",
