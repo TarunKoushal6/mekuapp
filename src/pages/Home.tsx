@@ -1,8 +1,8 @@
 import { AppShell } from "@/components/meku/AppShell";
 import { FeedCard } from "@/components/meku/FeedCard";
 import { EmptyState } from "@/components/meku/EmptyState";
-import { Loader2, Eye } from "lucide-react";
-import { IconBell, IconSend, IconAssets, IconSwap, IconActivity, IconPlus } from "@/components/meku/MekuIcon";
+import { Loader2 } from "lucide-react";
+import { IconBell, IconPlus } from "@/components/meku/MekuIcon";
 import { Logo } from "@/components/meku/Logo";
 import { Link } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
@@ -19,7 +19,6 @@ const Home = () => {
   const [tab, setTab] = useState<Tab>("For You");
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
-  const [balanceVisible, setBalanceVisible] = useState(true);
 
   const load = useCallback(async () => {
     try { setPosts(await fetchPosts(user?.id)); } finally { setLoading(false); }
@@ -35,9 +34,8 @@ const Home = () => {
 
   return (
     <AppShell>
-      {/* Top header */}
       <header className="flex items-center justify-between px-5 pb-2 pt-4">
-        <Logo size={22} />
+        <Logo size={24} />
         <Link to="/notifications" aria-label="Notifications" className="tap relative inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground">
           <IconBell size={20} />
           <span className="absolute right-2 top-2 h-[7px] w-[7px] rounded-full bg-primary" />
@@ -48,45 +46,11 @@ const Home = () => {
       <div className="px-5 pt-3">
         <div className="flex gap-3 overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden">
           <StoryItem add label="Your Story" />
-          {/* Empty until we have followers */}
-        </div>
-      </div>
-
-      {/* Balance card */}
-      <div className="px-5 pt-4">
-        <div className="relative overflow-hidden rounded-[24px] p-5 gradient-card shadow-purple">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-[13px] text-white/70">My Balance</p>
-              <p className="mt-1 text-white">
-                <span style={{ fontSize: 36, fontWeight: 700, letterSpacing: "-0.02em" }}>
-                  {balanceVisible ? "0" : "••••"}
-                </span>
-                <span className="ml-2 text-[14px] font-semibold text-white/80">ARC</span>
-              </p>
-            </div>
-            <button onClick={() => setBalanceVisible((v) => !v)} aria-label="Toggle balance" className="tap text-white/80">
-              <Eye className="h-[18px] w-[18px]" strokeWidth={1.7} />
-            </button>
-          </div>
-
-          <div className="mt-5 grid grid-cols-4 gap-2">
-            <QuickAction to="/wallet" icon={IconSend} label="Send" />
-            <QuickAction to="/wallet" icon={IconAssets} label="Receive" />
-            <QuickAction to="/onchain" icon={IconSwap} label="Swap" />
-            <QuickAction to="/wallet" icon={IconActivity} label="History" />
-          </div>
-
-          {/* decorative wave */}
-          <svg viewBox="0 0 400 200" className="pointer-events-none absolute -bottom-6 -right-10 h-[160px] w-[260px] opacity-30" aria-hidden>
-            <path d="M0 120 Q 100 40 200 120 T 400 120" stroke="white" strokeWidth="1.2" fill="none" />
-            <path d="M0 140 Q 100 60 200 140 T 400 140" stroke="white" strokeWidth="1" fill="none" opacity="0.6" />
-          </svg>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="mt-5 px-5">
+      <div className="mt-3 px-5">
         <div className="flex items-center gap-6 hairline-b">
           {tabs.map((t) => (
             <button
@@ -133,15 +97,6 @@ const StoryItem = ({ add, label }: { add?: boolean; label: string }) => (
     </button>
     <span className="truncate text-[11px] text-muted-foreground">{label}</span>
   </div>
-);
-
-const QuickAction = ({ to, icon: Icon, label }: { to: string; icon: any; label: string }) => (
-  <Link to={to} className="tap flex flex-col items-center gap-1.5 text-white">
-    <span className="inline-flex h-[44px] w-[44px] items-center justify-center rounded-full bg-white/15 backdrop-blur">
-      <Icon size={18} />
-    </span>
-    <span className="text-[11px] font-medium">{label}</span>
-  </Link>
 );
 
 export default Home;

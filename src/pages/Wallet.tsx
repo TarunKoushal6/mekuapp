@@ -6,14 +6,21 @@ import { cn } from "@/lib/utils";
 import { useWallet } from "@/hooks/useWallet";
 import {
   IconSend, IconSwap, IconBridge, IconAssets, IconActivity,
-  IconBack, IconMore,
+  IconBack, IconMore, IconCopy, IconExternal, IconRefresh, IconDroplet,
 } from "@/components/meku/MekuIcon";
 import { SendSheet } from "@/components/meku/SendSheet";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 
 type Tab = "Tokens" | "Activity";
+
+// Circle / USDC official mark
+const USDC_LOGO = "https://cryptologos.cc/logos/usd-coin-usdc-logo.svg";
+const ARC_EXPLORER = "https://testnet.arcscan.app";
 
 const Wallet = () => {
   const navigate = useNavigate();
@@ -42,15 +49,43 @@ const Wallet = () => {
     setTimeout(() => setCopied(false), 1500);
   };
 
+  const openExplorer = () => {
+    if (!wallet?.address) return;
+    window.open(`${ARC_EXPLORER}/address/${wallet.address}`, "_blank");
+  };
+
+  const openFaucet = () => {
+    window.open("https://faucet.circle.com", "_blank");
+  };
+
   return (
     <AppShell>
       <header className="sticky top-0 z-30 flex h-[56px] items-center justify-between bg-background/80 px-3 backdrop-blur-xl">
         <button onClick={() => navigate(-1)} aria-label="Back" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground">
           <IconBack size={22} />
         </button>
-        <button aria-label="More" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground">
-          <IconMore size={20} />
-        </button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button aria-label="More" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground">
+              <IconMore size={20} />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56 rounded-2xl">
+            <DropdownMenuItem onClick={copy} disabled={!wallet?.address}>
+              <IconCopy size={16} className="mr-2" /> Copy address
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={openExplorer} disabled={!wallet?.address}>
+              <IconExternal size={16} className="mr-2" /> View on explorer
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={openFaucet}>
+              <IconDroplet size={16} className="mr-2" /> Get testnet USDC
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => refresh()}>
+              <IconRefresh size={16} className="mr-2" /> Refresh balance
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </header>
 
       <h1 className="px-5 pt-2 text-[28px] font-bold tracking-[-0.02em] text-foreground">Wallet</h1>
@@ -80,6 +115,23 @@ const Wallet = () => {
             </p>
           )}
         </div>
+
+        {/* Faucet pill */}
+        <button
+          onClick={openFaucet}
+          className="tap mt-3 flex w-full items-center justify-between rounded-[16px] border border-border bg-surface px-4 py-3 text-left"
+        >
+          <span className="flex items-center gap-3">
+            <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary-soft text-primary">
+              <IconDroplet size={18} />
+            </span>
+            <span>
+              <span className="block text-[14px] font-semibold text-foreground">Get testnet USDC</span>
+              <span className="block text-[11.5px] text-muted-foreground">Top up from Circle's faucet</span>
+            </span>
+          </span>
+          <IconExternal size={16} className="text-muted-foreground" />
+        </button>
       </div>
 
       <div className="mt-5 grid grid-cols-4 gap-3 px-5">
@@ -109,9 +161,14 @@ const Wallet = () => {
       <ul className="mt-2 px-3 pb-8">
         {tab === "Tokens" ? (
           <li className="tap flex items-center gap-3 rounded-[16px] px-2 py-3 hover:bg-surface-2">
-            <span className="flex h-[40px] w-[40px] items-center justify-center rounded-full bg-gradient-to-br from-sky-400 to-blue-600 text-[12px] font-bold text-white">
-              US
-            </span>
+            <img
+              src={USDC_LOGO}
+              alt="USDC"
+              className="h-[40px] w-[40px] rounded-full"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).style.display = "none";
+              }}
+            />
             <div className="flex-1 min-w-0">
               <p className="text-[15px] font-semibold text-foreground">USDC</p>
               <p className="text-[12px] text-muted-foreground">Arc Testnet</p>
