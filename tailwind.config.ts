@@ -12,9 +12,11 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Geist', 'ui-sans-serif', 'system-ui', '-apple-system', 'sans-serif'],
-        serif: ['"Instrument Serif"', 'Times New Roman', 'serif'],
+        sans: ['Satoshi', 'ui-sans-serif', 'system-ui', '-apple-system', 'sans-serif'],
       },
+      colors: {
+        'primary-soft': 'hsl(var(--primary-soft))',
+      } as any,
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
