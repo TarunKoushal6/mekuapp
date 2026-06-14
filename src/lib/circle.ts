@@ -27,8 +27,13 @@ export interface InitResponse {
   appId?: string | null;
 }
 
+let cachedAppId: string | null = null;
+export function getAppId(): string | null { return cachedAppId; }
+
 export async function initCircle(): Promise<InitResponse> {
-  return invoke<InitResponse>("circle-init");
+  const r = await invoke<InitResponse>("circle-init");
+  if (r.appId) cachedAppId = r.appId;
+  return r;
 }
 
 export async function fetchBalance(): Promise<{ wallet: WalletRow | null; balances: any[] }> {
@@ -77,9 +82,11 @@ export async function executeChallenge(opts: {
   userToken: string;
   encryptionKey: string;
   challengeId: string;
-  appId: string;
+  appId?: string;
 }): Promise<void> {
-  const s = await getSdk(opts.appId);
+  const appId = opts.appId ?? cachedAppId;
+  if (!appId) throw new Error("Circle App ID missing — set CIRCLE_APP_ID secret");
+  const s = await getSdk(appId);
   return new Promise((resolve, reject) => {
     s.setAuthentication({
       userToken: opts.userToken,
