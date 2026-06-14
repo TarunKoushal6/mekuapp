@@ -1,5 +1,6 @@
 import { AppShell } from "@/components/meku/AppShell";
-import { ChevronLeft, MoreHorizontal, Settings, BadgeCheck, Loader2 } from "lucide-react";
+import { BadgeCheck, Loader2 } from "lucide-react";
+import { IconBack, IconMore, IconSettings } from "@/components/meku/MekuIcon";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
@@ -49,17 +50,17 @@ const Profile = () => {
   return (
     <AppShell>
       <header className="sticky top-0 z-30 flex h-[56px] items-center justify-between bg-background/80 px-3 backdrop-blur-xl">
-        <button onClick={() => navigate(-1)} aria-label="Back" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full">
-          <ChevronLeft className="h-[22px] w-[22px]" strokeWidth={1.6} />
+        <button onClick={() => navigate(-1)} aria-label="Back" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground">
+          <IconBack size={22} />
         </button>
         <div className="flex items-center gap-1">
           {isMe && (
-            <Link to="/settings" aria-label="Settings" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full">
-              <Settings className="h-[18px] w-[18px]" strokeWidth={1.6} />
+            <Link to="/settings" aria-label="Settings" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground">
+              <IconSettings size={18} />
             </Link>
           )}
-          <button aria-label="More" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full">
-            <MoreHorizontal className="h-[20px] w-[20px]" strokeWidth={1.6} />
+          <button aria-label="More" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground">
+            <IconMore size={20} />
           </button>
         </div>
       </header>

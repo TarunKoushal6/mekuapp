@@ -1,5 +1,5 @@
-// Custom MEKU stroke icons matching the reference iconography sheet.
-// All icons share the same look: 24x24, 1.5 stroke, rounded caps.
+// Custom MEKU stroke icons — single visual language across the app.
+// 24x24 grid, 1.6 stroke, rounded caps/joins.
 import { SVGProps } from "react";
 
 type IconProps = SVGProps<SVGSVGElement> & { size?: number };
@@ -89,5 +89,72 @@ export const IconCommunity = wrap(
 export const IconActivity = wrap(
   <>
     <path d="M13 3 5 14h6l-1 7 8-11h-6z" />
+  </>,
+);
+
+export const IconHome = wrap(
+  <>
+    <path d="M4 11.5 12 4l8 7.5V20a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z" />
+  </>,
+);
+
+export const IconPlus = wrap(
+  <>
+    <path d="M12 5v14M5 12h14" />
+  </>,
+);
+
+export const IconProfile = wrap(
+  <>
+    <circle cx="12" cy="8.5" r="3.6" />
+    <path d="M4.5 20c1.4-3.6 4.4-5.5 7.5-5.5s6.1 1.9 7.5 5.5" />
+  </>,
+);
+
+export const IconSearch = wrap(
+  <>
+    <circle cx="11" cy="11" r="6.5" />
+    <path d="m20 20-4.2-4.2" />
+  </>,
+);
+
+export const IconCompose = wrap(
+  <>
+    <path d="M4 20h4l10-10-4-4L4 16z" />
+    <path d="m14 6 4 4" />
+  </>,
+);
+
+export const IconSettings = wrap(
+  <>
+    <circle cx="12" cy="12" r="3" />
+    <path d="M19.4 13.5a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V20a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H4a2 2 0 0 1 0-4h.1a1.7 1.7 0 0 0 1.6-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H10a1.7 1.7 0 0 0 1-1.6V4a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V10a1.7 1.7 0 0 0 1.6 1H20a2 2 0 0 1 0 4h-.1a1.7 1.7 0 0 0-1.6 1z" />
+  </>,
+);
+
+export const IconMore = wrap(
+  <>
+    <circle cx="5" cy="12" r="1.2" />
+    <circle cx="12" cy="12" r="1.2" />
+    <circle cx="19" cy="12" r="1.2" />
+  </>,
+);
+
+export const IconBack = wrap(
+  <>
+    <path d="M15 5l-7 7 7 7" />
+  </>,
+);
+
+export const IconHeart = wrap(
+  <>
+    <path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z" />
+  </>,
+);
+
+export const IconRequest = wrap(
+  <>
+    <path d="M21 12 3 20l8-8L3 4z" />
+    <path d="M11 12h10" />
   </>,
 );

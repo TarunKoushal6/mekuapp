@@ -2,7 +2,7 @@ import { AppShell } from "@/components/meku/AppShell";
 import { TopBar, IconButton } from "@/components/meku/TopBar";
 import { Logo } from "@/components/meku/Logo";
 import { EmptyState } from "@/components/meku/EmptyState";
-import { SquarePen } from "lucide-react";
+import { IconCompose } from "@/components/meku/MekuIcon";
 import { Link } from "react-router-dom";
 
 const Inbox = () => {
@@ -11,10 +11,10 @@ const Inbox = () => {
   return (
     <AppShell>
       <TopBar
-        left={<div className="pl-2"><Logo size={36} wordmark={false} appIcon /></div>}
+        left={<div className="pl-3"><Logo size={20} /></div>}
         right={
           <IconButton ariaLabel="New message">
-            <SquarePen className="h-[20px] w-[20px]" strokeWidth={1.6} />
+            <IconCompose size={20} />
           </IconButton>
         }
       />

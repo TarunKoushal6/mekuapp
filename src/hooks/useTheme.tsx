@@ -9,8 +9,8 @@ const ThemeCtx = createContext<{ theme: Theme; setTheme: (t: Theme) => void; tog
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [theme, setTheme] = useState<Theme>(() => {
-    if (typeof window === "undefined") return "dark";
-    return (localStorage.getItem("meku-theme") as Theme) || "dark";
+    if (typeof window === "undefined") return "light";
+    return (localStorage.getItem("meku-theme") as Theme) || "light";
   });
 
   useEffect(() => {

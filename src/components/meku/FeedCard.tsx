@@ -1,4 +1,4 @@
-import { Heart, MessageCircle, Repeat2, Upload, MoreHorizontal, BadgeCheck } from "lucide-react";
+import { Heart, MessageCircle, Repeat2, Upload, BadgeCheck } from "lucide-react";
 import { Avatar } from "./Avatar";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -6,8 +6,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { toggleLike, type Post, timeAgo } from "@/lib/social";
-import { IconSend } from "./MekuIcon";
+import { IconSend, IconMore } from "./MekuIcon";
 import { SendSheet } from "./SendSheet";
+import { InlineActionCard, parseInlineAction } from "./InlineActionCard";
 
 interface FeedCardProps {
   post: Post;
@@ -74,7 +75,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
           <span className="shrink-0 text-[14px] text-muted-foreground">{timeAgo(post.created_at)}</span>
         </div>
         <button aria-label="More" onClick={(e) => e.stopPropagation()} className="tap -mr-2 -mt-1 inline-flex h-8 w-8 items-center justify-center text-muted-foreground">
-          <MoreHorizontal className="h-[18px] w-[18px]" strokeWidth={1.6} />
+          <IconMore size={18} />
         </button>
       </header>
 
@@ -86,6 +87,10 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
             <img src={post.image_url} alt="" loading="lazy" className="aspect-[5/4] w-full object-cover" />
           </div>
         )}
+        {(() => {
+          const action = parseInlineAction([post.title, post.body].filter(Boolean).join(" "));
+          return action ? <InlineActionCard action={action} postId={post.id} /> : null;
+        })()}
 
         <div className="mt-3 flex items-center justify-between pr-1 text-muted-foreground">
           <button
