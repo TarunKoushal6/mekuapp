@@ -6,6 +6,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { toggleLike, type Post, timeAgo } from "@/lib/social";
+import { IconSend } from "./MekuIcon";
+import { SendSheet } from "./SendSheet";
 
 interface FeedCardProps {
   post: Post;
