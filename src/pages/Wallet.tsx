@@ -1,10 +1,13 @@
 import { AppShell } from "@/components/meku/AppShell";
-import { ChevronLeft, MoreHorizontal, Eye, Loader2, Copy, Check } from "lucide-react";
+import { Eye, Loader2, Copy, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { useWallet } from "@/hooks/useWallet";
-import { IconSend, IconSwap, IconBridge, IconAssets, IconActivity } from "@/components/meku/MekuIcon";
+import {
+  IconSend, IconSwap, IconBridge, IconAssets, IconActivity,
+  IconBack, IconMore,
+} from "@/components/meku/MekuIcon";
 import { SendSheet } from "@/components/meku/SendSheet";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -42,11 +45,11 @@ const Wallet = () => {
   return (
     <AppShell>
       <header className="sticky top-0 z-30 flex h-[56px] items-center justify-between bg-background/80 px-3 backdrop-blur-xl">
-        <button onClick={() => navigate(-1)} aria-label="Back" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full">
-          <ChevronLeft className="h-[22px] w-[22px]" strokeWidth={1.7} />
+        <button onClick={() => navigate(-1)} aria-label="Back" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground">
+          <IconBack size={22} />
         </button>
-        <button aria-label="More" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full">
-          <MoreHorizontal className="h-[20px] w-[20px]" strokeWidth={1.7} />
+        <button aria-label="More" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground">
+          <IconMore size={20} />
         </button>
       </header>
 
