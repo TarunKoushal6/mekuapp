@@ -125,7 +125,15 @@
   .gradient-card { background: var(--gradient-card); }
   .shadow-purple { box-shadow: var(--shadow-purple); }
 
-  /* Invert wordmark for dark theme (image is black on transparent) */
+  /* Asset protection: disable long-press save, drag, selection on brand media */
+  .no-save {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    -webkit-touch-callout: none;
+  }
+  img { -webkit-touch-callout: none; -webkit-user-drag: none; }
+
   .wordmark-img { filter: none; }
   .dark .wordmark-img { filter: invert(1); }
 }
