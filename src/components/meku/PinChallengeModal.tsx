@@ -18,6 +18,7 @@ export const PinChallengeModal = () => {
     try {
       await executeChallenge(pendingChallenge);
       toast.success("Wallet ready");
+      void 0;
       clearChallenge();
       refresh();
     } catch (e: any) {
