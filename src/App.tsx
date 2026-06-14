@@ -12,7 +12,12 @@ import Profile from "./pages/Profile.tsx";
 import Notifications from "./pages/Notifications.tsx";
 import Onchain from "./pages/Onchain.tsx";
 import Chat from "./pages/Chat.tsx";
+import Auth from "./pages/Auth.tsx";
+import Settings from "./pages/Settings.tsx";
+import EditProfile from "./pages/EditProfile.tsx";
+import PostDetail from "./pages/PostDetail.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import { RequireAuth } from "./components/RequireAuth.tsx";
 
 const queryClient = new QueryClient();
 
@@ -24,14 +29,19 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Intro />} />
+          <Route path="/auth" element={<Auth />} />
           <Route path="/home" element={<Home />} />
           <Route path="/explore" element={<Explore />} />
-          <Route path="/create" element={<Create />} />
-          <Route path="/inbox" element={<Inbox />} />
-          <Route path="/inbox/:id" element={<Chat />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/notifications" element={<Notifications />} />
-          <Route path="/onchain" element={<Onchain />} />
+          <Route path="/p/:id" element={<PostDetail />} />
+          <Route path="/u/:handle" element={<Profile />} />
+          <Route path="/create" element={<RequireAuth><Create /></RequireAuth>} />
+          <Route path="/inbox" element={<RequireAuth><Inbox /></RequireAuth>} />
+          <Route path="/inbox/:id" element={<RequireAuth><Chat /></RequireAuth>} />
+          <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
+          <Route path="/notifications" element={<RequireAuth><Notifications /></RequireAuth>} />
+          <Route path="/onchain" element={<RequireAuth><Onchain /></RequireAuth>} />
+          <Route path="/settings" element={<RequireAuth><Settings /></RequireAuth>} />
+          <Route path="/settings/profile" element={<RequireAuth><EditProfile /></RequireAuth>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

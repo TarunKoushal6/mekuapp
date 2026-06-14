@@ -2,69 +2,57 @@ import { AppShell } from "@/components/meku/AppShell";
 import { TopBar, IconButton } from "@/components/meku/TopBar";
 import { Logo } from "@/components/meku/Logo";
 import { FeedCard } from "@/components/meku/FeedCard";
-import { Avatar } from "@/components/meku/Avatar";
 import { EmptyState } from "@/components/meku/EmptyState";
-import { feedItems } from "@/data/feed";
-import { Bell, Search, Plus } from "lucide-react";
+import { Bell, Search, Plus, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
+import { fetchPosts, type Post } from "@/lib/social";
+import { supabase } from "@/integrations/supabase/client";
 
 const tabs = ["For you", "Following"] as const;
 
-// Real data only — empty until the user follows people.
-const stories: { name: string }[] = [];
-
 const Home = () => {
+  const { user } = useAuth();
   const [tab, setTab] = useState<(typeof tabs)[number]>("For you");
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const load = useCallback(async () => {
+    try {
+      const data = await fetchPosts(user?.id);
+      setPosts(data);
+    } finally {
+      setLoading(false);
+    }
+  }, [user?.id]);
+
+  useEffect(() => { load(); }, [load]);
+
+  useEffect(() => {
+    const ch = supabase
+      .channel("home-posts")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "posts" }, () => load())
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [load]);
+
   return (
     <AppShell>
       <TopBar
-        left={
-          <div className="pl-2">
-            <Logo size={40} wordmark={false} appIcon />
-          </div>
-        }
+        left={<div className="pl-2"><Logo size={40} wordmark={false} appIcon /></div>}
         right={
           <>
-            <IconButton ariaLabel="Search">
-              <Search className="h-[22px] w-[22px]" strokeWidth={1.8} />
-            </IconButton>
-            <Link to="/notifications" aria-label="Notifications" className="relative">
-              <IconButton ariaLabel="Notifications">
-                <Bell className="h-[22px] w-[22px]" strokeWidth={1.8} />
-              </IconButton>
+            <IconButton ariaLabel="Search"><Search className="h-[22px] w-[22px]" strokeWidth={1.8} /></IconButton>
+            <Link to="/notifications" aria-label="Notifications">
+              <IconButton ariaLabel="Notifications"><Bell className="h-[22px] w-[22px]" strokeWidth={1.8} /></IconButton>
             </Link>
           </>
         }
       />
 
-      {/* Stories row */}
-      <div className="px-4 pb-3 pt-1">
-        <ul className="flex gap-3 overflow-x-auto pb-1">
-          <li className="flex w-[68px] shrink-0 flex-col items-center gap-1.5">
-            <Link
-              to="/create"
-              aria-label="New post"
-              className="tap inline-flex h-[60px] w-[60px] items-center justify-center rounded-full border border-border bg-surface text-foreground"
-            >
-              <Plus className="h-[22px] w-[22px]" strokeWidth={1.8} />
-            </Link>
-            <span className="t-caption text-foreground">New post</span>
-          </li>
-          {stories.map((s) => (
-            <li key={s.name} className="flex w-[68px] shrink-0 flex-col items-center gap-1.5">
-              <div className="rounded-full p-[2px] ring-[1.5px] ring-primary">
-                <Avatar name={s.name} size="lg" className="h-[56px] w-[56px] border-[2px] border-background" />
-              </div>
-              <span className="t-caption truncate text-foreground">{s.name}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* Segmented control */}
-      <div className="px-4 pb-2">
+      <div className="px-4 pb-2 pt-2">
         <div className="inline-flex w-full items-center gap-1 rounded-full bg-surface-2 p-1">
           {tabs.map((t) => (
             <button
@@ -82,25 +70,32 @@ const Home = () => {
       </div>
 
       <section>
-        {feedItems.length === 0 ? (
+        {loading ? (
+          <div className="flex justify-center py-16"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
+        ) : posts.length === 0 ? (
           <EmptyState
             pose="sitting"
             title="Your feed is quiet"
-            description="Follow people or share your first post to bring it to life."
+            description="Share your first post to bring it to life."
             action={
-              <Link
-                to="/create"
-                className="tap inline-flex h-[44px] items-center gap-2 rounded-full bg-foreground px-5 text-[14px] font-semibold text-background"
-              >
+              <Link to="/create" className="tap inline-flex h-[44px] items-center gap-2 rounded-full bg-foreground px-5 text-[14px] font-semibold text-background">
                 <Plus className="h-[16px] w-[16px]" strokeWidth={2} />
                 New post
               </Link>
             }
           />
         ) : (
-          feedItems.map((item) => <FeedCard key={item.id} item={item} />)
+          posts.map((p) => <FeedCard key={p.id} post={p} onChanged={load} />)
         )}
       </section>
+
+      <Link
+        to="/create"
+        aria-label="New post"
+        className="fixed bottom-[90px] right-5 z-30 inline-flex h-[56px] w-[56px] items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[0_8px_24px_-6px_hsl(var(--primary)/0.6)]"
+      >
+        <Plus className="h-[24px] w-[24px]" strokeWidth={2} />
+      </Link>
     </AppShell>
   );
 };
