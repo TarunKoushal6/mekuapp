@@ -15,6 +15,9 @@ import Chat from "./pages/Chat.tsx";
 import Auth from "./pages/Auth.tsx";
 import Settings from "./pages/Settings.tsx";
 import EditProfile from "./pages/EditProfile.tsx";
+import Appearance from "./pages/Appearance.tsx";
+import Privacy from "./pages/Privacy.tsx";
+import Wallet from "./pages/Wallet.tsx";
 import PostDetail from "./pages/PostDetail.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import { RequireAuth } from "./components/RequireAuth.tsx";
@@ -42,6 +45,9 @@ const App = () => (
           <Route path="/onchain" element={<RequireAuth><Onchain /></RequireAuth>} />
           <Route path="/settings" element={<RequireAuth><Settings /></RequireAuth>} />
           <Route path="/settings/profile" element={<RequireAuth><EditProfile /></RequireAuth>} />
+          <Route path="/settings/appearance" element={<Appearance />} />
+          <Route path="/settings/privacy" element={<RequireAuth><Privacy /></RequireAuth>} />
+          <Route path="/wallet" element={<RequireAuth><Wallet /></RequireAuth>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

@@ -48,11 +48,12 @@ const Settings = () => {
 
         <p className="px-4 pt-5 text-[12px] font-bold uppercase tracking-wider text-muted-foreground">Preferences</p>
         <Row icon={Bell} label="Notifications" to="/notifications" />
-        <Row icon={Palette} label="Appearance" onClick={() => toast.info("Coming soon")} />
-        <Row icon={Lock} label="Privacy & security" onClick={() => toast.info("Coming soon")} />
+        <Row icon={Palette} label="Appearance" to="/settings/appearance" />
+        <Row icon={Lock} label="Privacy & security" to="/settings/privacy" />
 
         <p className="px-4 pt-5 text-[12px] font-bold uppercase tracking-wider text-muted-foreground">Onchain</p>
-        <Row icon={Wallet} label="Wallet & swap" to="/onchain" />
+        <Row icon={Wallet} label="Wallet" to="/wallet" />
+        <Row icon={Wallet} label="Swap & bridge" to="/onchain" />
 
         <p className="px-4 pt-5 text-[12px] font-bold uppercase tracking-wider text-muted-foreground">Support</p>
         <Row icon={HelpCircle} label="Help center" onClick={() => toast.info("Coming soon")} />
