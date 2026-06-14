@@ -1,18 +1,48 @@
 import { AppShell } from "@/components/meku/AppShell";
-import { ChevronLeft, Loader2 } from "lucide-react";
+import { ChevronLeft, Loader2, Camera } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { getProfile, updateProfile, type Profile } from "@/lib/social";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Avatar } from "@/components/meku/Avatar";
 
 const EditProfile = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [p, setP] = useState<Profile | null>(null);
   const [busy, setBusy] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { if (user) getProfile(user.id).then(setP); }, [user]);
+
+  const onPick = () => fileRef.current?.click();
+
+  const onFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+    if (file.size > 5 * 1024 * 1024) { toast.error("Max 5MB"); return; }
+    if (!file.type.startsWith("image/")) { toast.error("Image files only"); return; }
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop()?.toLowerCase() || "png";
+      const path = `${user.id}/avatar-${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage.from("avatars").upload(path, file, {
+        upsert: true, contentType: file.type,
+      });
+      if (upErr) throw upErr;
+      const { data } = supabase.storage.from("avatars").getPublicUrl(path);
+      setP((prev) => prev ? { ...prev, avatar_url: data.publicUrl } : prev);
+      toast.success("Photo updated");
+    } catch (err: any) {
+      toast.error(err.message ?? "Upload failed");
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  };
 
   const save = async () => {
     if (!user || !p) return;
@@ -45,11 +75,28 @@ const EditProfile = () => {
         </button>
       </header>
 
+      <div className="flex flex-col items-center pt-6">
+        <div className="relative">
+          <Avatar name={p.display_name || p.username || "U"} src={p.avatar_url ?? undefined} size="xl" className="h-[104px] w-[104px]" />
+          <button
+            onClick={onPick}
+            disabled={uploading}
+            className="tap absolute -bottom-1 -right-1 inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-purple ring-4 ring-background disabled:opacity-60"
+            aria-label="Change photo"
+          >
+            {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
+          </button>
+        </div>
+        <input ref={fileRef} type="file" accept="image/*" hidden onChange={onFile} />
+        <button onClick={onPick} className="tap mt-3 text-[13px] font-semibold text-primary">
+          Change profile photo
+        </button>
+      </div>
+
       <div className="space-y-4 px-4 py-4">
         {[
           { label: "Display name", key: "display_name", placeholder: "Your name" },
           { label: "Username", key: "username", placeholder: "handle" },
-          { label: "Avatar URL", key: "avatar_url", placeholder: "https://…" },
         ].map((f) => (
           <label key={f.key} className="block">
             <span className="block pb-1 text-[12px] font-bold uppercase tracking-wider text-muted-foreground">{f.label}</span>
