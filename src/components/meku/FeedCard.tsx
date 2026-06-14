@@ -103,11 +103,27 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
             <Heart className={cn("h-[18px] w-[18px] transition-colors", liked && "fill-[#ef3b6b] text-[#ef3b6b]")} strokeWidth={1.6} />
             <span className={cn("text-[13px] tabular-nums", liked && "text-[#ef3b6b]")}>{likeCount}</span>
           </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); if (!user) return navigate("/auth"); setTipOpen(true); }}
+            className="tap inline-flex items-center gap-1.5 text-primary"
+            aria-label="Tip USDC"
+          >
+            <IconSend size={18} />
+          </button>
           <button onClick={handleShare} className="tap" aria-label="Share">
             <Upload className="h-[18px] w-[18px]" strokeWidth={1.6} />
           </button>
         </div>
       </div>
+      {tipOpen && author && (
+        <SendSheet
+          open={tipOpen}
+          onOpenChange={setTipOpen}
+          defaults={{ recipientUserId: post.user_id, postId: post.id, kind: "tip", amount: "1" }}
+          recipientLabel={`@${handle}`}
+          title="Tip USDC"
+        />
+      )}
     </article>
   );
 };
