@@ -21,29 +21,30 @@ const wrap = (children: React.ReactNode) =>
     </svg>
   )) as (p: IconProps) => JSX.Element;
 
-// Paper plane — clean two-fold silhouette
+// Paper plane — tilted with bottom fold crease (matches MEKU sheet)
 export const IconSend = wrap(
   <>
-    <path d="M21 3 3 10.5l7.5 2.5L13 21l8-18z" />
-    <path d="M10.5 13 21 3" />
+    <path d="M21.5 2.5 2.5 10.2a.4.4 0 0 0 0 .76l7.7 2.84 2.84 7.7a.4.4 0 0 0 .76 0L21.5 2.5z" />
+    <path d="m10.2 13.8 11.3-11.3" />
+    <path d="m10.2 13.8-1.6 5 4.6-2.8" />
   </>,
 );
 
-// Swap — two horizontal arrows in opposite directions
+// Swap — two parallel arrows in opposite directions
 export const IconSwap = wrap(
   <>
-    <path d="M4 8h14" />
-    <path d="m15 5 3 3-3 3" />
-    <path d="M20 16H6" />
-    <path d="m9 13-3 3 3 3" />
+    <path d="M4 8h15" />
+    <path d="m16 5 3 3-3 3" />
+    <path d="M20 16H5" />
+    <path d="m8 13-3 3 3 3" />
   </>,
 );
 
-// Bridge — arch with horizon line
+// Bridge — semicircular arch on baseline
 export const IconBridge = wrap(
   <>
-    <path d="M4 14h16" />
-    <path d="M6 14C6 9 9 6 12 6s6 3 6 8" />
+    <path d="M3 14h18" />
+    <path d="M6 14a6 6 0 0 1 12 0" />
   </>,
 );
 
