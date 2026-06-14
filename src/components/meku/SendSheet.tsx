@@ -100,7 +100,7 @@ export const SendSheet = ({ open, onOpenChange, defaults, recipientLabel, title 
 
         <button
           onClick={submit}
-          disabled={busy || !amount || Number(amount) <= 0}
+          disabled={busy || !amount || Number(amount) <= 0 || (needsAddress && !address)}
           className="tap mt-5 flex h-[52px] w-full items-center justify-center rounded-full bg-primary text-[15px] font-bold text-primary-foreground shadow-purple disabled:opacity-40"
         >
           {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : "Confirm & sign with PIN"}
