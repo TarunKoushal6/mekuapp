@@ -106,6 +106,7 @@ Deno.serve(async (req) => {
       encryptionKey,
       challengeId,
       wallet: walletRow,
+      appId: Deno.env.get("CIRCLE_APP_ID") ?? null,
     });
   } catch (e: any) {
     console.error(e);

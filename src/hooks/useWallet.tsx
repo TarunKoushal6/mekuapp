@@ -2,13 +2,13 @@ import { createContext, useContext, useEffect, useState, useCallback, ReactNode 
 import { useAuth } from "./useAuth";
 import { initCircle, fetchBalance, WalletRow } from "@/lib/circle";
 
-interface Balance { token: string; amount: string; tokenId: string }
-
 interface WalletCtx {
   wallet: WalletRow | null;
   usdc: string;
   loading: boolean;
-  pendingChallenge: { challengeId: string; userToken: string; encryptionKey: string } | null;
+  pendingChallenge:
+    | { challengeId: string; userToken: string; encryptionKey: string; appId: string }
+    | null;
   refresh: () => Promise<void>;
   clearChallenge: () => void;
 }
@@ -35,11 +35,12 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     try {
       const init = await initCircle();
       setWallet(init.wallet);
-      if (init.challengeId) {
+      if (init.challengeId && init.appId) {
         setPendingChallenge({
           challengeId: init.challengeId,
           userToken: init.userToken,
           encryptionKey: init.encryptionKey,
+          appId: init.appId,
         });
       }
       const bal = await fetchBalance();

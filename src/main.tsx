@@ -6,16 +6,22 @@ import { ThemeProvider } from "./hooks/useTheme.tsx";
 import { WalletProvider } from "./hooks/useWallet.tsx";
 import { PinChallengeModal } from "./components/meku/PinChallengeModal.tsx";
 
-// Asset protection — block context menu / drag on every <img> globally.
+// Asset protection — block context menu / drag / selection globally.
 if (typeof window !== "undefined") {
-  window.addEventListener("contextmenu", (e) => {
+  const stopOnImage = (e: Event) => {
     const t = e.target as HTMLElement | null;
-    if (t && (t.tagName === "IMG" || t.closest("img"))) e.preventDefault();
-  });
-  window.addEventListener("dragstart", (e) => {
+    if (t && (t.tagName === "IMG" || t.closest("img") || t.closest(".no-save"))) {
+      e.preventDefault();
+    }
+  };
+  window.addEventListener("contextmenu", stopOnImage);
+  window.addEventListener("dragstart", stopOnImage);
+  window.addEventListener("selectstart", (e) => {
     const t = e.target as HTMLElement | null;
-    if (t && t.tagName === "IMG") e.preventDefault();
+    if (t && t.closest(".no-save")) e.preventDefault();
   });
+  // iOS Safari long-press
+  document.addEventListener("touchstart", () => {}, { passive: true });
 }
 
 createRoot(document.getElementById("root")!).render(

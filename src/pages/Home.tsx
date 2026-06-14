@@ -34,7 +34,7 @@ const Home = () => {
 
   return (
     <AppShell>
-      <header className="flex items-center justify-between px-5 pb-2 pt-4">
+      <header className="sticky top-0 z-30 flex items-center justify-between bg-background/85 px-5 pb-2 pt-3 backdrop-blur-xl">
         <Logo size={24} />
         <Link to="/notifications" aria-label="Notifications" className="tap relative inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground">
           <IconBell size={20} />
@@ -42,16 +42,9 @@ const Home = () => {
         </Link>
       </header>
 
-      {/* Stories row */}
-      <div className="px-5 pt-3">
-        <div className="flex gap-3 overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden">
-          <StoryItem add label="Your Story" />
-        </div>
-      </div>
-
-      {/* Tabs */}
-      <div className="mt-3 px-5">
-        <div className="flex items-center gap-6 hairline-b">
+      {/* Tabs — X.com-style */}
+      <nav className="sticky top-[52px] z-20 bg-background/85 backdrop-blur-xl hairline-b">
+        <div className="flex items-center gap-8 px-5">
           {tabs.map((t) => (
             <button
               key={t}
@@ -59,11 +52,11 @@ const Home = () => {
               className={cn("tap relative py-3 text-[14px] font-semibold", tab === t ? "text-foreground" : "text-muted-foreground")}
             >
               {t}
-              {tab === t && <span className="absolute inset-x-0 -bottom-px h-[2px] rounded-full bg-primary" />}
+              {tab === t && <span className="absolute inset-x-0 -bottom-px h-[3px] rounded-full bg-primary" />}
             </button>
           ))}
         </div>
-      </div>
+      </nav>
 
       <section className="pb-6">
         {loading ? (
@@ -87,16 +80,5 @@ const Home = () => {
     </AppShell>
   );
 };
-
-const StoryItem = ({ add, label }: { add?: boolean; label: string }) => (
-  <div className="flex w-[68px] shrink-0 flex-col items-center gap-1.5">
-    <button className={cn("tap relative h-[60px] w-[60px] rounded-full p-[2px]", add ? "bg-border" : "gradient-purple")}>
-      <div className="flex h-full w-full items-center justify-center rounded-full bg-surface-2 text-foreground">
-        {add && <IconPlus size={20} />}
-      </div>
-    </button>
-    <span className="truncate text-[11px] text-muted-foreground">{label}</span>
-  </div>
-);
 
 export default Home;

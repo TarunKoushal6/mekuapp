@@ -24,10 +24,16 @@ export interface InitResponse {
   encryptionKey: string;
   challengeId?: string;
   wallet: WalletRow | null;
+  appId?: string | null;
 }
 
+let cachedAppId: string | null = null;
+export function getAppId(): string | null { return cachedAppId; }
+
 export async function initCircle(): Promise<InitResponse> {
-  return invoke<InitResponse>("circle-init");
+  const r = await invoke<InitResponse>("circle-init");
+  if (r.appId) cachedAppId = r.appId;
+  return r;
 }
 
 export async function fetchBalance(): Promise<{ wallet: WalletRow | null; balances: any[] }> {
@@ -55,15 +61,17 @@ export async function startSend(args: SendArgs) {
 // Lazy-loaded SDK instance. Importing the SDK eagerly crashes the bundle
 // because it pulls jsonwebtoken which expects Node's Buffer global.
 let sdkPromise: Promise<any> | null = null;
-async function getSdk() {
-  if (!sdkPromise) {
+let sdkAppId: string | null = null;
+async function getSdk(appId: string) {
+  if (!appId) throw new Error("Circle App ID missing — set CIRCLE_APP_ID secret");
+  if (!sdkPromise || sdkAppId !== appId) {
+    sdkAppId = appId;
     sdkPromise = (async () => {
-      // Polyfill Buffer for the SDK's transitive deps before importing it.
       const { Buffer } = await import("buffer");
       (globalThis as any).Buffer ??= Buffer;
       const mod = await import("@circle-fin/w3s-pw-web-sdk");
       const W3SSdk = (mod as any).W3SSdk ?? (mod as any).default;
-      return new W3SSdk({ appSettings: { appId: "meku" } });
+      return new W3SSdk({ appSettings: { appId } });
     })();
   }
   return sdkPromise;
@@ -74,8 +82,11 @@ export async function executeChallenge(opts: {
   userToken: string;
   encryptionKey: string;
   challengeId: string;
+  appId?: string;
 }): Promise<void> {
-  const s = await getSdk();
+  const appId = opts.appId ?? cachedAppId;
+  if (!appId) throw new Error("Circle App ID missing — set CIRCLE_APP_ID secret");
+  const s = await getSdk(appId);
   return new Promise((resolve, reject) => {
     s.setAuthentication({
       userToken: opts.userToken,
