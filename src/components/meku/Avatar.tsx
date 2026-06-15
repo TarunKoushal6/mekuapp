@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import defaultAvatar from "@/assets/default_avatar.png.asset.json";
 
@@ -17,7 +18,8 @@ const sizeMap = {
 };
 
 export const Avatar = ({ name, src, size = "md", className }: AvatarProps) => {
-  const url = src && src.trim() !== "" ? src : defaultAvatar.url;
+  const [errored, setErrored] = useState(false);
+  const url = !errored && src && src.trim() !== "" ? src : defaultAvatar.url;
   return (
     <div
       className={cn(
@@ -31,6 +33,7 @@ export const Avatar = ({ name, src, size = "md", className }: AvatarProps) => {
         alt={name}
         draggable={false}
         onContextMenu={(e) => e.preventDefault()}
+        onError={() => setErrored(true)}
         className="no-save h-full w-full object-cover"
       />
     </div>

@@ -21,22 +21,23 @@ export const BottomNav = () => {
   return (
     <nav
       aria-label="Primary"
-      className="fixed inset-x-0 bottom-0 z-40 bg-background/80 backdrop-blur-xl"
-      style={{ paddingBottom: "max(env(safe-area-inset-bottom), 8px)" }}
+      className="fixed inset-x-0 bottom-0 z-40 bg-background/85 backdrop-blur-xl"
+      style={{ paddingBottom: "max(env(safe-area-inset-bottom), 6px)" }}
     >
-      <div className="mx-auto max-w-[440px] px-4 pt-2">
-        <ul className="flex h-[64px] items-center justify-between rounded-[24px] border border-border bg-surface/70 px-3">
+      <div className="mx-auto max-w-[440px] px-3 pt-1.5">
+        <ul className="flex h-[62px] items-center justify-between rounded-[22px] border border-border bg-surface/80 px-2 shadow-[0_6px_30px_-12px_hsl(252_95%_40%/0.18)]">
           {items.map(({ to, label, icon: Icon, primary }) => {
-            const active = pathname === to || (to !== "/home" && pathname.startsWith(to));
+            const active =
+              pathname === to || (to !== "/home" && pathname.startsWith(to));
             if (primary) {
               return (
                 <li key={to} className="flex flex-1 justify-center">
                   <NavLink
                     to={to}
                     aria-label={label}
-                    className="tap inline-flex h-[44px] w-[44px] items-center justify-center rounded-[14px] gradient-purple text-primary-foreground shadow-purple"
+                    className="tap relative -mt-5 inline-flex h-[52px] w-[52px] items-center justify-center rounded-[18px] gradient-purple text-primary-foreground shadow-purple ring-4 ring-background"
                   >
-                    <Icon size={22} />
+                    <Icon size={22} strokeWidth={2} />
                   </NavLink>
                 </li>
               );
@@ -47,11 +48,16 @@ export const BottomNav = () => {
                   to={to}
                   aria-label={label}
                   className={cn(
-                    "tap inline-flex h-[40px] w-[40px] items-center justify-center rounded-full",
-                    active ? "text-primary" : "text-muted-foreground",
+                    "tap relative inline-flex h-[44px] w-[44px] items-center justify-center rounded-full transition-colors",
+                    active
+                      ? "text-primary"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                 >
-                  <Icon size={22} />
+                  <Icon size={22} strokeWidth={active ? 2 : 1.6} />
+                  {active && (
+                    <span className="pointer-events-none absolute -bottom-0.5 h-1 w-1 rounded-full bg-primary" />
+                  )}
                 </NavLink>
               </li>
             );

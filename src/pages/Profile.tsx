@@ -66,8 +66,9 @@ const Profile = () => {
       </header>
 
       <section className="px-5 pb-5 pt-2">
-        <div className="flex h-[96px] w-[96px] items-center justify-center overflow-hidden rounded-full border border-border bg-surface-2">
-          <Avatar name={name} src={profile?.avatar_url ?? undefined} className="h-full w-full" />
+        <div className="relative inline-block">
+          <span className="absolute -inset-[3px] rounded-full bg-gradient-to-br from-primary via-primary to-primary-glow" />
+          <Avatar name={name} src={profile?.avatar_url ?? undefined} size="xl" className="relative h-[96px] w-[96px] ring-4 ring-background" />
         </div>
 
         <div className="mt-5 flex items-center gap-2">
