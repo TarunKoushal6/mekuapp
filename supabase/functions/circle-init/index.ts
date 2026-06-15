@@ -78,10 +78,12 @@ Deno.serve(async (req) => {
       });
     }
 
-    // 5. if wallet should now exist, fetch + persist address
+    // 5. if wallet should now exist, fetch + persist address.
+    // Circle's user-controlled `GET /wallets` is scoped by the X-User-Token
+    // header — passing `?userId=` returns "API parameter invalid".
     if (!existing?.address) {
       try {
-        const list = await circleFetch(`/wallets?userId=${circleUserId}`, {
+        const list = await circleFetch(`/wallets`, {
           method: "GET",
           userToken,
         });
