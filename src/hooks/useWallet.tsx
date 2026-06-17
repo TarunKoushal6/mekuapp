@@ -2,9 +2,18 @@ import { createContext, useContext, useEffect, useState, useCallback, ReactNode 
 import { useAuth } from "./useAuth";
 import { initCircle, fetchBalance, WalletRow } from "@/lib/circle";
 
+export interface TokenBalance {
+  symbol: string;
+  name: string;
+  amount: string;
+  chain: string;
+  tokenAddress?: string;
+}
+
 interface WalletCtx {
   wallet: WalletRow | null;
   usdc: string;
+  balances: TokenBalance[];
   loading: boolean;
   pendingChallenge:
     | { challengeId: string; userToken: string; encryptionKey: string; appId: string }
@@ -16,6 +25,7 @@ interface WalletCtx {
 const Ctx = createContext<WalletCtx>({
   wallet: null,
   usdc: "0",
+  balances: [],
   loading: false,
   pendingChallenge: null,
   refresh: async () => {},
@@ -26,6 +36,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
   const [wallet, setWallet] = useState<WalletRow | null>(null);
   const [usdc, setUsdc] = useState("0");
+  const [balances, setBalances] = useState<TokenBalance[]>([]);
   const [loading, setLoading] = useState(false);
   const [pendingChallenge, setPendingChallenge] = useState<WalletCtx["pendingChallenge"]>(null);
 
@@ -45,9 +56,15 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       }
       const bal = await fetchBalance();
       if (bal.wallet) setWallet(bal.wallet);
-      const u = (bal.balances ?? []).find((b: any) =>
-        b.token?.symbol === "USDC" || b.token?.name === "USD Coin",
-      );
+      const tokens: TokenBalance[] = (bal.balances ?? []).map((b: any) => ({
+        symbol: b.token?.symbol ?? "?",
+        name: b.token?.name ?? b.token?.symbol ?? "Token",
+        amount: b.amount ?? "0",
+        chain: b.token?.blockchain ?? "ARC",
+        tokenAddress: b.token?.tokenAddress,
+      }));
+      setBalances(tokens);
+      const u = tokens.find((t) => t.symbol === "USDC");
       setUsdc(u?.amount ?? "0");
     } catch (e) {
       console.warn("wallet refresh failed", e);
@@ -60,7 +77,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <Ctx.Provider value={{
-      wallet, usdc, loading, pendingChallenge, refresh,
+      wallet, usdc, balances, loading, pendingChallenge, refresh,
       clearChallenge: () => setPendingChallenge(null),
     }}>
       {children}
