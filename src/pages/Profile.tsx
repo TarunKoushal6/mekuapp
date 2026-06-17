@@ -1,6 +1,6 @@
 import { AppShell } from "@/components/meku/AppShell";
 import { BadgeCheck, Loader2 } from "lucide-react";
-import { IconBack, IconMore, IconSettings } from "@/components/meku/MekuIcon";
+import { IconBack, IconMore, IconSettings, IconCopy, IconExternal } from "@/components/meku/MekuIcon";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
@@ -9,6 +9,8 @@ import { EmptyState } from "@/components/meku/EmptyState";
 import { FeedCard } from "@/components/meku/FeedCard";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
 import { fetchPosts, getProfile, type Post, type Profile as ProfileT } from "@/lib/social";
 
 const tabs = ["Posts", "Replies", "Media", "Likes"] as const;
@@ -59,9 +61,33 @@ const Profile = () => {
               <IconSettings size={18} />
             </Link>
           )}
-          <button aria-label="More" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground">
-            <IconMore size={20} />
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button aria-label="More" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground">
+                <IconMore size={20} />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-52 rounded-2xl">
+              <DropdownMenuItem
+                onClick={async () => {
+                  const url = `${window.location.origin}/u/${profile?.username ?? ""}`;
+                  await navigator.clipboard.writeText(url);
+                  toast.success("Profile link copied");
+                }}
+              >
+                <IconCopy size={16} className="mr-2" /> Copy profile link
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  const url = `${window.location.origin}/u/${profile?.username ?? ""}`;
+                  if (navigator.share) navigator.share({ url, title: name }).catch(() => {});
+                  else window.open(url, "_blank");
+                }}
+              >
+                <IconExternal size={16} className="mr-2" /> Share profile
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </header>
 
