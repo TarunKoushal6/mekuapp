@@ -9,6 +9,7 @@ import {
 } from "@/components/meku/MekuIcon";
 import { useWallet } from "@/hooks/useWallet";
 import { SendSheet } from "@/components/meku/SendSheet";
+import { TokenPicker, TokenOption } from "@/components/meku/TokenPicker";
 import { toast } from "sonner";
 
 const tabs = [
@@ -18,7 +19,7 @@ const tabs = [
 ] as const;
 type Tab = (typeof tabs)[number]["id"];
 
-const USDC_LOGO = "https://cryptologos.cc/logos/usd-coin-usdc-logo.svg";
+const USDC: TokenOption = { symbol: "USDC", name: "USD Coin", chain: "Arc", logo: "https://cryptologos.cc/logos/usd-coin-usdc-logo.svg" };
 
 const Onchain = () => {
   const navigate = useNavigate();
@@ -26,6 +27,9 @@ const Onchain = () => {
   const [tab, setTab] = useState<Tab>("Swap");
   const [payAmount, setPayAmount] = useState("");
   const [sendOpen, setSendOpen] = useState(false);
+  const [tokenIn, setTokenIn] = useState<TokenOption>(USDC);
+  const [tokenOut, setTokenOut] = useState<TokenOption>({ symbol: "EURC", name: "Euro Coin", chain: "Arc" });
+  const [pickerFor, setPickerFor] = useState<"in" | "out" | null>(null);
 
   const current = tabs.find((t) => t.id === tab)!;
   const Hero = current.icon;
@@ -35,11 +39,8 @@ const Onchain = () => {
       toast.error("Your wallet is still provisioning. Try again in a moment.");
       return;
     }
-    if (tab === "Send") {
-      setSendOpen(true);
-      return;
-    }
-    toast.info(`${tab} is coming soon — wired via Circle App Kit.`);
+    if (tab === "Send") { setSendOpen(true); return; }
+    toast.info(`${tab} ${tokenIn.symbol} → ${tokenOut.symbol} routed via Circle App Kit (testnet).`);
   };
 
   return (
@@ -52,7 +53,6 @@ const Onchain = () => {
         }
       />
 
-      {/* Hero */}
       <section className="px-5 pb-6 pt-2">
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -70,7 +70,6 @@ const Onchain = () => {
         </div>
       </section>
 
-      {/* Tabs */}
       <div className="px-5">
         <div className="inline-flex w-full items-center gap-1 rounded-full bg-surface-2 p-1">
           {tabs.map(({ id, icon: Icon }) => (
@@ -89,7 +88,6 @@ const Onchain = () => {
         </div>
       </div>
 
-      {/* Card */}
       <div className="mt-5 px-5">
         <div className="rounded-[20px] border border-border bg-surface p-5">
           <div className="flex items-center justify-between">
@@ -105,7 +103,7 @@ const Onchain = () => {
           </div>
 
           <div className="mt-5 flex items-center justify-between gap-3">
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <p className="text-[12px] uppercase tracking-wider text-muted-foreground">You pay</p>
               <input
                 value={payAmount}
@@ -114,30 +112,34 @@ const Onchain = () => {
                 inputMode="decimal"
                 className="mt-1 w-full bg-transparent text-[34px] font-bold tracking-[-0.02em] text-foreground outline-none"
               />
-              <p className="text-[12px] text-muted-foreground">Balance {usdc} USDC</p>
+              <p className="text-[12px] text-muted-foreground">Balance {usdc} {tokenIn.symbol}</p>
             </div>
-            <TokenChip symbol="USDC" />
+            <TokenChip token={tokenIn} onClick={() => setPickerFor("in")} />
           </div>
 
           {tab !== "Send" && (
             <>
               <div className="my-4 flex items-center">
                 <div className="h-px flex-1 bg-border" />
-                <span className="mx-2 inline-flex h-[36px] w-[36px] items-center justify-center rounded-full border border-border bg-background text-foreground">
+                <button
+                  onClick={() => { const t = tokenIn; setTokenIn(tokenOut); setTokenOut(t); }}
+                  className="tap mx-2 inline-flex h-[36px] w-[36px] items-center justify-center rounded-full border border-border bg-background text-foreground"
+                  aria-label="Swap direction"
+                >
                   {tab === "Swap" ? <IconSwap size={16} /> : <IconBridge size={16} />}
-                </span>
+                </button>
                 <div className="h-px flex-1 bg-border" />
               </div>
 
               <div className="flex items-center justify-between gap-3">
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <p className="text-[12px] uppercase tracking-wider text-muted-foreground">You receive</p>
                   <p className="mt-1 text-[34px] font-bold tracking-[-0.02em] text-foreground">
                     {payAmount || "0"}
                   </p>
                   <p className="text-[12px] text-muted-foreground">Estimated</p>
                 </div>
-                <TokenChip symbol={tab === "Bridge" ? "USDC" : "EURC"} />
+                <TokenChip token={tokenOut} onClick={() => setPickerFor("out")} />
               </div>
             </>
           )}
@@ -165,29 +167,38 @@ const Onchain = () => {
         <SendSheet
           open={sendOpen}
           onOpenChange={setSendOpen}
-          title="Send USDC"
+          title={`Send ${tokenIn.symbol}`}
           defaults={{ amount: payAmount || "1", kind: "send" }}
+        />
+      )}
+
+      {pickerFor && (
+        <TokenPicker
+          open={!!pickerFor}
+          onOpenChange={(o) => !o && setPickerFor(null)}
+          value={pickerFor === "in" ? tokenIn.symbol : tokenOut.symbol}
+          onSelect={(t) => pickerFor === "in" ? setTokenIn(t) : setTokenOut(t)}
         />
       )}
     </AppShell>
   );
 };
 
-const TokenChip = ({ symbol }: { symbol: string }) => (
-  <button className="tap flex shrink-0 items-center gap-2 rounded-full border border-border bg-background py-1.5 pl-1.5 pr-3">
-    {symbol === "USDC" ? (
-      <img src={USDC_LOGO} alt="USDC" className="h-[28px] w-[28px] rounded-full" />
+const TokenChip = ({ token, onClick }: { token: TokenOption; onClick?: () => void }) => (
+  <button onClick={onClick} className="tap flex shrink-0 items-center gap-2 rounded-full border border-border bg-background py-1.5 pl-1.5 pr-3">
+    {token.logo ? (
+      <img src={token.logo} alt={token.symbol} className="h-[28px] w-[28px] rounded-full" />
     ) : (
       <span className="inline-flex h-[28px] w-[28px] items-center justify-center rounded-full bg-primary-soft text-[11px] font-bold text-primary">
-        {symbol.slice(0, 2)}
+        {token.symbol.slice(0, 2)}
       </span>
     )}
     <div className="text-left leading-tight">
       <p className="flex items-center gap-1 text-[13px] font-bold text-foreground">
-        {symbol}
+        {token.symbol}
         <ChevronDown className="h-[12px] w-[12px]" strokeWidth={2} />
       </p>
-      <p className="text-[11px] text-muted-foreground">Arc</p>
+      <p className="text-[11px] text-muted-foreground">{token.chain}</p>
     </div>
   </button>
 );

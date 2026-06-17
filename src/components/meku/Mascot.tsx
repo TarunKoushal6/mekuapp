@@ -30,6 +30,17 @@ const sources: Record<MascotPose, string> = {
   happy: happy.url,
 };
 
+// Preload every mascot pose at module load so empty/loading states render
+// the artwork instantly without a network round-trip.
+if (typeof window !== "undefined") {
+  Object.values(sources).forEach((url) => {
+    const img = new Image();
+    img.decoding = "async";
+    img.loading = "eager";
+    img.src = url;
+  });
+}
+
 /**
  * MEKU mascot — official brand illustration. Use only in onboarding,
  * empty, loading, success, and welcome states. Never in main feed or nav.

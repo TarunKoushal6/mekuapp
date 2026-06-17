@@ -19,7 +19,8 @@ const sizeMap = {
 
 export const Avatar = ({ name, src, size = "md", className }: AvatarProps) => {
   const [errored, setErrored] = useState(false);
-  const url = !errored && src && src.trim() !== "" ? src : defaultAvatar.url;
+  const usingDefault = errored || !src || src.trim() === "";
+  const url = usingDefault ? defaultAvatar.url : src!;
   return (
     <div
       className={cn(
@@ -34,6 +35,13 @@ export const Avatar = ({ name, src, size = "md", className }: AvatarProps) => {
         draggable={false}
         onContextMenu={(e) => e.preventDefault()}
         onError={() => setErrored(true)}
+        // For the brand mascot avatar we zoom in slightly and lock to the upper
+        // third so the face stays centered in every size.
+        style={
+          usingDefault
+            ? { objectPosition: "50% 22%", transform: "scale(1.18)" }
+            : undefined
+        }
         className="no-save h-full w-full object-cover"
       />
     </div>
