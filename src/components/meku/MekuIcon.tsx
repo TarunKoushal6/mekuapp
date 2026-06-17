@@ -143,10 +143,11 @@ export const IconCompose = wrap(
   </>,
 );
 
+// Settings — proper Apple-style cog: 8 rounded teeth + inner circle.
 export const IconSettings = wrap(
   <>
-    <circle cx="12" cy="12" r="2.6" />
-    <path d="M12 3v2.2M12 18.8V21M3 12h2.2M18.8 12H21M5.6 5.6l1.6 1.6M16.8 16.8l1.6 1.6M5.6 18.4l1.6-1.6M16.8 7.2l1.6-1.6" />
+    <path d="M12 2.6 13.5 5l2.7-.4 1 2.6 2.5 1.1-.4 2.7 1.7 2.2-1.7 2.2.4 2.7-2.5 1.1-1 2.6-2.7-.4L12 21.4 10.5 19l-2.7.4-1-2.6L4.3 15.7l.4-2.7L3 10.8l1.7-2.2-.4-2.7 2.5-1.1 1-2.6L10.5 5 12 2.6Z" />
+    <circle cx="12" cy="12" r="3" />
   </>,
 );
 
