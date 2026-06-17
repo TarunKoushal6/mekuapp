@@ -27,7 +27,7 @@ const TOKEN_LOGO: Record<string, string> = { USDC: USDC_LOGO };
 const Wallet = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { wallet, usdc, loading, refresh } = useWallet();
+  const { wallet, usdc, balances, loading, refresh } = useWallet();
   const [tab, setTab] = useState<Tab>("Tokens");
   const [show, setShow] = useState(true);
   const [sendOpen, setSendOpen] = useState(false);
