@@ -2,7 +2,7 @@
 // No PIN modal — Circle signs with the entity secret on the server.
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { circleFetch, entitySecretCiphertext, uuid } from "../_shared/circle.ts";
+import { circleFetch, circleStateToStatus, entitySecretCiphertext, getCircleTransaction, uuid } from "../_shared/circle.ts";
 
 interface Body {
   destinationAddress?: string;
@@ -74,6 +74,7 @@ Deno.serve(async (req) => {
       }),
     });
 
+    const circleTxId = tx?.data?.id ?? null;
     const { data: txRow } = await admin.from("transactions").insert({
       user_id: userId,
       kind: body.kind ?? "send",
@@ -83,13 +84,32 @@ Deno.serve(async (req) => {
       counterparty_address: dest,
       post_id: body.postId ?? null,
       comment_id: body.commentId ?? null,
-      circle_tx_id: tx?.data?.id ?? null,
+      circle_tx_id: circleTxId,
       status: "pending",
     }).select().single();
 
+    let finalRow = txRow;
+    if (circleTxId && txRow?.id) {
+      for (let i = 0; i < 8; i++) {
+        await new Promise((resolve) => setTimeout(resolve, i === 0 ? 750 : 1500));
+        const latest = await getCircleTransaction(circleTxId);
+        const status = circleStateToStatus(latest?.state ?? latest?.status);
+        if (status !== "pending") {
+          const { data: updated } = await admin.from("transactions").update({
+            status,
+            tx_hash: latest?.txHash ?? null,
+            metadata: { circle: latest },
+          }).eq("id", txRow.id).select().single();
+          finalRow = updated ?? txRow;
+          break;
+        }
+      }
+    }
+
     return json({
-      transactionId: txRow?.id,
-      circleTxId: tx?.data?.id,
+      transactionId: finalRow?.id,
+      circleTxId,
+      status: finalRow?.status ?? "pending",
       state: tx?.data?.state ?? "INITIATED",
     });
   } catch (e: any) {
