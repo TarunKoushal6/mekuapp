@@ -20,6 +20,7 @@ const PRESETS = ["1", "5", "10", "25"];
 export const SendSheet = ({ open, onOpenChange, defaults, recipientLabel, title = "Send USDC" }: Props) => {
   const [amount, setAmount] = useState(defaults?.amount ?? "1");
   const [address, setAddress] = useState(defaults?.destinationAddress ?? "");
+  const [confirmPin, setConfirmPin] = useState("");
   const [busy, setBusy] = useState(false);
   const { refresh, wallet, usdc } = useWallet();
   const needsAddress = !defaults?.recipientUserId && !defaults?.destinationAddress;
@@ -28,6 +29,10 @@ export const SendSheet = ({ open, onOpenChange, defaults, recipientLabel, title 
     if (busy) return;
     if (!wallet?.wallet_id) {
       toast.error("Your wallet is still provisioning. Try again in a moment.");
+      return;
+    }
+    if (confirmPin.length !== 4) {
+      toast.error("Enter your 4-digit confirmation PIN first.");
       return;
     }
     setBusy(true);
@@ -39,6 +44,7 @@ export const SendSheet = ({ open, onOpenChange, defaults, recipientLabel, title 
         kind: defaults?.kind ?? "send",
       });
       toast.success(`Sent ${amount} USDC`);
+      setConfirmPin("");
       onOpenChange(false);
       refresh();
     } catch (e: any) {
@@ -103,6 +109,15 @@ export const SendSheet = ({ open, onOpenChange, defaults, recipientLabel, title 
             </button>
           ))}
         </div>
+
+        <input
+          value={confirmPin}
+          onChange={(e) => setConfirmPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
+          placeholder="4-digit confirmation PIN"
+          inputMode="numeric"
+          type="password"
+          className="mt-3 h-12 w-full rounded-2xl border border-border bg-surface px-4 text-center text-[14px] font-semibold outline-none focus:border-primary"
+        />
 
         <button
           onClick={submit}
