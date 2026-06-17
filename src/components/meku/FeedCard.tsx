@@ -1,14 +1,15 @@
 import { Heart, MessageCircle, Repeat2, Upload, BadgeCheck } from "lucide-react";
 import { Avatar } from "./Avatar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
-import { toggleLike, type Post, timeAgo } from "@/lib/social";
+import { toggleLike, toggleRepost, isReposted, getRepostCount, type Post, timeAgo } from "@/lib/social";
 import { IconSend, IconMore } from "./MekuIcon";
 import { SendSheet } from "./SendSheet";
 import { InlineActionCard, parseInlineAction } from "./InlineActionCard";
+import { PostBody } from "./PostBody";
 
 interface FeedCardProps {
   post: Post;
@@ -21,9 +22,38 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
   const [liked, setLiked] = useState(post.liked_by_me);
   const [likeCount, setLikeCount] = useState(post.like_count);
   const [tipOpen, setTipOpen] = useState(false);
+  const [reposted, setReposted] = useState(false);
+  const [repostCount, setRepostCount] = useState(0);
   const author = post.author;
   const name = author?.display_name || author?.username || "Anonymous";
   const handle = author?.username || "anon";
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const [c, mine] = await Promise.all([
+        getRepostCount(post.id),
+        user ? isReposted(user.id, post.id) : Promise.resolve(false),
+      ]);
+      if (!cancelled) { setRepostCount(c); setReposted(mine); }
+    })();
+    return () => { cancelled = true; };
+  }, [post.id, user?.id]);
+
+  const handleRepost = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!user) { navigate("/auth"); return; }
+    const next = !reposted;
+    setReposted(next);
+    setRepostCount((c) => c + (next ? 1 : -1));
+    try {
+      await toggleRepost(user.id, post.id, reposted);
+    } catch (err: any) {
+      setReposted(!next);
+      setRepostCount((c) => c + (next ? -1 : 1));
+      toast.error(err?.message ?? "Could not repost");
+    }
+  };
 
   const handleLike = async (e: React.MouseEvent) => {
     e.stopPropagation();
