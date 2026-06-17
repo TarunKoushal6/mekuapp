@@ -76,7 +76,7 @@ export const SendSheet = ({ open, onOpenChange, defaults, recipientLabel, title 
             </span>
             <span className="text-[15px] font-semibold text-muted-foreground">USDC</span>
           </div>
-          <p className="mt-1 text-[12px] text-muted-foreground">Arc Testnet · Bal {wallet?.address ? "loading..." : "—"}</p>
+          <p className="mt-1 text-[12px] text-muted-foreground">Arc Testnet · Bal {Number(usdc || 0).toFixed(2)} USDC</p>
         </div>
 
         <input
