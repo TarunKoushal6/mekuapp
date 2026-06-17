@@ -66,21 +66,21 @@ const CommentNode = ({ node, postId, onReplied, depth = 0 }: { node: TreeNode; p
             <span className="text-muted-foreground">@{node.author?.username ?? "anon"}</span>
             <span className="text-muted-foreground">· {timeAgo(node.created_at)}</span>
           </div>
-          <p className="mt-0.5 whitespace-pre-wrap text-[14px] leading-[1.45] text-foreground/90">{node.body}</p>
+          <PostBody text={node.body} className="mt-0.5 whitespace-pre-wrap break-words text-[14px] leading-[1.45] text-foreground/90" />
           <button onClick={() => setShowReply((v) => !v)} className="tap mt-1 text-[12px] font-medium text-muted-foreground hover:text-foreground">
             Reply
           </button>
           {showReply && (
-            <div className="mt-2 flex items-center gap-2">
+            <div className="mt-2 flex min-w-0 items-center gap-2">
               <input
                 autoFocus
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && send()}
                 placeholder={`Reply to ${name}…`}
-                className="h-[36px] flex-1 rounded-full border border-border bg-surface px-3 text-[13px] outline-none focus:border-primary"
+                className="h-[36px] min-w-0 flex-1 rounded-full border border-border bg-surface px-3 text-[13px] outline-none focus:border-primary"
               />
-              <button onClick={send} disabled={busy || !draft.trim()} className="tap rounded-full bg-primary px-3 py-1.5 text-[12px] font-bold text-primary-foreground disabled:opacity-40">
+              <button onClick={send} disabled={busy || !draft.trim()} className="tap shrink-0 rounded-full bg-primary px-3 py-1.5 text-[12px] font-bold text-primary-foreground disabled:opacity-40">
                 Send
               </button>
             </div>
@@ -88,8 +88,8 @@ const CommentNode = ({ node, postId, onReplied, depth = 0 }: { node: TreeNode; p
         </div>
       </div>
       {node.children.length > 0 && (
-        <div className="ml-9 mt-1">
-          {node.children.map((c) => <CommentNode key={c.id} node={c} postId={postId} onReplied={onReplied} depth={depth + 1} />)}
+        <div className="ml-3 mt-1">
+          {node.children.map((c) => <CommentNode key={c.id} node={c} postId={postId} onReplied={onReplied} depth={Math.min(depth + 1, 3)} />)}
         </div>
       )}
     </div>
