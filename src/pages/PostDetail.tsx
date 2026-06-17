@@ -15,6 +15,7 @@ import {
 } from "@/lib/social";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { PostBody } from "@/components/meku/PostBody";
 
 interface TreeNode extends CommentRow { children: TreeNode[]; }
 
@@ -57,7 +58,7 @@ const CommentNode = ({ node, postId, onReplied, depth = 0 }: { node: TreeNode; p
 
   return (
     <div className={cn("py-3", depth > 0 && "border-l border-border pl-3")}>
-      <div className="flex gap-3">
+      <div className="flex min-w-0 gap-3">
         <Avatar name={name} src={node.author?.avatar_url ?? undefined} size="sm" />
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5 text-[13px]">
