@@ -42,13 +42,22 @@ Deno.serve(async (req) => {
     const walletId = sender?.dcw_wallet_id;
     if (!walletId) return json({ error: "DCW wallet not provisioned" }, 400);
 
-    let dest = body.destinationAddress;
+    let dest = body.destinationAddress?.trim();
     if (!dest && body.recipientUserId) {
       const { data: recipient } = await admin
         .from("wallets").select("dcw_address,address").eq("user_id", body.recipientUserId).maybeSingle();
-      dest = recipient?.dcw_address ?? recipient?.address ?? undefined;
+      dest = (recipient?.dcw_address ?? recipient?.address ?? undefined)?.trim();
+      if (!dest) {
+        return json({ error: "Recipient hasn't set up their MEKU wallet yet." }, 400);
+      }
     }
     if (!dest) return json({ error: "destination required" }, 400);
+    if (!/^0x[a-fA-F0-9]{40}$/.test(dest)) {
+      return json({ error: `Invalid destination address: ${dest}` }, 400);
+    }
+    if (sender?.dcw_address && dest.toLowerCase() === String(sender.dcw_address).toLowerCase()) {
+      return json({ error: "Cannot send to your own wallet." }, 400);
+    }
 
     // Look up USDC tokenId from DCW balances (no userToken needed).
     let tokenId = body.tokenId;
