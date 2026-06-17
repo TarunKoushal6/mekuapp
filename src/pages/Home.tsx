@@ -43,10 +43,9 @@ const Home = () => {
             aria-label="Menu"
             className="tap inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground"
           >
-            <Menu className="h-[22px] w-[22px]" strokeWidth={2} />
+            <Menu className="h-[24px] w-[24px]" strokeWidth={2} />
           </button>
-          <Logo appIcon size={28} />
-          <Logo size={22} />
+          <Logo size={28} />
         </div>
         <Link to="/notifications" aria-label="Notifications" className="tap relative inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground">
           <IconBell size={20} />

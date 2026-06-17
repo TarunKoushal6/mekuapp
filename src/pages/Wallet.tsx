@@ -161,7 +161,11 @@ const Wallet = () => {
         <QA icon={IconSend} label="Send" onClick={() => setSendOpen(true)} />
         <QA icon={IconSwap} label="Swap" onClick={() => navigate("/onchain")} />
         <QA icon={IconBridge} label="Bridge" onClick={() => navigate("/onchain")} />
-        <QA icon={IconAssets} label="Assets" onClick={() => setTab("Tokens")} />
+        <QA icon={IconAssets} label="Assets" onClick={async () => {
+          setTab("Tokens");
+          await refresh();
+          toast.success("Assets refreshed");
+        }} />
       </div>
 
       <div className="mt-6 px-5">
