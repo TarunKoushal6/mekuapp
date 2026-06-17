@@ -9,7 +9,10 @@ import { EmptyState } from "@/components/meku/EmptyState";
 import { FeedCard } from "@/components/meku/FeedCard";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { fetchPosts, getProfile, type Post, type Profile as ProfileT } from "@/lib/social";
+import {
+  fetchPosts, getProfile, type Post, type Profile as ProfileT,
+  getFollowCounts, isFollowing, followUser, unfollowUser,
+} from "@/lib/social";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 
@@ -24,6 +27,9 @@ const Profile = () => {
   const [profile, setProfile] = useState<ProfileT | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const [counts, setCounts] = useState({ followers: 0, following: 0 });
+  const [following, setFollowing] = useState(false);
+  const [followBusy, setFollowBusy] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -37,17 +43,39 @@ const Profile = () => {
       }
       setProfile(p);
       if (p) {
-        const all = await fetchPosts(user?.id);
-        setPosts(all.filter((x) => x.user_id === p!.id));
+        const [all, c, follows] = await Promise.all([
+          fetchPosts(user?.id, { authorId: p.id }),
+          getFollowCounts(p.id),
+          user && user.id !== p.id ? isFollowing(user.id, p.id) : Promise.resolve(false),
+        ]);
+        setPosts(all);
+        setCounts(c);
+        setFollowing(follows);
       }
     } finally { setLoading(false); }
   }, [handle, user]);
 
   useEffect(() => { load(); }, [load]);
 
+  const toggleFollow = async () => {
+    if (!user || !profile || followBusy) { if (!user) navigate("/auth"); return; }
+    setFollowBusy(true);
+    const next = !following;
+    setFollowing(next);
+    setCounts((c) => ({ ...c, followers: c.followers + (next ? 1 : -1) }));
+    try {
+      if (next) await followUser(user.id, profile.id);
+      else await unfollowUser(user.id, profile.id);
+    } catch (e: any) {
+      setFollowing(!next);
+      setCounts((c) => ({ ...c, followers: c.followers + (next ? -1 : 1) }));
+      toast.error(e?.message ?? "Could not update follow");
+    } finally { setFollowBusy(false); }
+  };
+
   const isMe = user && profile && user.id === profile.id;
   const name = profile?.display_name || profile?.username || (user?.email ?? "Profile");
-  const stats = { posts: posts.length, followers: 0, following: 0 };
+  const stats = { posts: posts.length, followers: counts.followers, following: counts.following };
 
   return (
     <AppShell>
