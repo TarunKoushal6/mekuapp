@@ -75,6 +75,24 @@ export type Database = {
           },
         ]
       }
+      follows: {
+        Row: {
+          created_at: string
+          followee_id: string
+          follower_id: string
+        }
+        Insert: {
+          created_at?: string
+          followee_id: string
+          follower_id: string
+        }
+        Update: {
+          created_at?: string
+          followee_id?: string
+          follower_id?: string
+        }
+        Relationships: []
+      }
       post_likes: {
         Row: {
           created_at: string
@@ -155,6 +173,7 @@ export type Database = {
           created_at: string
           display_name: string | null
           id: string
+          pin_hash: string | null
           updated_at: string
           username: string | null
           verified: boolean
@@ -165,6 +184,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id: string
+          pin_hash?: string | null
           updated_at?: string
           username?: string | null
           verified?: boolean
@@ -175,11 +195,38 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          pin_hash?: string | null
           updated_at?: string
           username?: string | null
           verified?: boolean
         }
         Relationships: []
+      }
+      reposts: {
+        Row: {
+          created_at: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reposts_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       transactions: {
         Row: {

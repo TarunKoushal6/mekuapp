@@ -71,24 +71,27 @@ const Create = () => {
           placeholder="Title (optional)"
           className="w-full bg-transparent text-[26px] font-bold leading-[1.15] tracking-[-0.02em] text-foreground outline-none placeholder:text-muted-foreground/50"
         />
-        <textarea
-          ref={bodyRef}
-          value={body}
-          onChange={(e) => { setBody(e.target.value); setCaret(e.target.selectionStart ?? e.target.value.length); }}
-          onKeyUp={(e) => setCaret((e.target as HTMLTextAreaElement).selectionStart ?? 0)}
-          onClick={(e) => setCaret((e.target as HTMLTextAreaElement).selectionStart ?? 0)}
-          rows={12}
-          placeholder="What's on your mind? Type @ to mention someone."
-          className="mt-3 w-full resize-none bg-transparent text-[16px] leading-[1.55] text-foreground outline-none placeholder:text-muted-foreground/60"
-        />
-        <MentionAutocomplete
-          value={body}
-          onChange={setBody}
-          caret={caret}
-          setCaret={setCaret}
-          inputRef={bodyRef}
-        />
+        <div className="relative mt-3">
+          <textarea
+            ref={bodyRef}
+            value={body}
+            onChange={(e) => { setBody(e.target.value); setCaret(e.target.selectionStart ?? e.target.value.length); }}
+            onKeyUp={(e) => setCaret((e.target as HTMLTextAreaElement).selectionStart ?? 0)}
+            onClick={(e) => setCaret((e.target as HTMLTextAreaElement).selectionStart ?? 0)}
+            rows={12}
+            placeholder="What's on your mind? Type @ to mention someone."
+            className="w-full resize-none bg-transparent text-[16px] leading-[1.55] text-foreground outline-none placeholder:text-muted-foreground/60"
+          />
+          <MentionAutocomplete
+            value={body}
+            onChange={setBody}
+            caret={caret}
+            setCaret={setCaret}
+            inputRef={bodyRef}
+          />
+        </div>
       </div>
+
 
       <div className="fixed inset-x-0 bottom-0 z-30 hairline-t bg-background/90 backdrop-blur-xl" style={{ paddingBottom: "max(env(safe-area-inset-bottom), 8px)" }}>
         <div className="mx-auto flex h-[56px] max-w-[440px] items-center gap-1 px-3 text-muted-foreground">

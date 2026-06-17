@@ -4,6 +4,7 @@ import "./index.css";
 import { AuthProvider } from "./hooks/useAuth.tsx";
 import { ThemeProvider } from "./hooks/useTheme.tsx";
 import { WalletProvider } from "./hooks/useWallet.tsx";
+import { PinProvider } from "./hooks/usePin.tsx";
 
 
 // Asset protection — block context menu / drag globally, but only when the
@@ -35,7 +36,9 @@ createRoot(document.getElementById("root")!).render(
   <ThemeProvider>
     <AuthProvider>
       <WalletProvider>
-        <App />
+        <PinProvider>
+          <App />
+        </PinProvider>
       </WalletProvider>
 
     </AuthProvider>

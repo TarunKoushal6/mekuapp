@@ -1,14 +1,15 @@
 import { Heart, MessageCircle, Repeat2, Upload, BadgeCheck } from "lucide-react";
 import { Avatar } from "./Avatar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
-import { toggleLike, type Post, timeAgo } from "@/lib/social";
+import { toggleLike, toggleRepost, isReposted, getRepostCount, type Post, timeAgo } from "@/lib/social";
 import { IconSend, IconMore } from "./MekuIcon";
 import { SendSheet } from "./SendSheet";
 import { InlineActionCard, parseInlineAction } from "./InlineActionCard";
+import { PostBody } from "./PostBody";
 
 interface FeedCardProps {
   post: Post;
@@ -21,9 +22,38 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
   const [liked, setLiked] = useState(post.liked_by_me);
   const [likeCount, setLikeCount] = useState(post.like_count);
   const [tipOpen, setTipOpen] = useState(false);
+  const [reposted, setReposted] = useState(false);
+  const [repostCount, setRepostCount] = useState(0);
   const author = post.author;
   const name = author?.display_name || author?.username || "Anonymous";
   const handle = author?.username || "anon";
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const [c, mine] = await Promise.all([
+        getRepostCount(post.id),
+        user ? isReposted(user.id, post.id) : Promise.resolve(false),
+      ]);
+      if (!cancelled) { setRepostCount(c); setReposted(mine); }
+    })();
+    return () => { cancelled = true; };
+  }, [post.id, user?.id]);
+
+  const handleRepost = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!user) { navigate("/auth"); return; }
+    const next = !reposted;
+    setReposted(next);
+    setRepostCount((c) => c + (next ? 1 : -1));
+    try {
+      await toggleRepost(user.id, post.id, reposted);
+    } catch (err: any) {
+      setReposted(!next);
+      setRepostCount((c) => c + (next ? -1 : 1));
+      toast.error(err?.message ?? "Could not repost");
+    }
+  };
 
   const handleLike = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -81,7 +111,12 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
 
       <div className="ml-[52px] mt-1.5">
         {post.title && <h2 className="text-[15.5px] font-semibold leading-[1.4] tracking-[-0.005em] text-foreground">{post.title}</h2>}
-        {post.body && <p className={(post.title ? "mt-1 " : "") + "whitespace-pre-wrap text-[15px] leading-[1.5] text-foreground/90"}>{post.body}</p>}
+        {post.body && (
+          <PostBody
+            text={post.body}
+            className={(post.title ? "mt-1 " : "") + "whitespace-pre-wrap text-[15px] leading-[1.5] text-foreground/90"}
+          />
+        )}
         {post.image_url && (
           <div className="mt-3 overflow-hidden rounded-[14px] border border-border bg-surface-2">
             <img src={post.image_url} alt="" loading="lazy" className="aspect-[5/4] w-full object-cover" />
@@ -101,8 +136,13 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
             <MessageCircle className="h-[18px] w-[18px]" strokeWidth={1.6} />
             <span className="text-[13px] tabular-nums">{post.comment_count}</span>
           </button>
-          <button onClick={(e) => e.stopPropagation()} className="tap inline-flex items-center gap-1.5" aria-label="Repost">
+          <button
+            onClick={handleRepost}
+            className={cn("tap inline-flex items-center gap-1.5", reposted && "text-emerald-500")}
+            aria-label="Repost"
+          >
             <Repeat2 className="h-[18px] w-[18px]" strokeWidth={1.6} />
+            {repostCount > 0 && <span className="text-[13px] tabular-nums">{repostCount}</span>}
           </button>
           <button onClick={handleLike} className="tap inline-flex items-center gap-1.5" aria-label="Like">
             <Heart className={cn("h-[18px] w-[18px] transition-colors", liked && "fill-[#ef3b6b] text-[#ef3b6b]")} strokeWidth={1.6} />

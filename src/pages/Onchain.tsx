@@ -1,6 +1,6 @@
 import { AppShell } from "@/components/meku/AppShell";
 import { TopBar, IconButton } from "@/components/meku/TopBar";
-import { ChevronDown, SlidersHorizontal } from "lucide-react";
+import { ChevronDown, Loader2, SlidersHorizontal } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -8,6 +8,7 @@ import {
   IconBack, IconSend, IconSwap, IconBridge,
 } from "@/components/meku/MekuIcon";
 import { useWallet } from "@/hooks/useWallet";
+import { usePin } from "@/hooks/usePin";
 import { SendSheet } from "@/components/meku/SendSheet";
 import { TokenPicker, TokenOption } from "@/components/meku/TokenPicker";
 import { toast } from "sonner";
@@ -29,7 +30,8 @@ const DESTINATION_CHAINS = [
 
 const Onchain = () => {
   const navigate = useNavigate();
-  const { wallet, usdc } = useWallet();
+  const { wallet, usdc, refresh } = useWallet();
+  const { requirePin } = usePin();
   const [tab, setTab] = useState<Tab>("Swap");
   const [payAmount, setPayAmount] = useState("");
   const [sendOpen, setSendOpen] = useState(false);
@@ -37,40 +39,41 @@ const Onchain = () => {
   const [tokenOut, setTokenOut] = useState<TokenOption>({ symbol: "EURC", name: "Euro Coin", chain: "Arc" });
   const [pickerFor, setPickerFor] = useState<"in" | "out" | null>(null);
   const [destinationChain, setDestinationChain] = useState<(typeof DESTINATION_CHAINS)[number]["id"]>("Base_Sepolia");
-  const [confirmPin, setConfirmPin] = useState("");
+  const [busy, setBusy] = useState(false);
 
   const current = tabs.find((t) => t.id === tab)!;
   const Hero = current.icon;
 
   const onCta = async () => {
+    if (busy) return;
     if (!wallet?.wallet_id) {
       toast.error("Your wallet is still provisioning. Try again in a moment.");
       return;
     }
     if (tab === "Send") { setSendOpen(true); return; }
-    if (confirmPin.length !== 4) {
-      toast.error("Enter your 4-digit confirmation PIN first.");
-      return;
-    }
+    const ok = await requirePin();
+    if (!ok) return;
+    setBusy(true);
     try {
+      const { supabase } = await import("@/integrations/supabase/client");
       if (tab === "Swap") {
-        const { data, error } = await (await import("@/integrations/supabase/client")).supabase
-          .functions.invoke("circle-swap", {
-            body: { chain: "Arc_Testnet", tokenIn: tokenIn.symbol, tokenOut: tokenOut.symbol, amountIn: payAmount },
-          });
+        const { data, error } = await supabase.functions.invoke("circle-swap", {
+          body: { chain: "Arc_Testnet", tokenIn: tokenIn.symbol, tokenOut: tokenOut.symbol, amountIn: payAmount },
+        });
         if (error || (data as any)?.error) throw new Error((data as any)?.error ?? error?.message);
         toast.success("Swap submitted");
       } else if (tab === "Bridge") {
-        const { data, error } = await (await import("@/integrations/supabase/client")).supabase
-          .functions.invoke("circle-bridge", {
-            body: { fromChain: "Arc_Testnet", toChain: destinationChain, amount: payAmount, recipientAddress: wallet.address },
-          });
+        const { data, error } = await supabase.functions.invoke("circle-bridge", {
+          body: { fromChain: "Arc_Testnet", toChain: destinationChain, amount: payAmount, recipientAddress: wallet.address },
+        });
         if (error || (data as any)?.error) throw new Error((data as any)?.error ?? error?.message);
         toast.success("Bridge submitted");
       }
-      setConfirmPin("");
+      refresh();
     } catch (e: any) {
       toast.error(e?.message ?? `${tab} failed`);
+    } finally {
+      setBusy(false);
     }
   };
 
@@ -185,17 +188,6 @@ const Onchain = () => {
           )}
         </div>
 
-        {tab !== "Send" && (
-          <input
-            value={confirmPin}
-            onChange={(e) => setConfirmPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
-            placeholder="4-digit confirmation PIN"
-            inputMode="numeric"
-            type="password"
-            className="mt-4 h-12 w-full rounded-2xl border border-border bg-surface px-4 text-center text-[14px] font-semibold outline-none focus:border-primary"
-          />
-        )}
-
         <div className="mt-4 rounded-[16px] border border-border bg-surface p-4 text-[13px]">
           <Row label="Route" value={tab === "Bridge" ? "CCTP v2" : "Circle App Kit"} />
           <div className="my-3 h-px bg-border" />
@@ -204,10 +196,10 @@ const Onchain = () => {
 
         <button
           onClick={onCta}
-          disabled={!payAmount || Number(payAmount) <= 0}
+          disabled={busy || !payAmount || Number(payAmount) <= 0}
           className="tap mt-5 flex h-[56px] w-full items-center justify-center rounded-full bg-foreground text-[15px] font-bold text-background disabled:opacity-40"
         >
-          Review {tab.toLowerCase()}
+          {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : `Review ${tab.toLowerCase()}`}
         </button>
         <p className="mt-3 pb-8 text-center text-[12px] text-muted-foreground">
           Routed through your MEKU wallet on Arc Testnet.

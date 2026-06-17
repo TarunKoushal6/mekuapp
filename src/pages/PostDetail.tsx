@@ -15,6 +15,7 @@ import {
 } from "@/lib/social";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { PostBody } from "@/components/meku/PostBody";
 
 interface TreeNode extends CommentRow { children: TreeNode[]; }
 
@@ -57,7 +58,7 @@ const CommentNode = ({ node, postId, onReplied, depth = 0 }: { node: TreeNode; p
 
   return (
     <div className={cn("py-3", depth > 0 && "border-l border-border pl-3")}>
-      <div className="flex gap-3">
+      <div className="flex min-w-0 gap-3">
         <Avatar name={name} src={node.author?.avatar_url ?? undefined} size="sm" />
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5 text-[13px]">
@@ -65,21 +66,21 @@ const CommentNode = ({ node, postId, onReplied, depth = 0 }: { node: TreeNode; p
             <span className="text-muted-foreground">@{node.author?.username ?? "anon"}</span>
             <span className="text-muted-foreground">· {timeAgo(node.created_at)}</span>
           </div>
-          <p className="mt-0.5 whitespace-pre-wrap text-[14px] leading-[1.45] text-foreground/90">{node.body}</p>
+          <PostBody text={node.body} className="mt-0.5 whitespace-pre-wrap break-words text-[14px] leading-[1.45] text-foreground/90" />
           <button onClick={() => setShowReply((v) => !v)} className="tap mt-1 text-[12px] font-medium text-muted-foreground hover:text-foreground">
             Reply
           </button>
           {showReply && (
-            <div className="mt-2 flex items-center gap-2">
+            <div className="mt-2 flex min-w-0 items-center gap-2">
               <input
                 autoFocus
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && send()}
                 placeholder={`Reply to ${name}…`}
-                className="h-[36px] flex-1 rounded-full border border-border bg-surface px-3 text-[13px] outline-none focus:border-primary"
+                className="h-[36px] min-w-0 flex-1 rounded-full border border-border bg-surface px-3 text-[13px] outline-none focus:border-primary"
               />
-              <button onClick={send} disabled={busy || !draft.trim()} className="tap rounded-full bg-primary px-3 py-1.5 text-[12px] font-bold text-primary-foreground disabled:opacity-40">
+              <button onClick={send} disabled={busy || !draft.trim()} className="tap shrink-0 rounded-full bg-primary px-3 py-1.5 text-[12px] font-bold text-primary-foreground disabled:opacity-40">
                 Send
               </button>
             </div>
@@ -87,8 +88,8 @@ const CommentNode = ({ node, postId, onReplied, depth = 0 }: { node: TreeNode; p
         </div>
       </div>
       {node.children.length > 0 && (
-        <div className="ml-9 mt-1">
-          {node.children.map((c) => <CommentNode key={c.id} node={c} postId={postId} onReplied={onReplied} depth={depth + 1} />)}
+        <div className="ml-3 mt-1">
+          {node.children.map((c) => <CommentNode key={c.id} node={c} postId={postId} onReplied={onReplied} depth={Math.min(depth + 1, 3)} />)}
         </div>
       )}
     </div>
@@ -170,7 +171,7 @@ const PostDetail = () => {
         </Link>
 
         {post.title && <h1 className="mt-4 text-[20px] font-bold leading-tight tracking-[-0.01em] text-foreground">{post.title}</h1>}
-        <p className="mt-2 whitespace-pre-wrap text-[16px] leading-[1.55] text-foreground/90">{post.body}</p>
+        <PostBody text={post.body} className="mt-2 whitespace-pre-wrap break-words text-[16px] leading-[1.55] text-foreground/90" />
         {post.image_url && <div className="mt-3 overflow-hidden rounded-[14px] border border-border"><img src={post.image_url} alt="" className="w-full" /></div>}
 
         <p className="mt-3 text-[12px] text-muted-foreground">{new Date(post.created_at).toLocaleString()}</p>
