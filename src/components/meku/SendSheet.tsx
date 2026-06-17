@@ -4,8 +4,8 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { sendUsdc, SendArgs } from "@/lib/circle";
 import { useWallet } from "@/hooks/useWallet";
+import { usePin } from "@/hooks/usePin";
 import { IconSend } from "./MekuIcon";
-
 
 interface Props {
   open: boolean;
@@ -20,9 +20,9 @@ const PRESETS = ["1", "5", "10", "25"];
 export const SendSheet = ({ open, onOpenChange, defaults, recipientLabel, title = "Send USDC" }: Props) => {
   const [amount, setAmount] = useState(defaults?.amount ?? "1");
   const [address, setAddress] = useState(defaults?.destinationAddress ?? "");
-  const [confirmPin, setConfirmPin] = useState("");
   const [busy, setBusy] = useState(false);
   const { refresh, wallet, usdc } = useWallet();
+  const { requirePin } = usePin();
   const needsAddress = !defaults?.recipientUserId && !defaults?.destinationAddress;
 
   const submit = async () => {
@@ -31,10 +31,8 @@ export const SendSheet = ({ open, onOpenChange, defaults, recipientLabel, title 
       toast.error("Your wallet is still provisioning. Try again in a moment.");
       return;
     }
-    if (confirmPin.length !== 4) {
-      toast.error("Enter your 4-digit confirmation PIN first.");
-      return;
-    }
+    const ok = await requirePin();
+    if (!ok) return;
     setBusy(true);
     try {
       await sendUsdc({
@@ -44,7 +42,6 @@ export const SendSheet = ({ open, onOpenChange, defaults, recipientLabel, title 
         kind: defaults?.kind ?? "send",
       });
       toast.success(`Sent ${amount} USDC`);
-      setConfirmPin("");
       onOpenChange(false);
       refresh();
     } catch (e: any) {
@@ -58,7 +55,6 @@ export const SendSheet = ({ open, onOpenChange, defaults, recipientLabel, title 
       setBusy(false);
     }
   };
-
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -110,15 +106,6 @@ export const SendSheet = ({ open, onOpenChange, defaults, recipientLabel, title 
           ))}
         </div>
 
-        <input
-          value={confirmPin}
-          onChange={(e) => setConfirmPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
-          placeholder="4-digit confirmation PIN"
-          inputMode="numeric"
-          type="password"
-          className="mt-3 h-12 w-full rounded-2xl border border-border bg-surface px-4 text-center text-[14px] font-semibold outline-none focus:border-primary"
-        />
-
         <button
           onClick={submit}
           disabled={busy || !amount || Number(amount) <= 0 || (needsAddress && !address)}
@@ -127,7 +114,7 @@ export const SendSheet = ({ open, onOpenChange, defaults, recipientLabel, title 
           {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : "Confirm transfer"}
         </button>
         <p className="mt-2 text-center text-[11px] text-muted-foreground">
-          Signed by your MEKU wallet on Arc Testnet.
+          You'll be asked for your wallet PIN before signing.
         </p>
 
       </DialogContent>
