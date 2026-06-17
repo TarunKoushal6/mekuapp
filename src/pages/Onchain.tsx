@@ -34,13 +34,31 @@ const Onchain = () => {
   const current = tabs.find((t) => t.id === tab)!;
   const Hero = current.icon;
 
-  const onCta = () => {
+  const onCta = async () => {
     if (!wallet?.wallet_id) {
       toast.error("Your wallet is still provisioning. Try again in a moment.");
       return;
     }
     if (tab === "Send") { setSendOpen(true); return; }
-    toast.info(`${tab} ${tokenIn.symbol} → ${tokenOut.symbol} routed via Circle App Kit (testnet).`);
+    try {
+      if (tab === "Swap") {
+        const { data, error } = await (await import("@/integrations/supabase/client")).supabase
+          .functions.invoke("circle-swap", {
+            body: { chain: "Arc_Testnet", tokenIn: tokenIn.symbol, tokenOut: tokenOut.symbol, amountIn: payAmount },
+          });
+        if (error || (data as any)?.error) throw new Error((data as any)?.error ?? error?.message);
+        toast.success("Swap submitted");
+      } else if (tab === "Bridge") {
+        const { data, error } = await (await import("@/integrations/supabase/client")).supabase
+          .functions.invoke("circle-bridge", {
+            body: { fromChain: "Arc_Testnet", toChain: "Base_Sepolia", amount: payAmount, recipientAddress: wallet.address },
+          });
+        if (error || (data as any)?.error) throw new Error((data as any)?.error ?? error?.message);
+        toast.success("Bridge submitted");
+      }
+    } catch (e: any) {
+      toast.error(e?.message ?? `${tab} failed`);
+    }
   };
 
   return (
