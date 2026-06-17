@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Loader2, Delete } from "lucide-react";
+import { Loader2, Delete, ShieldCheck } from "lucide-react";
 import { IconWallet } from "./MekuIcon";
+import { Mascot } from "./Mascot";
 
 interface Props {
   mode: "setup" | "confirm";
