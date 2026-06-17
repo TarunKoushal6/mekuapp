@@ -20,7 +20,7 @@ export const SendSheet = ({ open, onOpenChange, defaults, recipientLabel, title 
   const [amount, setAmount] = useState(defaults?.amount ?? "1");
   const [address, setAddress] = useState(defaults?.destinationAddress ?? "");
   const [busy, setBusy] = useState(false);
-  const { refresh, wallet } = useWallet();
+  const { refresh, wallet, usdc } = useWallet();
   const needsAddress = !defaults?.recipientUserId && !defaults?.destinationAddress;
 
   const submit = async () => {
