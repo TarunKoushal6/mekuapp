@@ -36,10 +36,28 @@ const Wallet = () => {
 
   useEffect(() => {
     if (!user) return;
-    supabase.from("transactions").select("*").eq("user_id", user.id)
-      .order("created_at", { ascending: false }).limit(20)
-      .then(({ data }) => setTxs(data ?? []));
+    (async () => {
+      // Auto-fail any "pending" tx older than 10 minutes so the activity
+      // list never gets stuck on a transient send.
+      const cutoff = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+      await supabase.from("transactions")
+        .update({ status: "failed" })
+        .eq("user_id", user.id)
+        .eq("status", "pending")
+        .lt("created_at", cutoff);
+
+      const { data } = await supabase.from("transactions").select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false }).limit(20);
+      setTxs(data ?? []);
+    })();
   }, [user, sendOpen]);
+
+  const cancelPending = async (id: string) => {
+    await supabase.from("transactions").update({ status: "failed" }).eq("id", id);
+    setTxs((prev) => prev.map((t) => (t.id === id ? { ...t, status: "failed" } : t)));
+    toast.success("Marked as failed");
+  };
 
   const copy = async () => {
     if (!wallet?.address) return;
@@ -192,9 +210,19 @@ const Wallet = () => {
                   {t.counterparty_address?.slice(0, 6)}…{t.counterparty_address?.slice(-4)} · {t.status}
                 </p>
               </div>
-              <p className="text-[14px] font-semibold tabular-nums text-foreground">
-                {t.kind === "send" || t.kind === "tip" ? "-" : "+"}{t.amount} {t.token}
-              </p>
+              <div className="flex items-center gap-2">
+                <p className="text-[14px] font-semibold tabular-nums text-foreground">
+                  {t.kind === "send" || t.kind === "tip" ? "-" : "+"}{t.amount} {t.token}
+                </p>
+                {t.status === "pending" && (
+                  <button
+                    onClick={() => cancelPending(t.id)}
+                    className="tap rounded-full border border-border px-2 py-1 text-[11px] font-semibold text-muted-foreground"
+                  >
+                    Cancel
+                  </button>
+                )}
+              </div>
             </li>
           ))
         )}
