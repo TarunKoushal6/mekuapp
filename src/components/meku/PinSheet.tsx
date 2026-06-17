@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Loader2, Delete, X } from "lucide-react";
+import { Loader2, Delete } from "lucide-react";
 import { IconWallet } from "./MekuIcon";
 
 interface Props {
