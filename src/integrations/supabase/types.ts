@@ -259,6 +259,9 @@ export type Database = {
           chain: string
           circle_user_id: string
           created_at: string
+          custody: string
+          dcw_address: string | null
+          dcw_wallet_id: string | null
           status: string
           updated_at: string
           user_id: string
@@ -269,6 +272,9 @@ export type Database = {
           chain?: string
           circle_user_id: string
           created_at?: string
+          custody?: string
+          dcw_address?: string | null
+          dcw_wallet_id?: string | null
           status?: string
           updated_at?: string
           user_id: string
@@ -279,6 +285,9 @@ export type Database = {
           chain?: string
           circle_user_id?: string
           created_at?: string
+          custody?: string
+          dcw_address?: string | null
+          dcw_wallet_id?: string | null
           status?: string
           updated_at?: string
           user_id?: string
