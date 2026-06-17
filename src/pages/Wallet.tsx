@@ -123,7 +123,7 @@ const Wallet = () => {
           </div>
           <p className="mt-1 text-white">
             <span style={{ fontSize: 40, fontWeight: 700, letterSpacing: "-0.02em" }}>
-              {loading ? "…" : show ? usdc : "••••"}
+              {loading ? "…" : show ? formatAmount(usdc) : "••••"}
             </span>
             <span className="ml-2 text-[14px] font-semibold text-white/80">USDC</span>
           </p>
