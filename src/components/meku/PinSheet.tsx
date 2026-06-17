@@ -100,41 +100,67 @@ export const PinSheet = ({ mode, onCancel, onSubmit }: Props) => {
 
   const keys = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
 
+  const mascotPose = isSetup
+    ? step === "enter"
+      ? "waving"
+      : "happy"
+    : "thinking";
+
   return (
     <Dialog open onOpenChange={(o) => !o && onCancel()}>
       <DialogContent
-        className="max-w-[420px] gap-0 rounded-[28px] border-border bg-background p-0 overflow-hidden"
+        className="max-w-[420px] gap-0 rounded-[32px] border-border/60 bg-background p-0 overflow-hidden shadow-purple"
       >
-        {/* Header */}
-        <div className="relative px-6 pt-6 pb-2 text-center">
-          <div className="mx-auto mb-4 inline-flex h-[64px] w-[64px] items-center justify-center rounded-[20px] gradient-purple text-primary-foreground shadow-purple">
-            <IconWallet size={30} />
+        {/* Gradient hero */}
+        <div className="relative overflow-hidden px-6 pt-7 pb-6 text-center gradient-card text-white">
+          {/* Decorative blobs */}
+          <div className="pointer-events-none absolute -top-16 -right-12 h-44 w-44 rounded-full bg-white/20 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-20 -left-10 h-44 w-44 rounded-full bg-black/20 blur-3xl" />
+
+          {/* Mascot floats behind the badge */}
+          <div className="pointer-events-none absolute right-3 top-2 opacity-90">
+            <Mascot pose={mascotPose} size={76} />
           </div>
-          <h2 className="text-[19px] font-bold tracking-tight">{title}</h2>
-          <p className="mx-auto mt-1.5 max-w-[280px] text-[13px] leading-snug text-muted-foreground">
+
+          <div className="relative mx-auto mb-3 inline-flex h-[60px] w-[60px] items-center justify-center rounded-[18px] bg-white/15 backdrop-blur-md ring-1 ring-white/30 shadow-purple">
+            <IconWallet size={28} className="text-white" />
+            <span className="absolute -bottom-1 -right-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-white text-primary shadow">
+              <ShieldCheck size={12} strokeWidth={2.6} />
+            </span>
+          </div>
+          <h2 className="relative text-[20px] font-bold tracking-tight">{title}</h2>
+          <p className="relative mx-auto mt-1 max-w-[280px] text-[12.5px] leading-snug text-white/85">
             {subtitle}
           </p>
-        </div>
 
-        {/* Dots */}
-        <div
-          className={`mt-4 flex justify-center gap-3 px-6 ${
-            shake ? "animate-[wallet-shake_0.4s_ease-in-out]" : ""
-          }`}
-        >
-          {Array.from({ length: PIN_LEN }).map((_, i) => {
-            const filled = i < pin.length;
-            return (
-              <span
-                key={i}
-                className={`h-3 w-3 rounded-full transition-all ${
-                  filled
-                    ? "bg-primary scale-110 shadow-purple"
-                    : "bg-border"
-                }`}
-              />
-            );
-          })}
+          {/* Dots inside the hero */}
+          <div
+            className={`relative mt-5 flex justify-center gap-2.5 ${
+              shake ? "animate-[wallet-shake_0.4s_ease-in-out]" : ""
+            }`}
+          >
+            {Array.from({ length: PIN_LEN }).map((_, i) => {
+              const filled = i < pin.length;
+              return (
+                <span
+                  key={i}
+                  className={`h-[14px] w-[14px] rounded-full ring-1 transition-all duration-200 ${
+                    filled
+                      ? "bg-white ring-white scale-110 shadow-[0_0_14px_rgba(255,255,255,0.55)]"
+                      : "bg-white/15 ring-white/40"
+                  }`}
+                />
+              );
+            })}
+          </div>
+
+          {/* Step indicator for setup */}
+          {isSetup && (
+            <div className="relative mt-4 flex items-center justify-center gap-1.5">
+              <span className={`h-1 w-6 rounded-full transition ${step === "enter" ? "bg-white" : "bg-white/40"}`} />
+              <span className={`h-1 w-6 rounded-full transition ${step === "confirm" ? "bg-white" : "bg-white/40"}`} />
+            </div>
+          )}
         </div>
 
         {/* Error / hint */}
@@ -149,14 +175,14 @@ export const PinSheet = ({ mode, onCancel, onSubmit }: Props) => {
               Continue →
             </button>
           ) : (
-            <span className="text-muted-foreground/60">
-              {pin.length}/{PIN_LEN}
+            <span className="text-muted-foreground/70">
+              {pin.length}/{PIN_LEN} digits
             </span>
           )}
         </div>
 
         {/* Keypad */}
-        <div className="grid grid-cols-3 gap-2 px-6 pb-6 pt-2">
+        <div className="grid grid-cols-3 gap-2.5 px-5 pb-5 pt-2">
           {keys.map((k) => (
             <KeyButton key={k} onClick={() => press(k)} disabled={busy}>
               {k}
@@ -174,6 +200,20 @@ export const PinSheet = ({ mode, onCancel, onSubmit }: Props) => {
           >
             <Delete size={22} />
           </KeyButton>
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-between border-t border-border/60 bg-surface/60 px-5 py-3">
+          <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+            <ShieldCheck size={13} className="text-primary" />
+            Stored locally · never sent to MEKU
+          </p>
+          <button
+            onClick={onCancel}
+            className="tap text-[12px] font-semibold text-muted-foreground hover:text-foreground"
+          >
+            Cancel
+          </button>
         </div>
 
         {busy && (
