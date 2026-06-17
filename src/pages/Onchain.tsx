@@ -11,6 +11,7 @@ import { useWallet } from "@/hooks/useWallet";
 import { SendSheet } from "@/components/meku/SendSheet";
 import { TokenPicker, TokenOption } from "@/components/meku/TokenPicker";
 import { toast } from "sonner";
+import { ChainLogo, TokenLogo } from "@/components/meku/TokenLogo";
 
 const tabs = [
   { id: "Send", icon: IconSend, blurb: "Move USDC to any Arc address." },
@@ -19,7 +20,12 @@ const tabs = [
 ] as const;
 type Tab = (typeof tabs)[number]["id"];
 
-const USDC: TokenOption = { symbol: "USDC", name: "USD Coin", chain: "Arc", logo: "https://cryptologos.cc/logos/usd-coin-usdc-logo.svg" };
+const USDC: TokenOption = { symbol: "USDC", name: "USD Coin", chain: "Arc" };
+const DESTINATION_CHAINS = [
+  { id: "Base_Sepolia", label: "Base Sepolia" },
+  { id: "Ethereum_Sepolia", label: "Ethereum Sepolia" },
+  { id: "Arbitrum_Sepolia", label: "Arbitrum Sepolia" },
+] as const;
 
 const Onchain = () => {
   const navigate = useNavigate();
@@ -30,6 +36,8 @@ const Onchain = () => {
   const [tokenIn, setTokenIn] = useState<TokenOption>(USDC);
   const [tokenOut, setTokenOut] = useState<TokenOption>({ symbol: "EURC", name: "Euro Coin", chain: "Arc" });
   const [pickerFor, setPickerFor] = useState<"in" | "out" | null>(null);
+  const [destinationChain, setDestinationChain] = useState<(typeof DESTINATION_CHAINS)[number]["id"]>("Base_Sepolia");
+  const [confirmPin, setConfirmPin] = useState("");
 
   const current = tabs.find((t) => t.id === tab)!;
   const Hero = current.icon;
@@ -40,6 +48,10 @@ const Onchain = () => {
       return;
     }
     if (tab === "Send") { setSendOpen(true); return; }
+    if (confirmPin.length !== 4) {
+      toast.error("Enter your 4-digit confirmation PIN first.");
+      return;
+    }
     try {
       if (tab === "Swap") {
         const { data, error } = await (await import("@/integrations/supabase/client")).supabase
@@ -51,11 +63,12 @@ const Onchain = () => {
       } else if (tab === "Bridge") {
         const { data, error } = await (await import("@/integrations/supabase/client")).supabase
           .functions.invoke("circle-bridge", {
-            body: { fromChain: "Arc_Testnet", toChain: "Base_Sepolia", amount: payAmount, recipientAddress: wallet.address },
+            body: { fromChain: "Arc_Testnet", toChain: destinationChain, amount: payAmount, recipientAddress: wallet.address },
           });
         if (error || (data as any)?.error) throw new Error((data as any)?.error ?? error?.message);
         toast.success("Bridge submitted");
       }
+      setConfirmPin("");
     } catch (e: any) {
       toast.error(e?.message ?? `${tab} failed`);
     }
