@@ -9,9 +9,11 @@ import {
   IconBack, IconMore, IconCopy, IconExternal, IconRefresh, IconDroplet,
 } from "@/components/meku/MekuIcon";
 import { SendSheet } from "@/components/meku/SendSheet";
+import { TokenDetailSheet } from "@/components/meku/TokenDetailSheet";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import { formatAmount } from "@/lib/format";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
@@ -33,6 +35,7 @@ const Wallet = () => {
   const [sendOpen, setSendOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [txs, setTxs] = useState<any[]>([]);
+  const [tokenDetail, setTokenDetail] = useState<any>(null);
 
   useEffect(() => { refresh(); }, []); // eslint-disable-line
 
@@ -120,7 +123,7 @@ const Wallet = () => {
           </div>
           <p className="mt-1 text-white">
             <span style={{ fontSize: 40, fontWeight: 700, letterSpacing: "-0.02em" }}>
-              {loading ? "…" : show ? usdc : "••••"}
+              {loading ? "…" : show ? formatAmount(usdc) : "••••"}
             </span>
             <span className="ml-2 text-[14px] font-semibold text-white/80">USDC</span>
           </p>
@@ -180,37 +183,55 @@ const Wallet = () => {
 
       <ul className="mt-2 px-3 pb-8">
         {tab === "Tokens" ? (
-          (balances.length === 0
-            ? [{ symbol: "USDC", name: "USD Coin", chain: "Arc Testnet", amount: usdc }]
-            : balances
-          ).map((b) => (
-            <li key={b.symbol} className="tap flex items-center gap-3 rounded-[16px] px-2 py-3 hover:bg-surface-2">
-              {TOKEN_LOGO[b.symbol] ? (
-                <img
-                  src={TOKEN_LOGO[b.symbol]}
-                  alt={b.symbol}
-                  className="h-[40px] w-[40px] rounded-full"
-                  onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
-                />
-              ) : (
-                <span className="inline-flex h-[40px] w-[40px] items-center justify-center rounded-full bg-primary-soft text-[12px] font-bold text-primary">
-                  {b.symbol.slice(0, 3)}
-                </span>
-              )}
-              <div className="flex-1 min-w-0">
-                <p className="text-[15px] font-semibold text-foreground">{b.symbol}</p>
-                <p className="text-[12px] text-muted-foreground">{b.name ?? "Arc Testnet"}</p>
-              </div>
-              <div className="text-right">
-                <p className="text-[15px] font-semibold tabular-nums text-foreground">
-                  {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : b.amount}
-                </p>
-                {b.symbol === "USDC" && (
-                  <p className="text-[12px] text-muted-foreground tabular-nums">${b.amount}</p>
-                )}
-              </div>
-            </li>
-          ))
+          (() => {
+            // Merge live balances with USDC fallback, dedupe by symbol+chain
+            const all = balances.length === 0
+              ? [{ symbol: "USDC", name: "USD Coin", chain: "Arc Testnet", amount: usdc }]
+              : balances;
+            const seen = new Set<string>();
+            const list = all.filter((b) => {
+              const k = `${b.symbol}-${b.chain ?? ""}`;
+              if (seen.has(k)) return false;
+              seen.add(k);
+              return true;
+            });
+            return list.map((b) => {
+              const logo = TOKEN_LOGO[b.symbol];
+              return (
+                <li key={`${b.symbol}-${b.chain ?? ""}`}>
+                  <button
+                    onClick={() => setTokenDetail({ ...b, logo })}
+                    className="tap flex w-full items-center gap-3 rounded-[16px] px-2 py-3 text-left hover:bg-surface-2"
+                  >
+                    {logo ? (
+                      <img
+                        src={logo}
+                        alt={b.symbol}
+                        className="h-[40px] w-[40px] rounded-full"
+                        onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+                      />
+                    ) : (
+                      <span className="inline-flex h-[40px] w-[40px] items-center justify-center rounded-full bg-primary-soft text-[12px] font-bold text-primary">
+                        {b.symbol.slice(0, 3)}
+                      </span>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-[15px] font-semibold text-foreground">{b.symbol}</p>
+                      <p className="truncate text-[12px] text-muted-foreground">{b.name ?? b.chain ?? "Arc Testnet"}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[15px] font-semibold tabular-nums text-foreground">
+                        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : formatAmount(b.amount)}
+                      </p>
+                      {b.symbol === "USDC" && (
+                        <p className="text-[12px] text-muted-foreground tabular-nums">${formatAmount(b.amount)}</p>
+                      )}
+                    </div>
+                  </button>
+                </li>
+              );
+            });
+          })()
         ) : txs.length === 0 ? (
           <li className="px-4 py-10 text-center text-[13px] text-muted-foreground flex flex-col items-center gap-2">
             <IconActivity size={28} />
@@ -227,7 +248,7 @@ const Wallet = () => {
               </div>
               <div className="flex items-center gap-2">
                 <p className="text-[14px] font-semibold tabular-nums text-foreground">
-                  {t.kind === "send" || t.kind === "tip" ? "-" : "+"}{t.amount} {t.token}
+                  {t.kind === "send" || t.kind === "tip" ? "-" : "+"}{formatAmount(t.amount)} {t.token}
                 </p>
                 {t.status === "pending" && (
                   <button
@@ -246,6 +267,12 @@ const Wallet = () => {
       {sendOpen && (
         <SendSheet open={sendOpen} onOpenChange={setSendOpen} title="Send USDC" />
       )}
+
+      <TokenDetailSheet
+        open={!!tokenDetail}
+        onOpenChange={(o) => !o && setTokenDetail(null)}
+        token={tokenDetail}
+      />
     </AppShell>
   );
 };

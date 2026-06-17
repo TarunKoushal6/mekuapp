@@ -20,11 +20,15 @@ export const SendSheet = ({ open, onOpenChange, defaults, recipientLabel, title 
   const [amount, setAmount] = useState(defaults?.amount ?? "1");
   const [address, setAddress] = useState(defaults?.destinationAddress ?? "");
   const [busy, setBusy] = useState(false);
-  const { refresh, wallet } = useWallet();
+  const { refresh, wallet, usdc } = useWallet();
   const needsAddress = !defaults?.recipientUserId && !defaults?.destinationAddress;
 
   const submit = async () => {
     if (busy) return;
+    if (!wallet?.wallet_id) {
+      toast.error("Your wallet is still provisioning. Try again in a moment.");
+      return;
+    }
     setBusy(true);
     try {
       const start = await startSend({
@@ -42,7 +46,12 @@ export const SendSheet = ({ open, onOpenChange, defaults, recipientLabel, title 
       onOpenChange(false);
       refresh();
     } catch (e: any) {
-      toast.error(e?.message ?? "Transaction failed");
+      const msg = String(e?.message ?? "Transaction failed");
+      if (msg.includes("destination required")) {
+        toast.error("Recipient hasn't set up their MEKU wallet yet.");
+      } else {
+        toast.error(msg);
+      }
     } finally {
       setBusy(false);
     }
@@ -67,7 +76,7 @@ export const SendSheet = ({ open, onOpenChange, defaults, recipientLabel, title 
             </span>
             <span className="text-[15px] font-semibold text-muted-foreground">USDC</span>
           </div>
-          <p className="mt-1 text-[12px] text-muted-foreground">Arc Testnet · Bal {wallet?.address ? "loading..." : "—"}</p>
+          <p className="mt-1 text-[12px] text-muted-foreground">Arc Testnet · Bal {Number(usdc || 0).toFixed(2)} USDC</p>
         </div>
 
         <input
