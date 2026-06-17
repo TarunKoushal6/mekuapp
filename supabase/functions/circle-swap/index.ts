@@ -1,12 +1,11 @@
-// supabase/functions/circle-swap/index.ts
-// Swap tokens on a single chain via Circle App Kit (LiFi aggregator).
+// Swap tokens on a single chain via Circle App Kit using the caller's DCW.
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 interface Body {
-  chain?: string;       // e.g. "Arc_Testnet"
-  tokenIn: string;      // symbol
-  tokenOut: string;     // symbol
+  chain?: string;
+  tokenIn: string;
+  tokenOut: string;
   amountIn: string;
 }
 
@@ -34,6 +33,13 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
+    const { data: wallet } = await admin
+      .from("wallets").select("*").eq("user_id", user.id).maybeSingle();
+    const walletId = wallet?.dcw_wallet_id;
+    if (!walletId) {
+      return json({ error: "DCW wallet not provisioned. Open Wallet to initialize." }, 400);
+    }
+
     const { data: txRow } = await admin.from("transactions").insert({
       user_id: user.id,
       kind: "swap",
@@ -49,18 +55,15 @@ Deno.serve(async (req) => {
       const apiKey = Deno.env.get("CIRCLE_API_KEY");
       const entitySecret = Deno.env.get("CIRCLE_ENTITY_SECRET");
       const kitKey = Deno.env.get("KIT_KEY");
-      const evmWalletId = Deno.env.get("CIRCLE_DCW_EVM_WALLET_ID");
-      if (!apiKey || !entitySecret || !kitKey || !evmWalletId) {
+      if (!apiKey || !entitySecret || !kitKey) {
         await admin.from("transactions").update({ status: "failed" }).eq("id", txRow?.id);
-        return json({
-          error: "Swap needs KIT_KEY and a developer-controlled relay wallet. Configure CIRCLE_DCW_EVM_WALLET_ID.",
-        }, 501);
+        return json({ error: "Missing CIRCLE_API_KEY / CIRCLE_ENTITY_SECRET / KIT_KEY" }, 500);
       }
 
       const adapter = await createCircleWalletsAdapter({
         apiKey,
         entitySecret,
-        walletId: evmWalletId,
+        walletId,
       });
 
       const kit = new AppKit();
@@ -83,7 +86,7 @@ Deno.serve(async (req) => {
       return json({ error: sdkErr?.message ?? "App Kit swap failed" }, 500);
     }
   } catch (e: any) {
-    console.error(e);
+    console.error("circle-swap", e);
     return json({ error: e.message ?? "Internal error" }, 500);
   }
 });
