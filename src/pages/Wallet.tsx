@@ -9,9 +9,11 @@ import {
   IconBack, IconMore, IconCopy, IconExternal, IconRefresh, IconDroplet,
 } from "@/components/meku/MekuIcon";
 import { SendSheet } from "@/components/meku/SendSheet";
+import { TokenDetailSheet } from "@/components/meku/TokenDetailSheet";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import { formatAmount } from "@/lib/format";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
@@ -33,6 +35,7 @@ const Wallet = () => {
   const [sendOpen, setSendOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [txs, setTxs] = useState<any[]>([]);
+  const [tokenDetail, setTokenDetail] = useState<any>(null);
 
   useEffect(() => { refresh(); }, []); // eslint-disable-line
 
