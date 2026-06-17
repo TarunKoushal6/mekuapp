@@ -164,17 +164,37 @@ const Onchain = () => {
 
               <div className="flex items-center justify-between gap-3">
                 <div className="min-w-0 flex-1">
-                  <p className="text-[12px] uppercase tracking-wider text-muted-foreground">You receive</p>
-                  <p className="mt-1 text-[34px] font-bold tracking-[-0.02em] text-foreground">
-                    {payAmount || "0"}
+                  <p className="text-[12px] uppercase tracking-wider text-muted-foreground">{tab === "Bridge" ? "Destination chain" : "You receive"}</p>
+                  <p className="mt-1 text-[28px] font-bold tracking-[-0.02em] text-foreground">
+                    {tab === "Bridge" ? DESTINATION_CHAINS.find((c) => c.id === destinationChain)?.label : payAmount || "0"}
                   </p>
                   <p className="text-[12px] text-muted-foreground">Estimated</p>
                 </div>
-                <TokenChip token={tokenOut} onClick={() => setPickerFor("out")} />
+                {tab === "Bridge" ? <ChainChip chain={destinationChain} /> : <TokenChip token={tokenOut} onClick={() => setPickerFor("out")} />}
               </div>
+              {tab === "Bridge" && (
+                <div className="mt-4 grid gap-2">
+                  {DESTINATION_CHAINS.map((chain) => (
+                    <button key={chain.id} onClick={() => setDestinationChain(chain.id)} className={cn("tap flex h-11 items-center gap-3 rounded-2xl border px-3 text-left text-[13px] font-semibold", destinationChain === chain.id ? "border-primary bg-primary-soft text-primary" : "border-border bg-background text-foreground")}>
+                      <ChainLogo chain={chain.id} size="sm" /> {chain.label}
+                    </button>
+                  ))}
+                </div>
+              )}
             </>
           )}
         </div>
+
+        {tab !== "Send" && (
+          <input
+            value={confirmPin}
+            onChange={(e) => setConfirmPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
+            placeholder="4-digit confirmation PIN"
+            inputMode="numeric"
+            type="password"
+            className="mt-4 h-12 w-full rounded-2xl border border-border bg-surface px-4 text-center text-[14px] font-semibold outline-none focus:border-primary"
+          />
+        )}
 
         <div className="mt-4 rounded-[16px] border border-border bg-surface p-4 text-[13px]">
           <Row label="Route" value={tab === "Bridge" ? "CCTP v2" : "Circle App Kit"} />
@@ -217,13 +237,7 @@ const Onchain = () => {
 
 const TokenChip = ({ token, onClick }: { token: TokenOption; onClick?: () => void }) => (
   <button onClick={onClick} className="tap flex shrink-0 items-center gap-2 rounded-full border border-border bg-background py-1.5 pl-1.5 pr-3">
-    {token.logo ? (
-      <img src={token.logo} alt={token.symbol} className="h-[28px] w-[28px] rounded-full" />
-    ) : (
-      <span className="inline-flex h-[28px] w-[28px] items-center justify-center rounded-full bg-primary-soft text-[11px] font-bold text-primary">
-        {token.symbol.slice(0, 2)}
-      </span>
-    )}
+    <TokenLogo symbol={token.symbol} size="sm" />
     <div className="text-left leading-tight">
       <p className="flex items-center gap-1 text-[13px] font-bold text-foreground">
         {token.symbol}
@@ -232,6 +246,13 @@ const TokenChip = ({ token, onClick }: { token: TokenOption; onClick?: () => voi
       <p className="text-[11px] text-muted-foreground">{token.chain}</p>
     </div>
   </button>
+);
+
+const ChainChip = ({ chain }: { chain: string }) => (
+  <span className="flex shrink-0 items-center gap-2 rounded-full border border-border bg-background py-1.5 pl-1.5 pr-3">
+    <ChainLogo chain={chain} size="sm" />
+    <span className="text-[13px] font-bold text-foreground">{chain.split("_")[0]}</span>
+  </span>
 );
 
 const Row = ({ label, value }: { label: string; value: string }) => (
