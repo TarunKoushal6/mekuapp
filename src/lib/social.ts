@@ -41,12 +41,36 @@ export const timeAgo = (iso: string) => {
   return new Date(iso).toLocaleDateString();
 };
 
-export async function fetchPosts(viewerId?: string | null): Promise<Post[]> {
-  const { data: posts, error } = await supabase
+export interface FetchPostsOptions {
+  /** When true, only include posts from accounts the viewer follows. */
+  followingOnly?: boolean;
+  /** Optional explicit author filter (e.g. profile page). */
+  authorId?: string;
+}
+
+export async function fetchPosts(
+  viewerId?: string | null,
+  opts: FetchPostsOptions = {},
+): Promise<Post[]> {
+  let followingIds: string[] | null = null;
+  if (opts.followingOnly && viewerId) {
+    const { data: fl } = await supabase
+      .from("follows")
+      .select("followee_id")
+      .eq("follower_id", viewerId);
+    followingIds = (fl ?? []).map((r: any) => r.followee_id);
+    if (followingIds.length === 0) return [];
+  }
+
+  let query = supabase
     .from("posts")
     .select("id, user_id, title, body, image_url, created_at")
     .order("created_at", { ascending: false })
     .limit(50);
+  if (opts.authorId) query = query.eq("user_id", opts.authorId);
+  if (followingIds) query = query.in("user_id", followingIds);
+
+  const { data: posts, error } = await query;
   if (error) throw error;
   if (!posts || posts.length === 0) return [];
 
@@ -76,6 +100,56 @@ export async function fetchPosts(viewerId?: string | null): Promise<Post[]> {
     comment_count: cmtCount.get(p.id) ?? 0,
     liked_by_me: liked.has(p.id),
   }));
+}
+
+// ============ Follows ============
+export async function isFollowing(viewerId: string, targetId: string) {
+  const { data } = await supabase
+    .from("follows").select("followee_id")
+    .eq("follower_id", viewerId).eq("followee_id", targetId).maybeSingle();
+  return !!data;
+}
+
+export async function followUser(viewerId: string, targetId: string) {
+  const { error } = await supabase.from("follows").insert({ follower_id: viewerId, followee_id: targetId });
+  if (error && !String(error.message).toLowerCase().includes("duplicate")) throw error;
+}
+
+export async function unfollowUser(viewerId: string, targetId: string) {
+  const { error } = await supabase.from("follows").delete()
+    .eq("follower_id", viewerId).eq("followee_id", targetId);
+  if (error) throw error;
+}
+
+export async function getFollowCounts(userId: string) {
+  const [{ count: followers }, { count: following }] = await Promise.all([
+    supabase.from("follows").select("*", { count: "exact", head: true }).eq("followee_id", userId),
+    supabase.from("follows").select("*", { count: "exact", head: true }).eq("follower_id", userId),
+  ]);
+  return { followers: followers ?? 0, following: following ?? 0 };
+}
+
+// ============ Reposts ============
+export async function isReposted(viewerId: string, postId: string) {
+  const { data } = await supabase.from("reposts").select("post_id")
+    .eq("user_id", viewerId).eq("post_id", postId).maybeSingle();
+  return !!data;
+}
+
+export async function toggleRepost(viewerId: string, postId: string, currentlyReposted: boolean) {
+  if (currentlyReposted) {
+    const { error } = await supabase.from("reposts").delete()
+      .eq("user_id", viewerId).eq("post_id", postId);
+    if (error) throw error;
+  } else {
+    const { error } = await supabase.from("reposts").insert({ user_id: viewerId, post_id: postId });
+    if (error && !String(error.message).toLowerCase().includes("duplicate")) throw error;
+  }
+}
+
+export async function getRepostCount(postId: string) {
+  const { count } = await supabase.from("reposts").select("*", { count: "exact", head: true }).eq("post_id", postId);
+  return count ?? 0;
 }
 
 export async function fetchPost(id: string, viewerId?: string | null): Promise<Post | null> {
