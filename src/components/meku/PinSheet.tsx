@@ -102,18 +102,10 @@ export const PinSheet = ({ mode, onCancel, onSubmit }: Props) => {
   return (
     <Dialog open onOpenChange={(o) => !o && onCancel()}>
       <DialogContent
-        hideClose
         className="max-w-[420px] gap-0 rounded-[28px] border-border bg-background p-0 overflow-hidden"
       >
         {/* Header */}
         <div className="relative px-6 pt-6 pb-2 text-center">
-          <button
-            onClick={onCancel}
-            aria-label="Close"
-            className="tap absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-full bg-surface text-muted-foreground"
-          >
-            <X size={18} />
-          </button>
           <div className="mx-auto mb-4 inline-flex h-[64px] w-[64px] items-center justify-center rounded-[20px] gradient-purple text-primary-foreground shadow-purple">
             <IconWallet size={30} />
           </div>
