@@ -25,9 +25,8 @@ export const SideMenu = ({ open, onOpenChange }: Props) => {
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="left" className="w-[300px] max-w-[85vw] border-border bg-background p-0">
         <SheetHeader className="px-5 pb-3 pt-5">
-          <SheetTitle className="flex items-center gap-2">
-            <Logo appIcon size={28} />
-            <Logo size={22} />
+          <SheetTitle className="flex items-center">
+            <Logo size={28} />
           </SheetTitle>
         </SheetHeader>
         <nav className="px-2">
