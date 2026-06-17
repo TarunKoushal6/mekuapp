@@ -1,6 +1,6 @@
 import { AppShell } from "@/components/meku/AppShell";
 import { TopBar, IconButton } from "@/components/meku/TopBar";
-import { ChevronDown, SlidersHorizontal } from "lucide-react";
+import { ChevronDown, Loader2, SlidersHorizontal } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -8,6 +8,7 @@ import {
   IconBack, IconSend, IconSwap, IconBridge,
 } from "@/components/meku/MekuIcon";
 import { useWallet } from "@/hooks/useWallet";
+import { usePin } from "@/hooks/usePin";
 import { SendSheet } from "@/components/meku/SendSheet";
 import { TokenPicker, TokenOption } from "@/components/meku/TokenPicker";
 import { toast } from "sonner";
@@ -29,7 +30,8 @@ const DESTINATION_CHAINS = [
 
 const Onchain = () => {
   const navigate = useNavigate();
-  const { wallet, usdc } = useWallet();
+  const { wallet, usdc, refresh } = useWallet();
+  const { requirePin } = usePin();
   const [tab, setTab] = useState<Tab>("Swap");
   const [payAmount, setPayAmount] = useState("");
   const [sendOpen, setSendOpen] = useState(false);
@@ -37,40 +39,42 @@ const Onchain = () => {
   const [tokenOut, setTokenOut] = useState<TokenOption>({ symbol: "EURC", name: "Euro Coin", chain: "Arc" });
   const [pickerFor, setPickerFor] = useState<"in" | "out" | null>(null);
   const [destinationChain, setDestinationChain] = useState<(typeof DESTINATION_CHAINS)[number]["id"]>("Base_Sepolia");
-  const [confirmPin, setConfirmPin] = useState("");
+  const [busy, setBusy] = useState(false);
 
   const current = tabs.find((t) => t.id === tab)!;
   const Hero = current.icon;
 
   const onCta = async () => {
+    if (busy) return;
     if (!wallet?.wallet_id) {
       toast.error("Your wallet is still provisioning. Try again in a moment.");
       return;
     }
     if (tab === "Send") { setSendOpen(true); return; }
-    if (confirmPin.length !== 4) {
-      toast.error("Enter your 4-digit confirmation PIN first.");
-      return;
-    }
+    const ok = await requirePin();
+    if (!ok) return;
+    setBusy(true);
     try {
+      const { supabase } = await import("@/integrations/supabase/client");
       if (tab === "Swap") {
-        const { data, error } = await (await import("@/integrations/supabase/client")).supabase
-          .functions.invoke("circle-swap", {
-            body: { chain: "Arc_Testnet", tokenIn: tokenIn.symbol, tokenOut: tokenOut.symbol, amountIn: payAmount },
-          });
+        const { data, error } = await supabase.functions.invoke("circle-swap", {
+          body: { chain: "Arc_Testnet", tokenIn: tokenIn.symbol, tokenOut: tokenOut.symbol, amountIn: payAmount },
+        });
         if (error || (data as any)?.error) throw new Error((data as any)?.error ?? error?.message);
         toast.success("Swap submitted");
       } else if (tab === "Bridge") {
-        const { data, error } = await (await import("@/integrations/supabase/client")).supabase
-          .functions.invoke("circle-bridge", {
-            body: { fromChain: "Arc_Testnet", toChain: destinationChain, amount: payAmount, recipientAddress: wallet.address },
-          });
+        const toChain = (tokenOut.chain || destinationChain).replace(/\s+/g, "_");
+        const { data, error } = await supabase.functions.invoke("circle-bridge", {
+          body: { fromChain: "Arc_Testnet", toChain, amount: payAmount, recipientAddress: wallet.address },
+        });
         if (error || (data as any)?.error) throw new Error((data as any)?.error ?? error?.message);
         toast.success("Bridge submitted");
       }
-      setConfirmPin("");
+      refresh();
     } catch (e: any) {
       toast.error(e?.message ?? `${tab} failed`);
+    } finally {
+      setBusy(false);
     }
   };
 
