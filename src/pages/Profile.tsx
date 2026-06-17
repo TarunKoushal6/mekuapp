@@ -12,7 +12,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { fetchPosts, getProfile, type Post, type Profile as ProfileT } from "@/lib/social";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
-import { fetchPosts, getProfile, type Post, type Profile as ProfileT } from "@/lib/social";
 
 const tabs = ["Posts", "Replies", "Media", "Likes"] as const;
 type Tab = (typeof tabs)[number];
