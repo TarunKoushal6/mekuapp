@@ -253,10 +253,10 @@ const KeyButton = ({
     {...rest}
     onClick={onClick}
     disabled={disabled}
-    className={`tap relative flex h-[58px] items-center justify-center rounded-2xl text-[22px] font-semibold transition-all active:scale-95 disabled:opacity-40 ${
+    className={`tap relative flex h-[60px] items-center justify-center rounded-2xl text-[24px] font-semibold transition-all active:scale-[0.94] disabled:opacity-40 ${
       ghost
         ? "text-muted-foreground hover:bg-surface"
-        : "bg-surface text-foreground hover:bg-surface-hover active:bg-primary/10"
+        : "bg-gradient-to-b from-surface to-surface/60 text-foreground shadow-[0_1px_0_hsl(var(--foreground)/0.04),0_1px_2px_hsl(var(--foreground)/0.04)] ring-1 ring-border/60 hover:from-surface-hover active:from-primary/10 active:to-primary/5 active:ring-primary/30"
     }`}
   >
     {children}
