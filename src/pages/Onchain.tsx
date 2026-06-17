@@ -63,9 +63,8 @@ const Onchain = () => {
         if (error || (data as any)?.error) throw new Error((data as any)?.error ?? error?.message);
         toast.success("Swap submitted");
       } else if (tab === "Bridge") {
-        const toChain = (tokenOut.chain || destinationChain).replace(/\s+/g, "_");
         const { data, error } = await supabase.functions.invoke("circle-bridge", {
-          body: { fromChain: "Arc_Testnet", toChain, amount: payAmount, recipientAddress: wallet.address },
+          body: { fromChain: "Arc_Testnet", toChain: destinationChain, amount: payAmount, recipientAddress: wallet.address },
         });
         if (error || (data as any)?.error) throw new Error((data as any)?.error ?? error?.message);
         toast.success("Bridge submitted");
