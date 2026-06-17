@@ -65,7 +65,7 @@ export const MentionAutocomplete = ({ value, onChange, caret, setCaret, inputRef
   };
 
   return (
-    <div className="fade-in absolute left-3 right-3 z-40 mt-1 overflow-hidden rounded-2xl border border-border bg-background shadow-lg">
+    <div className="fade-in absolute left-0 right-0 top-full z-40 mt-1 overflow-hidden rounded-2xl border border-border bg-background shadow-lg">
       <ul className="max-h-[260px] overflow-y-auto py-1">
         {results.map((p) => (
           <li key={p.id}>
