@@ -36,6 +36,10 @@ export async function initCircle(): Promise<InitResponse> {
   return r;
 }
 
+export async function initDcw(): Promise<{ wallet: WalletRow | null }> {
+  return invoke("circle-dcw-init");
+}
+
 export async function fetchBalance(): Promise<{ wallet: WalletRow | null; balances: any[] }> {
   return invoke("circle-balance");
 }
@@ -49,14 +53,14 @@ export interface SendArgs {
   kind?: "send" | "tip" | "request";
 }
 
-export async function startSend(args: SendArgs) {
-  return invoke<{
-    challengeId: string;
-    userToken: string;
-    encryptionKey: string;
-    transactionId: string;
-  }>("circle-send", args);
+// Server-signed DCW transfer — no PIN modal needed.
+export async function sendUsdc(args: SendArgs) {
+  return invoke<{ transactionId: string; circleTxId?: string; state?: string }>(
+    "circle-send",
+    args,
+  );
 }
+
 
 // Lazy-loaded SDK instance. Importing the SDK eagerly crashes the bundle
 // because it pulls jsonwebtoken which expects Node's Buffer global.

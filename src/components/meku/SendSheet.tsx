@@ -2,9 +2,10 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { startSend, executeChallenge, SendArgs } from "@/lib/circle";
+import { sendUsdc, SendArgs } from "@/lib/circle";
 import { useWallet } from "@/hooks/useWallet";
 import { IconSend } from "./MekuIcon";
+
 
 interface Props {
   open: boolean;
@@ -31,16 +32,11 @@ export const SendSheet = ({ open, onOpenChange, defaults, recipientLabel, title 
     }
     setBusy(true);
     try {
-      const start = await startSend({
+      await sendUsdc({
         ...defaults,
         amount,
         destinationAddress: needsAddress ? address : defaults?.destinationAddress,
         kind: defaults?.kind ?? "send",
-      });
-      await executeChallenge({
-        challengeId: start.challengeId,
-        userToken: start.userToken,
-        encryptionKey: start.encryptionKey,
       });
       toast.success(`Sent ${amount} USDC`);
       onOpenChange(false);
@@ -56,6 +52,7 @@ export const SendSheet = ({ open, onOpenChange, defaults, recipientLabel, title 
       setBusy(false);
     }
   };
+
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -112,11 +109,12 @@ export const SendSheet = ({ open, onOpenChange, defaults, recipientLabel, title 
           disabled={busy || !amount || Number(amount) <= 0 || (needsAddress && !address)}
           className="tap mt-5 flex h-[52px] w-full items-center justify-center rounded-full bg-primary text-[15px] font-bold text-primary-foreground shadow-purple disabled:opacity-40"
         >
-          {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : "Confirm & sign with PIN"}
+          {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : "Confirm transfer"}
         </button>
         <p className="mt-2 text-center text-[11px] text-muted-foreground">
-          Circle will ask for your PIN to authorize this transfer.
+          Signed by your MEKU wallet on Arc Testnet.
         </p>
+
       </DialogContent>
     </Dialog>
   );

@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from "react";
 import { useAuth } from "./useAuth";
-import { initCircle, fetchBalance, WalletRow } from "@/lib/circle";
+import { initCircle, initDcw, fetchBalance, WalletRow } from "@/lib/circle";
 
 export interface TokenBalance {
   symbol: string;
@@ -38,22 +38,16 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
   const [usdc, setUsdc] = useState("0");
   const [balances, setBalances] = useState<TokenBalance[]>([]);
   const [loading, setLoading] = useState(false);
-  const [pendingChallenge, setPendingChallenge] = useState<WalletCtx["pendingChallenge"]>(null);
 
   const refresh = useCallback(async () => {
     if (!user) return;
     setLoading(true);
     try {
-      const init = await initCircle();
-      setWallet(init.wallet);
-      if (init.challengeId && init.appId) {
-        setPendingChallenge({
-          challengeId: init.challengeId,
-          userToken: init.userToken,
-          encryptionKey: init.encryptionKey,
-          appId: init.appId,
-        });
-      }
+      // Ensure Circle user exists (best-effort; safe to skip if it fails).
+      try { await initCircle(); } catch (e) { console.warn("initCircle skipped", e); }
+      // Provision / load the developer-controlled wallet.
+      const dcw = await initDcw();
+      if (dcw.wallet) setWallet(dcw.wallet);
       const bal = await fetchBalance();
       if (bal.wallet) setWallet(bal.wallet);
       const tokens: TokenBalance[] = (bal.balances ?? []).map((b: any) => ({
@@ -77,8 +71,10 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <Ctx.Provider value={{
-      wallet, usdc, balances, loading, pendingChallenge, refresh,
-      clearChallenge: () => setPendingChallenge(null),
+      wallet, usdc, balances, loading,
+      pendingChallenge: null,
+      refresh,
+      clearChallenge: () => {},
     }}>
       {children}
     </Ctx.Provider>
@@ -86,3 +82,4 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
 };
 
 export const useWallet = () => useContext(Ctx);
+
