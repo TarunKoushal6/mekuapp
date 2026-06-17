@@ -9,6 +9,7 @@ import { EmptyState } from "@/components/meku/EmptyState";
 import { FeedCard } from "@/components/meku/FeedCard";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchPosts, getProfile, type Post, type Profile as ProfileT } from "@/lib/social";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { fetchPosts, getProfile, type Post, type Profile as ProfileT } from "@/lib/social";
