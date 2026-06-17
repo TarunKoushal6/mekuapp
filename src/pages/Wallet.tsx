@@ -267,6 +267,12 @@ const Wallet = () => {
       {sendOpen && (
         <SendSheet open={sendOpen} onOpenChange={setSendOpen} title="Send USDC" />
       )}
+
+      <TokenDetailSheet
+        open={!!tokenDetail}
+        onOpenChange={(o) => !o && setTokenDetail(null)}
+        token={tokenDetail}
+      />
     </AppShell>
   );
 };
