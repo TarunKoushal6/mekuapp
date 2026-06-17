@@ -52,6 +52,7 @@ export function circleStateToStatus(state?: string | null) {
 // generate ciphertext using their public key. To keep this lightweight, this
 // helper supports both: if CIRCLE_ENTITY_SECRET_CIPHERTEXT is provided, use it.
 // Otherwise we fetch their public key and encrypt the 32-byte secret.
+let cachedPubKey: CryptoKey | null = null;
 export async function entitySecretCiphertext(): Promise<string> {
   const cached = Deno.env.get("CIRCLE_ENTITY_SECRET_CIPHERTEXT");
   if (cached) return cached;
@@ -59,31 +60,23 @@ export async function entitySecretCiphertext(): Promise<string> {
   const secretHex = Deno.env.get("CIRCLE_ENTITY_SECRET");
   if (!secretHex) throw new Error("CIRCLE_ENTITY_SECRET not set");
 
-  // 1. fetch public key
-  const pk = await circleFetch("/config/entity/publicKey", { method: "GET" });
-  const pemKey: string = pk?.data?.publicKey;
-  if (!pemKey) throw new Error("No Circle public key returned");
+  if (!cachedPubKey) {
+    const pk = await circleFetch("/config/entity/publicKey", { method: "GET" });
+    const pemKey: string = pk?.data?.publicKey;
+    if (!pemKey) throw new Error("No Circle public key returned");
+    const b64 = pemKey
+      .replace(/-----BEGIN PUBLIC KEY-----/, "")
+      .replace(/-----END PUBLIC KEY-----/, "")
+      .replace(/\s+/g, "");
+    const der = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+    cachedPubKey = await crypto.subtle.importKey(
+      "spki", der, { name: "RSA-OAEP", hash: "SHA-256" }, false, ["encrypt"],
+    );
+  }
 
-  // 2. import the PEM key
-  const b64 = pemKey
-    .replace(/-----BEGIN PUBLIC KEY-----/, "")
-    .replace(/-----END PUBLIC KEY-----/, "")
-    .replace(/\s+/g, "");
-  const der = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
-  const cryptoKey = await crypto.subtle.importKey(
-    "spki",
-    der,
-    { name: "RSA-OAEP", hash: "SHA-256" },
-    false,
-    ["encrypt"],
-  );
-
-  // 3. encrypt the 32-byte entity secret
   const secretBytes = hexToBytes(secretHex);
   const cipher = await crypto.subtle.encrypt(
-    { name: "RSA-OAEP" },
-    cryptoKey,
-    secretBytes,
+    { name: "RSA-OAEP" }, cachedPubKey, secretBytes,
   );
   return btoa(String.fromCharCode(...new Uint8Array(cipher)));
 }
