@@ -55,26 +55,37 @@ Deno.serve(async (req) => {
     const userToken: string = tokenRes?.data?.userToken;
     const encryptionKey: string = tokenRes?.data?.encryptionKey;
 
-    // 4. status — if no wallet yet, request initialize challenge
+    // 4. status — if no wallet yet, request initialize challenge.
+    // Circle returns 409/155106 if the user was already initialized in a
+    // previous attempt (e.g. the local wallets row was wiped or the PIN
+    // setup was abandoned). Treat that as "already done" and continue to
+    // the wallet-fetch step instead of bubbling a 500.
     let challengeId: string | undefined;
     if (!existing?.wallet_id) {
-      const initRes = await circleFetch("/user/initialize", {
-        method: "POST",
-        userToken,
-        body: JSON.stringify({
-          idempotencyKey: uuid(),
-          accountType: "EOA",
-          blockchains: [ARC_TESTNET],
-          entitySecretCiphertext: await entitySecretCiphertext(),
-        }),
-      });
-      challengeId = initRes?.data?.challengeId;
+      try {
+        const initRes = await circleFetch("/user/initialize", {
+          method: "POST",
+          userToken,
+          body: JSON.stringify({
+            idempotencyKey: uuid(),
+            accountType: "EOA",
+            blockchains: [ARC_TESTNET],
+            entitySecretCiphertext: await entitySecretCiphertext(),
+          }),
+        });
+        challengeId = initRes?.data?.challengeId;
+      } catch (e: any) {
+        const msg = String(e?.message ?? "");
+        const alreadyInit = msg.includes("155106") || msg.includes("already been initialized");
+        if (!alreadyInit) throw e;
+        console.log("user already initialized — skipping challenge");
+      }
 
       await admin.from("wallets").upsert({
         user_id: userId,
         circle_user_id: circleUserId,
         chain: ARC_TESTNET,
-        status: "challenge_pending",
+        status: challengeId ? "challenge_pending" : "ready",
       });
     }
 
