@@ -111,7 +111,12 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
 
       <div className="ml-[52px] mt-1.5">
         {post.title && <h2 className="text-[15.5px] font-semibold leading-[1.4] tracking-[-0.005em] text-foreground">{post.title}</h2>}
-        {post.body && <p className={(post.title ? "mt-1 " : "") + "whitespace-pre-wrap text-[15px] leading-[1.5] text-foreground/90"}>{post.body}</p>}
+        {post.body && (
+          <PostBody
+            text={post.body}
+            className={(post.title ? "mt-1 " : "") + "whitespace-pre-wrap text-[15px] leading-[1.5] text-foreground/90"}
+          />
+        )}
         {post.image_url && (
           <div className="mt-3 overflow-hidden rounded-[14px] border border-border bg-surface-2">
             <img src={post.image_url} alt="" loading="lazy" className="aspect-[5/4] w-full object-cover" />
@@ -131,8 +136,13 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
             <MessageCircle className="h-[18px] w-[18px]" strokeWidth={1.6} />
             <span className="text-[13px] tabular-nums">{post.comment_count}</span>
           </button>
-          <button onClick={(e) => e.stopPropagation()} className="tap inline-flex items-center gap-1.5" aria-label="Repost">
+          <button
+            onClick={handleRepost}
+            className={cn("tap inline-flex items-center gap-1.5", reposted && "text-emerald-500")}
+            aria-label="Repost"
+          >
             <Repeat2 className="h-[18px] w-[18px]" strokeWidth={1.6} />
+            {repostCount > 0 && <span className="text-[13px] tabular-nums">{repostCount}</span>}
           </button>
           <button onClick={handleLike} className="tap inline-flex items-center gap-1.5" aria-label="Like">
             <Heart className={cn("h-[18px] w-[18px] transition-colors", liked && "fill-[#ef3b6b] text-[#ef3b6b]")} strokeWidth={1.6} />
