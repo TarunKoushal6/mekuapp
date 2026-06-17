@@ -189,17 +189,6 @@ const Onchain = () => {
           )}
         </div>
 
-        {tab !== "Send" && (
-          <input
-            value={confirmPin}
-            onChange={(e) => setConfirmPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
-            placeholder="4-digit confirmation PIN"
-            inputMode="numeric"
-            type="password"
-            className="mt-4 h-12 w-full rounded-2xl border border-border bg-surface px-4 text-center text-[14px] font-semibold outline-none focus:border-primary"
-          />
-        )}
-
         <div className="mt-4 rounded-[16px] border border-border bg-surface p-4 text-[13px]">
           <Row label="Route" value={tab === "Bridge" ? "CCTP v2" : "Circle App Kit"} />
           <div className="my-3 h-px bg-border" />
@@ -208,10 +197,10 @@ const Onchain = () => {
 
         <button
           onClick={onCta}
-          disabled={!payAmount || Number(payAmount) <= 0}
+          disabled={busy || !payAmount || Number(payAmount) <= 0}
           className="tap mt-5 flex h-[56px] w-full items-center justify-center rounded-full bg-foreground text-[15px] font-bold text-background disabled:opacity-40"
         >
-          Review {tab.toLowerCase()}
+          {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : `Review ${tab.toLowerCase()}`}
         </button>
         <p className="mt-3 pb-8 text-center text-[12px] text-muted-foreground">
           Routed through your MEKU wallet on Arc Testnet.
