@@ -14,17 +14,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { formatAmount } from "@/lib/format";
+import { syncTransaction } from "@/lib/circle";
+import { TokenLogo } from "@/components/meku/TokenLogo";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
 type Tab = "Tokens" | "Activity";
 
-// Circle / USDC official mark
-const USDC_LOGO = "https://cryptologos.cc/logos/usd-coin-usdc-logo.svg";
 const ARC_EXPLORER = "https://testnet.arcscan.app";
-
-const TOKEN_LOGO: Record<string, string> = { USDC: USDC_LOGO };
 
 const Wallet = () => {
   const navigate = useNavigate();
@@ -54,7 +52,12 @@ const Wallet = () => {
       const { data } = await supabase.from("transactions").select("*")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false }).limit(20);
-      setTxs(data ?? []);
+      const rows = data ?? [];
+      const synced = await Promise.all(rows.map(async (t) => {
+        if (t.status !== "pending" || !t.circle_tx_id) return t;
+        try { return (await syncTransaction(t.id)).transaction ?? t; } catch { return t; }
+      }));
+      setTxs(synced);
     })();
   }, [user, sendOpen]);
 
@@ -199,26 +202,13 @@ const Wallet = () => {
               seen.add(k);
               return true;
             });
-            return list.map((b) => {
-              const logo = TOKEN_LOGO[b.symbol];
-              return (
+            return list.map((b) => (
                 <li key={`${b.symbol}-${b.chain ?? ""}`}>
                   <button
-                    onClick={() => setTokenDetail({ ...b, logo })}
+                    onClick={() => setTokenDetail(b)}
                     className="tap flex w-full items-center gap-3 rounded-[16px] px-2 py-3 text-left hover:bg-surface-2"
                   >
-                    {logo ? (
-                      <img
-                        src={logo}
-                        alt={b.symbol}
-                        className="h-[40px] w-[40px] rounded-full"
-                        onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
-                      />
-                    ) : (
-                      <span className="inline-flex h-[40px] w-[40px] items-center justify-center rounded-full bg-primary-soft text-[12px] font-bold text-primary">
-                        {b.symbol.slice(0, 3)}
-                      </span>
-                    )}
+                    <TokenLogo symbol={b.symbol} size="lg" />
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-[15px] font-semibold text-foreground">{b.symbol}</p>
                       <p className="truncate text-[12px] text-muted-foreground">{b.name ?? b.chain ?? "Arc Testnet"}</p>
@@ -233,8 +223,7 @@ const Wallet = () => {
                     </div>
                   </button>
                 </li>
-              );
-            });
+              ));
           })()
         ) : txs.length === 0 ? (
           <li className="px-4 py-10 text-center text-[13px] text-muted-foreground flex flex-col items-center gap-2">

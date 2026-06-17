@@ -61,6 +61,10 @@ export async function sendUsdc(args: SendArgs) {
   );
 }
 
+export async function syncTransaction(transactionId: string) {
+  return invoke<{ transaction?: any; circleState?: string }>("circle-sync-transaction", { transactionId });
+}
+
 
 // Lazy-loaded SDK instance. Importing the SDK eagerly crashes the bundle
 // because it pulls jsonwebtoken which expects Node's Buffer global.

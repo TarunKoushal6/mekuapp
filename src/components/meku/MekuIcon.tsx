@@ -151,6 +151,30 @@ export const IconSettings = wrap(
   </>,
 );
 
+export const IconPalette = wrap(
+  <>
+    <path d="M12 3.5a8.5 8.5 0 0 0 0 17h1.2a2 2 0 0 0 1.4-3.4 1.6 1.6 0 0 1 1.1-2.7H17a4 4 0 0 0 4-4c0-3.8-4-6.9-9-6.9Z" />
+    <circle cx="8.2" cy="10" r=".9" fill="currentColor" stroke="none" />
+    <circle cx="11.2" cy="7.7" r=".9" fill="currentColor" stroke="none" />
+    <circle cx="14.8" cy="8.2" r=".9" fill="currentColor" stroke="none" />
+  </>,
+);
+
+export const IconShield = wrap(
+  <>
+    <path d="M12 3.2 5.5 5.8v5.7c0 4.2 2.7 7.2 6.5 9.3 3.8-2.1 6.5-5.1 6.5-9.3V5.8L12 3.2Z" />
+    <path d="m9.2 12 1.9 1.9 3.9-4" />
+  </>,
+);
+
+export const IconLogout = wrap(
+  <>
+    <path d="M10 5H6.5A2.5 2.5 0 0 0 4 7.5v9A2.5 2.5 0 0 0 6.5 19H10" />
+    <path d="M13 8l4 4-4 4" />
+    <path d="M17 12H9" />
+  </>,
+);
+
 export const IconMore = wrap(
   <>
     <circle cx="5" cy="12" r="1.2" />

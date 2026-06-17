@@ -28,6 +28,24 @@ export async function circleFetch(
   return body;
 }
 
+export async function getCircleTransaction(transactionId: string) {
+  try {
+    const direct = await circleFetch(`/transactions/${encodeURIComponent(transactionId)}`, { method: "GET" });
+    return direct?.data?.transaction ?? direct?.data ?? direct;
+  } catch (_) {
+    const listed = await circleFetch("/transactions?order=DESC&pageSize=50", { method: "GET" });
+    const txs = listed?.data?.transactions ?? [];
+    return txs.find((t: any) => t?.id === transactionId) ?? null;
+  }
+}
+
+export function circleStateToStatus(state?: string | null) {
+  const s = String(state ?? "").toUpperCase();
+  if (["COMPLETE", "CONFIRMED", "SUCCESS"].includes(s)) return "confirmed";
+  if (["FAILED", "DENIED", "CANCELLED", "ERROR"].includes(s)) return "failed";
+  return "pending";
+}
+
 // Circle requires a fresh RSA-encrypted ciphertext per request. The simpler
 // alternative they support: send the raw 32-byte hex entitySecret via the
 // `/v1/w3s/config/entity/publicKey` endpoint to encrypt, but for Deno we
