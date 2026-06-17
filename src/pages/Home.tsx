@@ -1,9 +1,10 @@
 import { AppShell } from "@/components/meku/AppShell";
 import { FeedCard } from "@/components/meku/FeedCard";
 import { EmptyState } from "@/components/meku/EmptyState";
-import { Loader2 } from "lucide-react";
+import { Loader2, Menu } from "lucide-react";
 import { IconBell, IconPlus } from "@/components/meku/MekuIcon";
 import { Logo } from "@/components/meku/Logo";
+import { SideMenu } from "@/components/meku/SideMenu";
 import { Link } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
 import { cn } from "@/lib/utils";
@@ -11,7 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { fetchPosts, type Post } from "@/lib/social";
 import { supabase } from "@/integrations/supabase/client";
 
-const tabs = ["For You", "Following", "Arc Moments"] as const;
+const tabs = ["For You", "Following"] as const;
 type Tab = (typeof tabs)[number];
 
 const Home = () => {
@@ -19,6 +20,7 @@ const Home = () => {
   const [tab, setTab] = useState<Tab>("For You");
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const load = useCallback(async () => {
     try { setPosts(await fetchPosts(user?.id)); } finally { setLoading(false); }
@@ -34,13 +36,25 @@ const Home = () => {
 
   return (
     <AppShell>
-      <header className="sticky top-0 z-30 flex items-center justify-between bg-background/85 px-5 pb-2 pt-3 backdrop-blur-xl">
-        <Logo size={24} />
+      <header className="sticky top-0 z-30 flex items-center justify-between bg-background/85 px-4 pb-2 pt-3 backdrop-blur-xl">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setMenuOpen(true)}
+            aria-label="Menu"
+            className="tap inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground"
+          >
+            <Menu className="h-[22px] w-[22px]" strokeWidth={2} />
+          </button>
+          <Logo appIcon size={28} />
+          <Logo size={22} />
+        </div>
         <Link to="/notifications" aria-label="Notifications" className="tap relative inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground">
           <IconBell size={20} />
           <span className="absolute right-2 top-2 h-[7px] w-[7px] rounded-full bg-primary" />
         </Link>
       </header>
+
+      <SideMenu open={menuOpen} onOpenChange={setMenuOpen} />
 
       {/* Tabs — X.com-style */}
       <nav className="sticky top-[52px] z-20 bg-background/85 backdrop-blur-xl hairline-b">
