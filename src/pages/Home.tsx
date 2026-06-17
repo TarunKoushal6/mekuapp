@@ -23,8 +23,11 @@ const Home = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const load = useCallback(async () => {
-    try { setPosts(await fetchPosts(user?.id)); } finally { setLoading(false); }
-  }, [user?.id]);
+    setLoading(true);
+    try {
+      setPosts(await fetchPosts(user?.id, { followingOnly: tab === "Following" }));
+    } finally { setLoading(false); }
+  }, [user?.id, tab]);
 
   useEffect(() => { load(); }, [load]);
   useEffect(() => {
