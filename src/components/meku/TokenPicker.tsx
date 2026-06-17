@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { useWallet } from "@/hooks/useWallet";
 import { IconCheck, IconSearch } from "./MekuIcon";
 import { useMemo, useState } from "react";
+import { TokenLogo } from "./TokenLogo";
 
 export interface TokenOption {
   symbol: string;
@@ -16,13 +17,14 @@ export interface TokenOption {
 }
 
 const CATALOGUE: TokenOption[] = [
-  { symbol: "USDC", name: "USD Coin", chain: "Arc", logo: "https://cryptologos.cc/logos/usd-coin-usdc-logo.svg" },
+  { symbol: "USDC", name: "USD Coin", chain: "Arc" },
   { symbol: "EURC", name: "Euro Coin", chain: "Arc" },
   { symbol: "USDT", name: "Tether USD", chain: "Arc" },
   { symbol: "PYUSD", name: "PayPal USD", chain: "Arc" },
   { symbol: "DAI",  name: "Dai", chain: "Arc" },
   { symbol: "USDE", name: "Ethena USDe", chain: "Arc" },
   { symbol: "WBTC", name: "Wrapped BTC", chain: "Arc" },
+  { symbol: "cirBTC", name: "Circle Wrapped Bitcoin", chain: "Arc" },
   { symbol: "WETH", name: "Wrapped ETH", chain: "Arc" },
 ];
 
@@ -79,18 +81,7 @@ export const TokenPicker = ({ open, onOpenChange, value, onSelect }: Props) => {
                 onClick={() => { onSelect(t); onOpenChange(false); }}
                 className="tap flex w-full items-center gap-3 rounded-2xl px-2 py-2.5 text-left hover:bg-surface-2"
               >
-                {t.logo ? (
-                  <img
-                    src={t.logo}
-                    alt={t.symbol}
-                    className="h-9 w-9 rounded-full"
-                    onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
-                  />
-                ) : (
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary-soft text-[11px] font-bold text-primary">
-                    {t.symbol.slice(0, 3)}
-                  </span>
-                )}
+                <TokenLogo symbol={t.symbol} />
                 <span className="flex-1">
                   <span className="block text-[14px] font-semibold text-foreground">{t.symbol}</span>
                   <span className="block text-[11.5px] text-muted-foreground">{t.name} · {t.chain}</span>
