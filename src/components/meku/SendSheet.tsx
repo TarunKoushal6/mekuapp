@@ -25,6 +25,10 @@ export const SendSheet = ({ open, onOpenChange, defaults, recipientLabel, title 
 
   const submit = async () => {
     if (busy) return;
+    if (!wallet?.wallet_id) {
+      toast.error("Your wallet is still provisioning. Try again in a moment.");
+      return;
+    }
     setBusy(true);
     try {
       const start = await startSend({
@@ -42,7 +46,12 @@ export const SendSheet = ({ open, onOpenChange, defaults, recipientLabel, title 
       onOpenChange(false);
       refresh();
     } catch (e: any) {
-      toast.error(e?.message ?? "Transaction failed");
+      const msg = String(e?.message ?? "Transaction failed");
+      if (msg.includes("destination required")) {
+        toast.error("Recipient hasn't set up their MEKU wallet yet.");
+      } else {
+        toast.error(msg);
+      }
     } finally {
       setBusy(false);
     }
