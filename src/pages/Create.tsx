@@ -90,6 +90,8 @@ const Create = () => {
             inputRef={bodyRef}
           />
         </div>
+      </div>
+
 
       <div className="fixed inset-x-0 bottom-0 z-30 hairline-t bg-background/90 backdrop-blur-xl" style={{ paddingBottom: "max(env(safe-area-inset-bottom), 8px)" }}>
         <div className="mx-auto flex h-[56px] max-w-[440px] items-center gap-1 px-3 text-muted-foreground">
