@@ -1,13 +1,11 @@
+// PinSheet — full-screen PIN page styled to match the AvatarEditor aesthetic
+// from 15 June: 56px header with back + centered title + right pill action,
+// large centered focal ring (instead of crop ring) with dimmed surroundings,
+// uppercase tracking-wider section labels, primary-accented controls, and a
+// small muted footer hint.
 import { useEffect, useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+import { IconWallet, IconBack, IconCheck } from "./MekuIcon";
 import { Loader2, Delete } from "lucide-react";
-import { IconWallet } from "./MekuIcon";
 
 interface Props {
   mode: "setup" | "confirm";
@@ -85,119 +83,139 @@ export const PinSheet = ({ mode, onCancel, onSubmit }: Props) => {
     await finalize(value);
   };
 
-  const title = isSetup
+  const title = isSetup ? "Set wallet PIN" : "Enter wallet PIN";
+  const sectionLabel = isSetup
     ? step === "enter"
-      ? "Set your wallet PIN"
-      : "Confirm your PIN"
-    : "Enter wallet PIN";
+      ? "Create PIN"
+      : "Confirm PIN"
+    : "Unlock";
 
-  const description = isSetup
+  const helperText = isSetup
     ? step === "enter"
-      ? "Create a 4–6 digit PIN to protect your MEKU wallet. You'll use it to authorise every transaction."
+      ? "Choose a 4–6 digit PIN. You'll use it to authorise every send, swap and bridge."
       : "Re-enter the same PIN to confirm."
     : "Enter your PIN to authorise this transaction.";
 
+  const ctaReady = pin.length >= MIN_LEN && !busy;
   const keys = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
 
-  const ctaLabel = busy
-    ? null
-    : isSetup
-      ? step === "enter"
-        ? "Continue"
-        : "Confirm PIN"
-      : "Unlock";
-
   return (
-    <Dialog open onOpenChange={(o) => !o && onCancel()}>
-      <DialogContent className="max-w-[380px] rounded-3xl border-border bg-background p-6 text-center">
-        <DialogHeader>
-          <div className="mx-auto mb-3 inline-flex h-[56px] w-[56px] items-center justify-center rounded-2xl gradient-purple text-primary-foreground shadow-purple">
-            <IconWallet size={26} />
-          </div>
-          <DialogTitle className="text-[18px]">{title}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
-        </DialogHeader>
-
-        {/* Dots */}
-        <div
-          className={`mt-4 flex justify-center gap-2.5 ${
-            shake ? "animate-[wallet-shake_0.4s_ease-in-out]" : ""
-          }`}
+    <div className="fixed inset-0 z-50 flex flex-col bg-background">
+      {/* Header — matches AvatarEditor */}
+      <header className="flex h-[56px] items-center justify-between px-3">
+        <button
+          onClick={onCancel}
+          className="tap inline-flex h-10 w-10 items-center justify-center rounded-full"
+          aria-label="Back"
         >
-          {Array.from({ length: PIN_LEN }).map((_, i) => {
-            const filled = i < pin.length;
-            return (
-              <span
-                key={i}
-                className={`h-[12px] w-[12px] rounded-full transition-all duration-200 ${
-                  filled
-                    ? "bg-primary scale-110"
-                    : "bg-muted ring-1 ring-border"
-                }`}
-              />
-            );
-          })}
+          <IconBack size={22} />
+        </button>
+        <h2 className="text-[15px] font-bold">{title}</h2>
+        <button
+          onClick={() => handleContinue()}
+          disabled={!ctaReady}
+          className="tap inline-flex h-9 items-center gap-1 rounded-full bg-primary px-4 text-[13px] font-bold text-primary-foreground disabled:opacity-40"
+        >
+          {busy ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <>
+              <IconCheck size={14} />
+              {isSetup && step === "enter" ? "Next" : "Done"}
+            </>
+          )}
+        </button>
+      </header>
+
+      {/* Body */}
+      <div className="flex flex-1 flex-col items-center justify-center px-4">
+        {/* Focal ring — same dimmed-surroundings trick as AvatarEditor crop ring */}
+        <div className="relative" style={{ width: 220, height: 220 }}>
+          <div
+            className="absolute inset-0 flex items-center justify-center rounded-full"
+            style={{
+              boxShadow: `0 0 0 9999px hsl(0 0% 0% / 0.55)`,
+              border: "2px solid hsl(var(--primary))",
+            }}
+          >
+            <div className="inline-flex h-[64px] w-[64px] items-center justify-center rounded-2xl gradient-purple text-primary-foreground shadow-purple">
+              <IconWallet size={30} />
+            </div>
+          </div>
         </div>
 
-        {/* Error / hint */}
-        <div className="mt-3 h-5 text-center text-[12px] font-medium">
-          {error ? (
-            <span className="text-destructive">{error}</span>
-          ) : (
-            <span className="text-muted-foreground">
-              {pin.length}/{PIN_LEN} digits
-            </span>
-          )}
+        {/* Dots */}
+        <div className="mt-8 w-full max-w-[320px]">
+          <span className="mb-2 block text-center text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            {sectionLabel}
+          </span>
+          <div
+            className={`flex justify-center gap-2.5 ${
+              shake ? "animate-[wallet-shake_0.4s_ease-in-out]" : ""
+            }`}
+          >
+            {Array.from({ length: PIN_LEN }).map((_, i) => {
+              const filled = i < pin.length;
+              return (
+                <span
+                  key={i}
+                  className={`h-[12px] w-[12px] rounded-full transition-all duration-200 ${
+                    filled
+                      ? "bg-primary scale-110"
+                      : "bg-muted ring-1 ring-border"
+                  }`}
+                />
+              );
+            })}
+          </div>
+          <div className="mt-2 h-5 text-center text-[12px] font-medium">
+            {error ? (
+              <span className="text-destructive">{error}</span>
+            ) : (
+              <span className="text-muted-foreground">
+                {pin.length}/{PIN_LEN} digits
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Keypad */}
-        <div className="mt-2 grid grid-cols-3 gap-2.5">
+        <div className="mt-2 grid w-full max-w-[320px] grid-cols-3 gap-2.5">
           {keys.map((k) => (
             <KeyButton key={k} onClick={() => press(k)} disabled={busy}>
               {k}
             </KeyButton>
           ))}
-          <div />
+          {/* Backspace, 0, action — mirrors the AvatarEditor small round bordered button */}
+          <button
+            onClick={backspace}
+            disabled={busy || pin.length === 0}
+            aria-label="Backspace"
+            className="tap mx-auto mt-1 inline-flex h-10 w-10 items-center justify-center rounded-full border border-border text-foreground disabled:opacity-40"
+          >
+            <Delete size={16} />
+          </button>
           <KeyButton onClick={() => press("0")} disabled={busy}>
             0
           </KeyButton>
-          <KeyButton
-            onClick={backspace}
-            disabled={busy || pin.length === 0}
-            ghost
-            aria-label="Backspace"
-          >
-            <Delete size={20} />
-          </KeyButton>
+          <div />
         </div>
 
-        {/* Primary pill — same style as the original UCW modal */}
-        <button
-          onClick={() => handleContinue()}
-          disabled={busy || pin.length < MIN_LEN}
-          className="tap mt-4 flex h-[48px] w-full items-center justify-center rounded-full bg-primary text-[14px] font-bold text-primary-foreground shadow-purple disabled:opacity-50"
-        >
-          {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : ctaLabel}
-        </button>
+        <p className="mt-4 text-center text-[12px] text-muted-foreground">
+          {helperText}
+        </p>
+      </div>
 
-        <button
-          onClick={onCancel}
-          className="tap mt-2 text-[12px] text-muted-foreground"
-        >
-          Cancel
-        </button>
-
-        <style>{`
-          @keyframes wallet-shake {
-            0%, 100% { transform: translateX(0); }
-            20% { transform: translateX(-8px); }
-            40% { transform: translateX(8px); }
-            60% { transform: translateX(-6px); }
-            80% { transform: translateX(6px); }
-          }
-        `}</style>
-      </DialogContent>
-    </Dialog>
+      <style>{`
+        @keyframes wallet-shake {
+          0%, 100% { transform: translateX(0); }
+          20% { transform: translateX(-8px); }
+          40% { transform: translateX(8px); }
+          60% { transform: translateX(-6px); }
+          80% { transform: translateX(6px); }
+        }
+      `}</style>
+    </div>
   );
 };
 
@@ -205,24 +223,15 @@ const KeyButton = ({
   children,
   onClick,
   disabled,
-  ghost,
-  ...rest
 }: {
   children: React.ReactNode;
   onClick: () => void;
   disabled?: boolean;
-  ghost?: boolean;
-  [k: string]: any;
 }) => (
   <button
-    {...rest}
     onClick={onClick}
     disabled={disabled}
-    className={`tap flex h-[52px] items-center justify-center rounded-2xl text-[22px] font-semibold transition-all active:scale-[0.94] disabled:opacity-40 ${
-      ghost
-        ? "text-muted-foreground hover:bg-surface"
-        : "bg-surface text-foreground hover:bg-surface-hover"
-    }`}
+    className="tap flex h-[52px] items-center justify-center rounded-2xl bg-surface text-[22px] font-semibold text-foreground transition-all hover:bg-surface-hover active:scale-[0.94] disabled:opacity-40"
   >
     {children}
   </button>
