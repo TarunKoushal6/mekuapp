@@ -22,6 +22,8 @@ type Tab = "Tokens" | "Activity";
 const USDC_LOGO = "https://cryptologos.cc/logos/usd-coin-usdc-logo.svg";
 const ARC_EXPLORER = "https://testnet.arcscan.app";
 
+const TOKEN_LOGO: Record<string, string> = { USDC: USDC_LOGO };
+
 const Wallet = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
