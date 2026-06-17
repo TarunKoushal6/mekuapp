@@ -180,24 +180,37 @@ const Wallet = () => {
 
       <ul className="mt-2 px-3 pb-8">
         {tab === "Tokens" ? (
-          <li className="tap flex items-center gap-3 rounded-[16px] px-2 py-3 hover:bg-surface-2">
-            <img
-              src={USDC_LOGO}
-              alt="USDC"
-              className="h-[40px] w-[40px] rounded-full"
-              onError={(e) => {
-                (e.currentTarget as HTMLImageElement).style.display = "none";
-              }}
-            />
-            <div className="flex-1 min-w-0">
-              <p className="text-[15px] font-semibold text-foreground">USDC</p>
-              <p className="text-[12px] text-muted-foreground">Arc Testnet</p>
-            </div>
-            <div className="text-right">
-              <p className="text-[15px] font-semibold tabular-nums text-foreground">{loading ? <Loader2 className="h-4 w-4 animate-spin" /> : usdc}</p>
-              <p className="text-[12px] text-muted-foreground tabular-nums">${usdc}</p>
-            </div>
-          </li>
+          (balances.length === 0
+            ? [{ symbol: "USDC", name: "USD Coin", chain: "Arc Testnet", amount: usdc }]
+            : balances
+          ).map((b) => (
+            <li key={b.symbol} className="tap flex items-center gap-3 rounded-[16px] px-2 py-3 hover:bg-surface-2">
+              {TOKEN_LOGO[b.symbol] ? (
+                <img
+                  src={TOKEN_LOGO[b.symbol]}
+                  alt={b.symbol}
+                  className="h-[40px] w-[40px] rounded-full"
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+                />
+              ) : (
+                <span className="inline-flex h-[40px] w-[40px] items-center justify-center rounded-full bg-primary-soft text-[12px] font-bold text-primary">
+                  {b.symbol.slice(0, 3)}
+                </span>
+              )}
+              <div className="flex-1 min-w-0">
+                <p className="text-[15px] font-semibold text-foreground">{b.symbol}</p>
+                <p className="text-[12px] text-muted-foreground">{b.name ?? "Arc Testnet"}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-[15px] font-semibold tabular-nums text-foreground">
+                  {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : b.amount}
+                </p>
+                {b.symbol === "USDC" && (
+                  <p className="text-[12px] text-muted-foreground tabular-nums">${b.amount}</p>
+                )}
+              </div>
+            </li>
+          ))
         ) : txs.length === 0 ? (
           <li className="px-4 py-10 text-center text-[13px] text-muted-foreground flex flex-col items-center gap-2">
             <IconActivity size={28} />
