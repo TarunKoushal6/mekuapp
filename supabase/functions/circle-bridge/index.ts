@@ -112,7 +112,7 @@ Deno.serve(async (req) => {
           contractAddress: src.tokenMessenger,
           abiFunctionSignature: "depositForBurn(uint256,uint32,bytes32,address)",
           abiParameters: [amountUnits, String(dst.destinationDomain), mintRecipientBytes32, src.usdc],
-          fee: { type: "level", config: { feeLevel: "MEDIUM" } },
+          feeLevel: "MEDIUM",
         }),
       });
 
