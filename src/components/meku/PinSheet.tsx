@@ -1,25 +1,48 @@
-// PinSheet — Circle-style PIN screen.
-// Reference: Circle's recovery flow (white canvas, illustrative hero with a
-// phone + lock + floating pastel blobs, large display title with a gradient
-// accent on the second line, soft body copy, full-width pill primary CTA).
-// Built with pure CSS/SVG — no extra assets — so the hero feels alive
-// (gentle float + glow) instead of static.
+// PinSheet — Circle-style PIN screen with built-in recovery flow.
+// Modes:
+//   "setup"   → enter PIN → confirm PIN → set 3 recovery questions
+//   "confirm" → enter PIN to authorise; exposes "Forgot PIN?" link
+//   "recover" → answer the 3 stored questions; on success the caller wipes
+//               the old PIN and re-opens setup
 import { useEffect, useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { ArrowLeft, Delete, Loader2, Lock } from "lucide-react";
+import { ArrowLeft, Delete, KeyRound, Loader2, Lock, ShieldCheck } from "lucide-react";
+import { RECOVERY_QUESTIONS } from "@/lib/pin";
+
+export type PinMode = "setup" | "confirm" | "recover";
 
 interface Props {
-  mode: "setup" | "confirm";
+  mode: PinMode;
+  /** Pre-loaded questions for "recover" mode. */
+  recoveryQuestions?: [string, string, string];
   onCancel: () => void;
+  /** Called once the PIN is captured (and confirmed if setup). Return error string or null. */
   onSubmit: (pin: string) => Promise<string | null>;
+  /** Called after setup PIN is saved, with the 3 chosen questions + answers. */
+  onSaveRecovery?: (qs: [string, string, string], answers: [string, string, string]) => Promise<string | null>;
+  /** Switch confirm-mode to recovery. Caller should re-open the sheet in "recover" mode. */
+  onForgotPin?: () => void;
+  /** Verify 3 answers in recover mode. Return error string or null. */
+  onVerifyRecovery?: (answers: [string, string, string]) => Promise<string | null>;
 }
 
 const PIN_LEN = 6;
 const MIN_LEN = 4;
 
-export const PinSheet = ({ mode, onCancel, onSubmit }: Props) => {
+type SetupStep = "enter" | "confirm" | "recovery";
+
+export const PinSheet = ({
+  mode,
+  recoveryQuestions,
+  onCancel,
+  onSubmit,
+  onSaveRecovery,
+  onForgotPin,
+  onVerifyRecovery,
+}: Props) => {
   const isSetup = mode === "setup";
-  const [step, setStep] = useState<"enter" | "confirm">("enter");
+  const isRecover = mode === "recover";
+  const [step, setStep] = useState<SetupStep>("enter");
   const [pin, setPin] = useState("");
   const [firstPin, setFirstPin] = useState("");
   const [busy, setBusy] = useState(false);
@@ -38,12 +61,42 @@ export const PinSheet = ({ mode, onCancel, onSubmit }: Props) => {
     setPin("");
   };
 
-  const finalize = async (value: string) => {
-    setBusy(true);
-    const err = await onSubmit(value);
-    setBusy(false);
-    if (err) triggerError(err);
-  };
+  // Recover mode renders its own component
+  if (isRecover) {
+    return (
+      <RecoveryDialog
+        title="Recover access"
+        subtitle="Answer your security questions to reset your wallet PIN."
+        questions={recoveryQuestions ?? ["", "", ""]}
+        ctaLabel="Verify answers"
+        onCancel={onCancel}
+        onSubmit={async (_qs, answers) => {
+          if (!onVerifyRecovery) return "Recovery not available";
+          return onVerifyRecovery(answers);
+        }}
+      />
+    );
+  }
+
+  // Setup recovery step renders its own component
+  if (isSetup && step === "recovery") {
+    return (
+      <RecoveryDialog
+        title="Secure your wallet"
+        subtitle="Pick 3 questions only you can answer. We'll use them if you ever forget your PIN."
+        editable
+        ctaLabel="Finish setup"
+        onCancel={onCancel}
+        onSubmit={async (qs, answers) => {
+          if (!onSaveRecovery) {
+            onCancel();
+            return null;
+          }
+          return onSaveRecovery(qs, answers);
+        }}
+      />
+    );
+  }
 
   const press = (digit: string) => {
     if (busy || pin.length >= PIN_LEN) return;
@@ -71,16 +124,29 @@ export const PinSheet = ({ mode, onCancel, onSubmit }: Props) => {
         setStep("confirm");
         return;
       }
-      if (value !== firstPin) {
-        triggerError("PINs don't match. Try again.");
-        setStep("enter");
-        setFirstPin("");
+      if (step === "confirm") {
+        if (value !== firstPin) {
+          triggerError("PINs don't match. Try again.");
+          setStep("enter");
+          setFirstPin("");
+          return;
+        }
+        setBusy(true);
+        const err = await onSubmit(value);
+        setBusy(false);
+        if (err) {
+          triggerError(err);
+          return;
+        }
+        // Move into recovery setup
+        setStep("recovery");
         return;
       }
-      await finalize(value);
-      return;
     }
-    await finalize(value);
+    setBusy(true);
+    const err = await onSubmit(value);
+    setBusy(false);
+    if (err) triggerError(err);
   };
 
   const headline = isSetup
@@ -117,7 +183,7 @@ export const PinSheet = ({ mode, onCancel, onSubmit }: Props) => {
             <ArrowLeft size={20} />
           </button>
           <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            {isSetup ? (step === "enter" ? "Step 1 of 2" : "Step 2 of 2") : "Unlock"}
+            {isSetup ? (step === "enter" ? "Step 1 of 3" : "Step 2 of 3") : "Unlock"}
           </span>
           <span className="w-9" />
         </div>
@@ -254,6 +320,16 @@ export const PinSheet = ({ mode, onCancel, onSubmit }: Props) => {
           >
             {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : "Continue"}
           </button>
+
+          {mode === "confirm" && onForgotPin && (
+            <button
+              onClick={onForgotPin}
+              className="tap mt-2 flex w-full items-center justify-center gap-1.5 text-[12.5px] font-semibold text-muted-foreground hover:text-foreground"
+            >
+              <KeyRound size={13} />
+              Forgot your PIN?
+            </button>
+          )}
         </div>
 
         <style>{`
@@ -314,3 +390,210 @@ const Key = ({
     {children}
   </button>
 );
+
+// ------------------------------------------------------------------
+// RecoveryDialog — used by both setup-recovery step and recover mode.
+// Same creative pastel hero language as the PIN sheet, with a shield
+// instead of a lock to signal "safety net".
+// ------------------------------------------------------------------
+
+interface RecoveryDialogProps {
+  title: string;
+  subtitle: string;
+  /** Allow choosing/editing questions (setup mode). */
+  editable?: boolean;
+  /** Pre-filled questions for verify mode. */
+  questions?: [string, string, string];
+  ctaLabel: string;
+  onCancel: () => void;
+  onSubmit: (qs: [string, string, string], answers: [string, string, string]) => Promise<string | null>;
+}
+
+const RecoveryDialog = ({
+  title, subtitle, editable, questions, ctaLabel, onCancel, onSubmit,
+}: RecoveryDialogProps) => {
+  const [qs, setQs] = useState<[string, string, string]>(() => {
+    if (questions && questions[0]) return questions;
+    return [RECOVERY_QUESTIONS[0], RECOVERY_QUESTIONS[1], RECOVERY_QUESTIONS[2]];
+  });
+  const [answers, setAnswers] = useState<[string, string, string]>(["", "", ""]);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const setAnswer = (i: number, v: string) =>
+    setAnswers((a) => {
+      const next = [...a] as [string, string, string];
+      next[i] = v;
+      return next;
+    });
+
+  const setQuestion = (i: number, v: string) => {
+    if (!editable) return;
+    setQs((current) => {
+      // prevent duplicates across the 3 slots
+      if (current.includes(v) && current[i] !== v) {
+        setError("Pick a different question for each slot.");
+        return current;
+      }
+      setError(null);
+      const next = [...current] as [string, string, string];
+      next[i] = v;
+      return next;
+    });
+  };
+
+  const canSubmit = answers.every((a) => a.trim().length >= 2);
+
+  const submit = async () => {
+    if (!canSubmit) {
+      setError("Answer all 3 questions.");
+      return;
+    }
+    setBusy(true);
+    const err = await onSubmit(qs, answers);
+    setBusy(false);
+    if (err) setError(err);
+  };
+
+  return (
+    <Dialog open onOpenChange={(o) => !o && onCancel()}>
+      <DialogContent
+        className="
+          max-w-[420px] gap-0 overflow-hidden border-0 bg-background p-0
+          rounded-[28px] shadow-2xl
+          h-[100dvh] sm:h-auto sm:max-h-[92vh] sm:my-4
+          flex flex-col
+        "
+      >
+        <div className="flex items-center justify-between px-4 pt-3 shrink-0">
+          <button
+            onClick={onCancel}
+            aria-label="Back"
+            className="tap flex h-9 w-9 items-center justify-center rounded-full text-foreground/80 hover:bg-muted"
+          >
+            <ArrowLeft size={20} />
+          </button>
+          <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            {editable ? "Step 3 of 3" : "Recovery"}
+          </span>
+          <span className="w-9" />
+        </div>
+
+        {/* Hero — pastel blobs + shield */}
+        <div className="relative mx-auto mt-1 h-[112px] w-[180px] shrink-0">
+          <span
+            aria-hidden
+            className="absolute left-1/2 top-1/2 h-[110px] w-[110px] -translate-x-1/2 -translate-y-1/2 rounded-full"
+            style={{ background: "radial-gradient(closest-side, hsl(168 80% 92%), transparent 70%)" }}
+          />
+          <span
+            aria-hidden
+            className="absolute left-[8%] top-[10%] h-8 w-8 rounded-[8px] rotate-[14deg] opacity-80 animate-[pin-float_5.5s_ease-in-out_infinite]"
+            style={{ background: "linear-gradient(135deg, #d8f5e6, #8fd9b6)" }}
+          />
+          <span
+            aria-hidden
+            className="absolute right-[6%] top-[34%] h-9 w-9 rounded-full opacity-90 animate-[pin-float-rev_6.5s_ease-in-out_infinite]"
+            style={{ background: "linear-gradient(135deg, #ffe7b3, #ffb86b)" }}
+          />
+          <span
+            aria-hidden
+            className="absolute left-[22%] bottom-[2%] h-5 w-5 rounded-full opacity-90 animate-[pin-float_4.5s_ease-in-out_infinite]"
+            style={{ background: "linear-gradient(135deg, #ffd6ee, #c89bff)" }}
+          />
+          <div className="relative mx-auto mt-3 flex h-[90px] w-[72px] items-center justify-center">
+            <span
+              aria-hidden
+              className="absolute inset-0 rounded-[20px] blur-md opacity-70 animate-[pin-glow_3s_ease-in-out_infinite]"
+              style={{ background: "radial-gradient(closest-side, #34e0b8, transparent 70%)" }}
+            />
+            <div className="relative flex h-[72px] w-[64px] items-center justify-center rounded-[18px] bg-gradient-to-br from-[#34e0b8] to-[#10b48a] text-white shadow-[0_14px_30px_-14px_rgba(16,180,138,0.6)] animate-[pin-bob_4s_ease-in-out_infinite]">
+              <ShieldCheck size={30} strokeWidth={2.2} />
+            </div>
+          </div>
+        </div>
+
+        {/* Title */}
+        <div className="shrink-0 px-6 pt-1 text-center">
+          <h2 className="text-[22px] font-semibold leading-[1.15] tracking-tight text-foreground">
+            {title.split(" ").slice(0, -1).join(" ")}{" "}
+            <span
+              className="bg-clip-text text-transparent"
+              style={{
+                backgroundImage:
+                  "linear-gradient(90deg, #6ee7c4 0%, #5b9dff 60%, #8b7aff 100%)",
+              }}
+            >
+              {title.split(" ").slice(-1)[0]}
+            </span>
+          </h2>
+          <p className="mx-auto mt-1.5 line-clamp-2 max-w-[300px] text-[13px] leading-snug text-muted-foreground">
+            {subtitle}
+          </p>
+        </div>
+
+        {/* Questions list — scrollable so keyboard fits */}
+        <div className="mt-3 flex-1 overflow-y-auto px-5">
+          <div className="space-y-3">
+            {[0, 1, 2].map((i) => (
+              <div
+                key={i}
+                className="rounded-2xl border border-border bg-muted/30 p-3"
+              >
+                {editable ? (
+                  <select
+                    value={qs[i]}
+                    onChange={(e) => setQuestion(i, e.target.value)}
+                    className="w-full bg-transparent text-[12.5px] font-semibold text-foreground/80 outline-none"
+                  >
+                    {RECOVERY_QUESTIONS.map((q) => (
+                      <option key={q} value={q}>{q}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <p className="text-[12.5px] font-semibold text-foreground/80">
+                    {qs[i]}
+                  </p>
+                )}
+                <input
+                  value={answers[i]}
+                  onChange={(e) => { setError(null); setAnswer(i, e.target.value); }}
+                  placeholder="Your answer"
+                  autoCapitalize="off"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  className="mt-1.5 w-full bg-transparent text-[15px] font-medium text-foreground outline-none placeholder:text-muted-foreground/50"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="shrink-0 px-5 pb-[max(12px,env(safe-area-inset-bottom))] pt-2">
+          <div className="h-4 text-center text-[11px] font-medium">
+            {error ? (
+              <span className="text-destructive">{error}</span>
+            ) : (
+              <span className="text-muted-foreground/70">
+                Answers are stored as one-way hashes.
+              </span>
+            )}
+          </div>
+          <button
+            onClick={submit}
+            disabled={busy || !canSubmit}
+            className="
+              tap mt-2 flex h-[48px] w-full items-center justify-center
+              rounded-2xl bg-[#10b48a] text-[15px] font-semibold text-white
+              shadow-[0_10px_24px_-10px_rgba(16,180,138,0.55)]
+              transition-all active:scale-[0.985]
+              disabled:bg-[#10b48a]/45 disabled:shadow-none
+            "
+          >
+            {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : ctaLabel}
+          </button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
