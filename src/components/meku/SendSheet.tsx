@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { sendUsdc, SendArgs } from "@/lib/circle";
 import { useWallet } from "@/hooks/useWallet";
 import { usePin } from "@/hooks/usePin";
 import { IconSend } from "./MekuIcon";
+import { SendFlyButton } from "./SendFlyButton";
 
 interface Props {
   open: boolean;
@@ -21,6 +21,7 @@ export const SendSheet = ({ open, onOpenChange, defaults, recipientLabel, title 
   const [amount, setAmount] = useState(defaults?.amount ?? "1");
   const [address, setAddress] = useState(defaults?.destinationAddress ?? "");
   const [busy, setBusy] = useState(false);
+  const [flying, setFlying] = useState(false);
   const { refresh, wallet, usdc } = useWallet();
   const { requirePin } = usePin();
   const needsAddress = !defaults?.recipientUserId && !defaults?.destinationAddress;
@@ -41,9 +42,13 @@ export const SendSheet = ({ open, onOpenChange, defaults, recipientLabel, title 
         destinationAddress: needsAddress ? address : defaults?.destinationAddress,
         kind: defaults?.kind ?? "send",
       });
+      setFlying(true);
       toast.success(`Sent ${amount} USDC`);
-      onOpenChange(false);
-      refresh();
+      setTimeout(() => {
+        setFlying(false);
+        onOpenChange(false);
+        refresh();
+      }, 700);
     } catch (e: any) {
       const msg = String(e?.message ?? "Transaction failed");
       if (msg.includes("destination required")) {
@@ -120,13 +125,14 @@ export const SendSheet = ({ open, onOpenChange, defaults, recipientLabel, title 
           ))}
         </div>
 
-        <button
+        <SendFlyButton
           onClick={submit}
+          busy={busy}
+          flying={flying}
           disabled={busy || !amount || Number(amount) <= 0 || (needsAddress && !/^0x[a-fA-F0-9]{40}$/.test(address))}
-          className="tap mt-5 flex h-[52px] w-full items-center justify-center rounded-full bg-primary text-[15px] font-bold text-primary-foreground shadow-purple disabled:opacity-40"
-        >
-          {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : "Confirm transfer"}
-        </button>
+          label="Confirm transfer"
+          className="mt-5"
+        />
         <p className="mt-2 text-center text-[11px] text-muted-foreground">
           You'll be asked for your wallet PIN before signing.
         </p>
