@@ -110,11 +110,11 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
       </header>
 
       <div className="ml-[52px] mt-1.5">
-        {post.title && <h2 className="text-[15.5px] font-semibold leading-[1.4] tracking-[-0.005em] text-foreground">{post.title}</h2>}
+        {post.title && <h2 className="text-[17px] font-bold leading-[1.3] tracking-[-0.01em] text-foreground">{post.title}</h2>}
         {post.body && (
           <PostBody
             text={post.body}
-            className={(post.title ? "mt-1 " : "") + "whitespace-pre-wrap text-[15px] leading-[1.5] text-foreground/90"}
+            className={(post.title ? "mt-1 " : "") + "whitespace-pre-wrap text-[15.5px] leading-[1.4] font-medium tracking-[-0.005em] text-foreground"}
           />
         )}
         {post.image_url && (
