@@ -1,4 +1,4 @@
-import { MessageCircle, Repeat2, Upload, BadgeCheck } from "lucide-react";
+import { MessageCircle, Repeat2, Upload, BadgeCheck, Coins } from "lucide-react";
 import { Avatar } from "./Avatar";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -6,7 +6,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { toggleLike, toggleRepost, isReposted, getRepostCount, type Post, timeAgo } from "@/lib/social";
-import { IconSend, IconMore } from "./MekuIcon";
 import { SendSheet } from "./SendSheet";
 import { InlineActionCard, parseInlineAction } from "./InlineActionCard";
 import { PostBody } from "./PostBody";
