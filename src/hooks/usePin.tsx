@@ -1,7 +1,10 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, ReactNode } from "react";
 import { useAuth } from "./useAuth";
-import { getPinHash, hashPin, isValidPin, setPin as savePin } from "@/lib/pin";
-import { PinSheet } from "@/components/meku/PinSheet";
+import {
+  getPinHash, hashPin, isValidPin, setPin as savePin,
+  saveRecovery, verifyRecovery, getRecovery, clearPin,
+} from "@/lib/pin";
+import { PinSheet, PinMode } from "@/components/meku/PinSheet";
 
 interface PinCtx {
   hasPin: boolean;
@@ -21,7 +24,11 @@ const Ctx = createContext<PinCtx>({
   refresh: async () => {},
 });
 
-type Mode = { kind: "setup" | "confirm"; resolve: (ok: boolean) => void } | null;
+type Mode = {
+  kind: PinMode;
+  resolve: (ok: boolean) => void;
+  recoveryQuestions?: [string, string, string];
+} | null;
 
 export const PinProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
@@ -39,8 +46,7 @@ export const PinProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => { refresh(); }, [refresh]);
 
-  // Auto-prompt PIN setup right after signup / first sign-in so every user
-  // has a transaction PIN before they can send, swap or bridge.
+  // Auto-prompt PIN setup right after signup / first sign-in.
   useEffect(() => {
     if (!user || loading || hash || mode) return;
     if (autoPromptedRef.current === user.id) return;
@@ -48,7 +54,6 @@ export const PinProvider = ({ children }: { children: ReactNode }) => {
     setMode({ kind: "setup", resolve: () => {} });
   }, [user, loading, hash, mode]);
 
-  // Reset auto-prompt guard on sign-out so a new user gets prompted too.
   useEffect(() => {
     if (!user) autoPromptedRef.current = null;
   }, [user]);
@@ -91,7 +96,7 @@ export const PinProvider = ({ children }: { children: ReactNode }) => {
         await savePin(user.id, pin);
         const h = await hashPin(pin);
         setHash(h);
-        handleClose(true);
+        // Do NOT close — PinSheet transitions to the recovery step next.
         return null;
       } catch (e: any) {
         return e?.message ?? "Could not save PIN";
@@ -107,14 +112,65 @@ export const PinProvider = ({ children }: { children: ReactNode }) => {
     return "Wrong PIN";
   };
 
+  const handleSaveRecovery = async (
+    qs: [string, string, string],
+    answers: [string, string, string],
+  ): Promise<string | null> => {
+    if (!user) return "Not signed in";
+    try {
+      await saveRecovery(user.id, qs, answers);
+      handleClose(true);
+      return null;
+    } catch (e: any) {
+      return e?.message ?? "Could not save recovery questions";
+    }
+  };
+
+  const handleForgotPin = async () => {
+    if (!user) return;
+    const row = await getRecovery(user.id);
+    if (!row) {
+      // No recovery set — fall back to fresh setup
+      handleClose(false);
+      setTimeout(() => setMode({ kind: "setup", resolve: () => {} }), 50);
+      return;
+    }
+    setMode({
+      kind: "recover",
+      resolve: () => {},
+      recoveryQuestions: [row.q1, row.q2, row.q3],
+    });
+  };
+
+  const handleVerifyRecovery = async (
+    answers: [string, string, string],
+  ): Promise<string | null> => {
+    if (!user) return "Not signed in";
+    const ok = await verifyRecovery(user.id, answers);
+    if (!ok) return "Those answers don't match. Try again.";
+    try {
+      await clearPin(user.id);
+      setHash(null);
+      // Switch to setup so the user picks a new PIN immediately.
+      setMode({ kind: "setup", resolve: () => {} });
+      return null;
+    } catch (e: any) {
+      return e?.message ?? "Could not reset PIN";
+    }
+  };
+
   return (
     <Ctx.Provider value={{ hasPin: !!hash, loading, requirePin, openSetup, refresh }}>
       {children}
       {mode && (
         <PinSheet
           mode={mode.kind}
+          recoveryQuestions={mode.recoveryQuestions}
           onCancel={() => handleClose(false)}
           onSubmit={handleSubmit}
+          onSaveRecovery={handleSaveRecovery}
+          onForgotPin={handleForgotPin}
+          onVerifyRecovery={handleVerifyRecovery}
         />
       )}
     </Ctx.Provider>
