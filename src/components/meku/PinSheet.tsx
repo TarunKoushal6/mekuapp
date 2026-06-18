@@ -16,6 +16,8 @@ interface Props {
   /** Pre-loaded questions for "recover" mode. */
   recoveryQuestions?: [string, string, string];
   onCancel: () => void;
+  /** Called after the success dialog dismisses (setup completed end-to-end). */
+  onComplete?: () => void;
   /** Called once the PIN is captured (and confirmed if setup). Return error string or null. */
   onSubmit: (pin: string) => Promise<string | null>;
   /** Called after setup PIN is saved, with the 3 chosen questions + answers. */
