@@ -117,8 +117,12 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
           <span className="text-[14px] text-muted-foreground">·</span>
           <span className="shrink-0 text-[14px] text-muted-foreground">{timeAgo(post.created_at)}</span>
         </div>
-        <button aria-label="More" onClick={(e) => e.stopPropagation()} className="tap -mr-2 -mt-1 inline-flex h-8 w-8 items-center justify-center text-muted-foreground">
-          <IconMore size={18} />
+        <button
+          aria-label="Tip USDC"
+          onClick={(e) => { e.stopPropagation(); if (!user) return navigate("/auth"); setTipOpen(true); }}
+          className="tap -mr-2 -mt-1 inline-flex h-8 w-8 items-center justify-center rounded-full text-amber-500 hover:bg-amber-500/10"
+        >
+          <Coins size={18} strokeWidth={1.8} />
         </button>
       </header>
 
