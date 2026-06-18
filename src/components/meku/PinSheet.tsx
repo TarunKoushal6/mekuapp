@@ -89,13 +89,19 @@ export const PinSheet = ({
         onCancel={onCancel}
         onSubmit={async (qs, answers) => {
           if (!onSaveRecovery) {
-            onCancel();
+            setStep("done");
             return null;
           }
-          return onSaveRecovery(qs, answers);
+          const err = await onSaveRecovery(qs, answers);
+          if (!err) setStep("done");
+          return err;
         }}
       />
     );
+  }
+
+  if (isSetup && step === "done") {
+    return <PinSuccessDialog onDone={onCancel} />;
   }
 
   const press = (digit: string) => {
