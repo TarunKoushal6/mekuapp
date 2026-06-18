@@ -37,6 +37,7 @@ export const PinSheet = ({
   mode,
   recoveryQuestions,
   onCancel,
+  onComplete,
   onSubmit,
   onSaveRecovery,
   onForgotPin,
