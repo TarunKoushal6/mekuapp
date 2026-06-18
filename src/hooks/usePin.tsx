@@ -119,11 +119,18 @@ export const PinProvider = ({ children }: { children: ReactNode }) => {
     if (!user) return "Not signed in";
     try {
       await saveRecovery(user.id, qs, answers);
-      handleClose(true);
+      // Do NOT close here — let PinSheet transition to the success step.
+      // PinSuccessDialog's onDone will fire `onComplete` which closes & resolves true.
       return null;
     } catch (e: any) {
       return e?.message ?? "Could not save recovery questions";
     }
+  };
+
+  const handleComplete = () => {
+    resolverRef.current?.(true);
+    resolverRef.current = null;
+    setMode(null);
   };
 
   const handleForgotPin = async () => {
