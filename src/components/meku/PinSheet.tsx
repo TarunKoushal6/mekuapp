@@ -108,74 +108,69 @@ export const PinSheet = ({ mode, onCancel, onSubmit }: Props) => {
         "
       >
         {/* Back */}
-        <div className="flex items-center justify-between px-5 pt-5">
+        <div className="flex items-center justify-between px-4 pt-3">
           <button
             onClick={onCancel}
             aria-label="Back"
-            className="tap flex h-10 w-10 items-center justify-center rounded-full text-foreground/80 hover:bg-muted"
+            className="tap flex h-9 w-9 items-center justify-center rounded-full text-foreground/80 hover:bg-muted"
           >
-            <ArrowLeft size={22} />
+            <ArrowLeft size={20} />
           </button>
-          <span className="text-[12px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+          <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
             {isSetup ? (step === "enter" ? "Step 1 of 2" : "Step 2 of 2") : "Unlock"}
           </span>
-          <span className="w-10" />
+          <span className="w-9" />
         </div>
 
-        {/* Hero illustration */}
-        <div className="relative mx-auto mt-2 h-[180px] w-[220px]">
-          {/* soft circle backdrop */}
+        {/* Hero illustration — compact so the keypad always fits */}
+        <div className="relative mx-auto mt-1 h-[124px] w-[180px] shrink-0">
           <span
             aria-hidden
-            className="absolute left-1/2 top-1/2 h-[170px] w-[170px] -translate-x-1/2 -translate-y-1/2 rounded-full"
+            className="absolute left-1/2 top-1/2 h-[120px] w-[120px] -translate-x-1/2 -translate-y-1/2 rounded-full"
             style={{ background: "radial-gradient(closest-side, hsl(252 100% 96%), transparent 70%)" }}
           />
-          {/* floating pastel blobs */}
           <span
             aria-hidden
-            className="absolute left-[8%] top-[18%] h-12 w-12 rounded-[10px] rotate-[18deg] opacity-80 animate-[pin-float_5.5s_ease-in-out_infinite]"
+            className="absolute left-[6%] top-[16%] h-9 w-9 rounded-[8px] rotate-[18deg] opacity-80 animate-[pin-float_5.5s_ease-in-out_infinite]"
             style={{ background: "linear-gradient(135deg, #e9e6ff, #c7c2ff)" }}
           />
           <span
             aria-hidden
-            className="absolute right-[6%] top-[36%] h-14 w-14 rounded-full opacity-90 animate-[pin-float-rev_6.5s_ease-in-out_infinite]"
+            className="absolute right-[4%] top-[34%] h-10 w-10 rounded-full opacity-90 animate-[pin-float-rev_6.5s_ease-in-out_infinite]"
             style={{ background: "linear-gradient(135deg, #b6d4ff, #6aa6ff)" }}
           />
           <span
             aria-hidden
-            className="absolute left-[22%] bottom-[6%] h-8 w-8 rounded-full opacity-90 animate-[pin-float_4.5s_ease-in-out_infinite]"
+            className="absolute left-[20%] bottom-[4%] h-6 w-6 rounded-full opacity-90 animate-[pin-float_4.5s_ease-in-out_infinite]"
             style={{ background: "linear-gradient(135deg, #ffd6ee, #c89bff)" }}
           />
 
           {/* phone */}
-          <div className="relative mx-auto mt-3 h-[150px] w-[88px] rounded-[18px] bg-[#2d2a44] shadow-[0_18px_40px_-18px_rgba(45,42,68,0.55)] animate-[pin-bob_4s_ease-in-out_infinite]">
-            <span className="absolute left-1/2 top-1.5 h-1 w-8 -translate-x-1/2 rounded-full bg-white/15" />
-            {/* lock badge */}
-            <div className="absolute left-1/2 top-7 -translate-x-1/2">
+          <div className="relative mx-auto mt-2 h-[104px] w-[64px] rounded-[14px] bg-[#2d2a44] shadow-[0_14px_30px_-14px_rgba(45,42,68,0.55)] animate-[pin-bob_4s_ease-in-out_infinite]">
+            <span className="absolute left-1/2 top-1 h-0.5 w-6 -translate-x-1/2 rounded-full bg-white/15" />
+            <div className="absolute left-1/2 top-4 -translate-x-1/2">
               <span
                 aria-hidden
                 className="absolute inset-0 -m-1 rounded-full blur-md animate-[pin-glow_2.6s_ease-in-out_infinite]"
                 style={{ background: "radial-gradient(closest-side, #2ad6b0, transparent 70%)" }}
               />
-              <div className="relative flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#34e0b8] to-[#10b48a] text-white shadow-lg">
-                <Lock size={18} strokeWidth={2.6} />
+              <div className="relative flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[#34e0b8] to-[#10b48a] text-white shadow-md">
+                <Lock size={14} strokeWidth={2.6} />
               </div>
             </div>
-            {/* content lines */}
-            <div className="absolute inset-x-3 top-[74px] space-y-2">
-              <span className="block h-1.5 w-full rounded-full bg-white/25" />
-              <span className="block h-1.5 w-3/4 rounded-full bg-white/20" />
-              <span className="block h-1.5 w-5/6 rounded-full bg-white/20" />
-              <span className="block h-1.5 w-2/3 rounded-full bg-white/15" />
+            <div className="absolute inset-x-2.5 top-[52px] space-y-1.5">
+              <span className="block h-1 w-full rounded-full bg-white/25" />
+              <span className="block h-1 w-3/4 rounded-full bg-white/20" />
+              <span className="block h-1 w-5/6 rounded-full bg-white/20" />
+              <span className="block h-1 w-2/3 rounded-full bg-white/15" />
             </div>
           </div>
         </div>
 
         {/* Title */}
-        <div className="px-7 pt-3 text-center">
-          <h2 className="text-[26px] font-semibold leading-[1.15] tracking-tight text-foreground">
-            {headline.a}
-            <br />
+        <div className="shrink-0 px-6 pt-1 text-center">
+          <h2 className="text-[22px] font-semibold leading-[1.15] tracking-tight text-foreground">
+            {headline.a}{" "}
             <span
               className="bg-clip-text text-transparent"
               style={{
@@ -186,14 +181,14 @@ export const PinSheet = ({ mode, onCancel, onSubmit }: Props) => {
               {headline.b}
             </span>
           </h2>
-          <p className="mx-auto mt-3 max-w-[320px] text-[14px] leading-relaxed text-muted-foreground">
+          <p className="mx-auto mt-1.5 line-clamp-2 max-w-[300px] text-[13px] leading-snug text-muted-foreground">
             {subtitle}
           </p>
         </div>
 
         {/* Dots */}
         <div
-          className={`mt-5 flex justify-center gap-3 px-6 ${
+          className={`mt-3 flex shrink-0 justify-center gap-2.5 px-6 ${
             shake ? "animate-[pin-shake_0.42s_ease-in-out]" : ""
           }`}
         >
@@ -213,7 +208,7 @@ export const PinSheet = ({ mode, onCancel, onSubmit }: Props) => {
         </div>
 
         {/* helper */}
-        <div className="mt-2 h-5 px-6 text-center text-[12px] font-medium">
+        <div className="mt-1.5 h-4 shrink-0 px-6 text-center text-[11px] font-medium">
           {error ? (
             <span className="text-destructive">{error}</span>
           ) : (
@@ -224,8 +219,8 @@ export const PinSheet = ({ mode, onCancel, onSubmit }: Props) => {
         </div>
 
         {/* Keypad */}
-        <div className="mt-auto px-6 pt-3">
-          <div className="grid grid-cols-3 gap-x-3 gap-y-2">
+        <div className="mt-auto px-5 pb-[max(12px,env(safe-area-inset-bottom))] pt-2">
+          <div className="grid grid-cols-3 gap-x-2.5 gap-y-1.5">
             {keys.map((k) => (
               <Key key={k} onClick={() => press(k)} disabled={busy}>
                 {k}
@@ -241,7 +236,7 @@ export const PinSheet = ({ mode, onCancel, onSubmit }: Props) => {
               ghost
               aria-label="Backspace"
             >
-              <Delete size={22} />
+              <Delete size={20} />
             </Key>
           </div>
 
@@ -250,7 +245,7 @@ export const PinSheet = ({ mode, onCancel, onSubmit }: Props) => {
             onClick={() => submit()}
             disabled={busy || pin.length < MIN_LEN}
             className="
-              tap mt-4 mb-5 flex h-[54px] w-full items-center justify-center
+              tap mt-3 flex h-[48px] w-full items-center justify-center
               rounded-2xl bg-[#1c7ed6] text-[15px] font-semibold text-white
               shadow-[0_10px_24px_-10px_rgba(28,126,214,0.55)]
               transition-all active:scale-[0.985]
