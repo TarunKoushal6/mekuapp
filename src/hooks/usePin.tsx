@@ -174,6 +174,7 @@ export const PinProvider = ({ children }: { children: ReactNode }) => {
           mode={mode.kind}
           recoveryQuestions={mode.recoveryQuestions}
           onCancel={() => handleClose(false)}
+          onComplete={handleComplete}
           onSubmit={handleSubmit}
           onSaveRecovery={handleSaveRecovery}
           onForgotPin={handleForgotPin}
