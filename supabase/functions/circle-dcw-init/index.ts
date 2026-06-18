@@ -17,8 +17,10 @@ Deno.serve(async (req) => {
       { global: { headers: { Authorization: authHeader } } },
     );
     const token = authHeader.replace("Bearer ", "");
-    const { data: { user }, error: userErr } = await supabase.auth.getUser(token);
-    if (userErr || !user) return json({ error: "Unauthorized" }, 401);
+    const { data: claimsData, error: userErr } = await supabase.auth.getClaims(token);
+    if (userErr || !claimsData?.claims?.sub) return json({ error: "Unauthorized" }, 401);
+    const user = { id: claimsData.claims.sub as string };
+
 
     const walletSetId = Deno.env.get("CIRCLE_WALLET_SET_ID");
     if (!walletSetId) return json({ error: "CIRCLE_WALLET_SET_ID not configured" }, 500);
