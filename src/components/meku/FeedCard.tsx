@@ -1,4 +1,4 @@
-import { Heart, MessageCircle, Repeat2, Upload, BadgeCheck } from "lucide-react";
+import { MessageCircle, Repeat2, Upload, BadgeCheck } from "lucide-react";
 import { Avatar } from "./Avatar";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -10,6 +10,17 @@ import { IconSend, IconMore } from "./MekuIcon";
 import { SendSheet } from "./SendSheet";
 import { InlineActionCard, parseInlineAction } from "./InlineActionCard";
 import { PostBody } from "./PostBody";
+import { HeartLike } from "./HeartLike";
+import { BookmarkSave } from "./BookmarkSave";
+
+const BOOKMARK_KEY = "meku.bookmarks.v1";
+const readBookmarks = (): Set<string> => {
+  try { return new Set(JSON.parse(localStorage.getItem(BOOKMARK_KEY) ?? "[]")); }
+  catch { return new Set(); }
+};
+const writeBookmarks = (s: Set<string>) => {
+  try { localStorage.setItem(BOOKMARK_KEY, JSON.stringify([...s])); } catch {}
+};
 
 interface FeedCardProps {
   post: Post;
