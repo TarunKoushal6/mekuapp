@@ -1,5 +1,7 @@
 import { AppShell } from "@/components/meku/AppShell";
-import { ChevronLeft, MoreHorizontal, BadgeCheck, Heart, MessageCircle, Repeat2, Upload, Loader2 } from "lucide-react";
+import { ChevronLeft, MoreHorizontal, BadgeCheck, MessageCircle, Repeat2, Upload, Loader2 } from "lucide-react";
+import { HeartLike } from "@/components/meku/HeartLike";
+import { BookmarkSave } from "@/components/meku/BookmarkSave";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
 import { Avatar } from "@/components/meku/Avatar";
