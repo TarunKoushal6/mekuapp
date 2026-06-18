@@ -60,8 +60,12 @@ const Onchain = () => {
         const { data, error } = await supabase.functions.invoke("circle-swap", {
           body: { chain: "Arc_Testnet", tokenIn: tokenIn.symbol, tokenOut: tokenOut.symbol, amountIn: payAmount },
         });
-        if (error || (data as any)?.error) throw new Error((data as any)?.error ?? error?.message);
-        toast.success("Swap submitted");
+        const errMsg = (data as any)?.error ?? error?.message;
+        if (errMsg) {
+          toast.info("Swap is coming soon", { description: errMsg });
+        } else {
+          toast.success("Swap submitted");
+        }
       } else if (tab === "Bridge") {
         const { data, error } = await supabase.functions.invoke("circle-bridge", {
           body: { fromChain: "Arc_Testnet", toChain: destinationChain, amount: payAmount, recipientAddress: wallet.address },
