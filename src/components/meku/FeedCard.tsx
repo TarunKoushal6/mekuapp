@@ -170,13 +170,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
             />
             <span className={cn("text-[13px] tabular-nums", liked && "text-[#ff5b89]")}>{likeCount}</span>
           </div>
-          <button
-            onClick={(e) => { e.stopPropagation(); if (!user) return navigate("/auth"); setTipOpen(true); }}
-            className="tap inline-flex items-center gap-1.5 text-primary"
-            aria-label="Tip USDC"
-          >
-            <IconSend size={18} />
-          </button>
+          {/* Tip moved to header (top-right). Keep this slot empty for layout balance. */}
           <BookmarkSave
             checked={bookmarked}
             onChange={(e) => {
