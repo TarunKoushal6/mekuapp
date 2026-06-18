@@ -198,14 +198,15 @@ const PostDetail = () => {
           <button className="tap inline-flex items-center gap-1.5"><Repeat2 className="h-[20px] w-[20px]" strokeWidth={1.6} /></button>
           <HeartLike checked={!!post.liked_by_me} onChange={() => handleLike()} size={22} aria-label="Like" />
           <BookmarkSave
-            checked={(() => { try { return (JSON.parse(localStorage.getItem("meku.bookmarks.v1") ?? "[]") as string[]).includes(post.id); } catch { return false; } })()}
+            checked={bookmarked}
             onChange={() => {
+              const next = !bookmarked;
+              setBookmarked(next);
               try {
                 const arr = JSON.parse(localStorage.getItem("meku.bookmarks.v1") ?? "[]") as string[];
                 const set = new Set(arr);
-                if (set.has(post.id)) set.delete(post.id); else set.add(post.id);
+                if (next) set.add(post.id); else set.delete(post.id);
                 localStorage.setItem("meku.bookmarks.v1", JSON.stringify([...set]));
-                toast.success(set.has(post.id) ? "Saved" : "Removed");
               } catch {}
             }}
             size={20}
