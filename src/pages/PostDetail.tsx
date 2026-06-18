@@ -1,5 +1,7 @@
 import { AppShell } from "@/components/meku/AppShell";
-import { ChevronLeft, MoreHorizontal, BadgeCheck, Heart, MessageCircle, Repeat2, Upload, Loader2 } from "lucide-react";
+import { ChevronLeft, MoreHorizontal, BadgeCheck, MessageCircle, Repeat2, Upload, Loader2 } from "lucide-react";
+import { HeartLike } from "@/components/meku/HeartLike";
+import { BookmarkSave } from "@/components/meku/BookmarkSave";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
 import { Avatar } from "@/components/meku/Avatar";
@@ -184,9 +186,21 @@ const PostDetail = () => {
         <div className="mt-2 flex items-center justify-around pt-1 text-muted-foreground">
           <button className="tap inline-flex items-center gap-1.5"><MessageCircle className="h-[20px] w-[20px]" strokeWidth={1.6} /></button>
           <button className="tap inline-flex items-center gap-1.5"><Repeat2 className="h-[20px] w-[20px]" strokeWidth={1.6} /></button>
-          <button onClick={handleLike} className="tap inline-flex items-center gap-1.5">
-            <Heart className={cn("h-[20px] w-[20px]", post.liked_by_me && "fill-[#ef3b6b] text-[#ef3b6b]")} strokeWidth={1.6} />
-          </button>
+          <HeartLike checked={!!post.liked_by_me} onChange={() => handleLike()} size={22} aria-label="Like" />
+          <BookmarkSave
+            checked={(() => { try { return (JSON.parse(localStorage.getItem("meku.bookmarks.v1") ?? "[]") as string[]).includes(post.id); } catch { return false; } })()}
+            onChange={() => {
+              try {
+                const arr = JSON.parse(localStorage.getItem("meku.bookmarks.v1") ?? "[]") as string[];
+                const set = new Set(arr);
+                if (set.has(post.id)) set.delete(post.id); else set.add(post.id);
+                localStorage.setItem("meku.bookmarks.v1", JSON.stringify([...set]));
+                toast.success(set.has(post.id) ? "Saved" : "Removed");
+              } catch {}
+            }}
+            size={20}
+            aria-label="Save"
+          />
           <button className="tap"><Upload className="h-[20px] w-[20px]" strokeWidth={1.6} /></button>
         </div>
       </article>
