@@ -5,7 +5,7 @@ import { EmptyState } from "@/components/meku/EmptyState";
 import { useEffect, useState } from "react";
 import { fetchPost, type Post } from "@/lib/social";
 import { useAuth } from "@/hooks/useAuth";
-import { Loader2, Bookmark } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 const BOOKMARK_KEY = "meku.bookmarks.v1";
 const readBookmarks = (): string[] => {
