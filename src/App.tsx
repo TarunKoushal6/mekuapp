@@ -49,6 +49,7 @@ const App = () => (
           <Route path="/settings/appearance" element={<Appearance />} />
           <Route path="/settings/privacy" element={<RequireAuth><Privacy /></RequireAuth>} />
           <Route path="/wallet" element={<RequireAuth><Wallet /></RequireAuth>} />
+          <Route path="/bookmarks" element={<RequireAuth><Bookmarks /></RequireAuth>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
