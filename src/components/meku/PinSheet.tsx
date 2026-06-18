@@ -4,9 +4,9 @@
 //   "confirm" → enter PIN to authorise; exposes "Forgot PIN?" link
 //   "recover" → answer the 3 stored questions; on success the caller wipes
 //               the old PIN and re-opens setup
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { ArrowLeft, Delete, KeyRound, Loader2, Lock, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Check, Delete, KeyRound, Loader2, Lock, ShieldCheck, Sparkles } from "lucide-react";
 import { RECOVERY_QUESTIONS } from "@/lib/pin";
 
 export type PinMode = "setup" | "confirm" | "recover";
