@@ -156,10 +156,15 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
             <Repeat2 className="h-[18px] w-[18px]" strokeWidth={1.6} />
             {repostCount > 0 && <span className="text-[13px] tabular-nums">{repostCount}</span>}
           </button>
-          <button onClick={handleLike} className="tap inline-flex items-center gap-1.5" aria-label="Like">
-            <Heart className={cn("h-[18px] w-[18px] transition-colors", liked && "fill-[#ef3b6b] text-[#ef3b6b]")} strokeWidth={1.6} />
-            <span className={cn("text-[13px] tabular-nums", liked && "text-[#ef3b6b]")}>{likeCount}</span>
-          </button>
+          <div className="inline-flex items-center gap-1.5">
+            <HeartLike
+              checked={liked}
+              onChange={(e) => handleLike(e)}
+              size={20}
+              aria-label="Like"
+            />
+            <span className={cn("text-[13px] tabular-nums", liked && "text-[#ff5b89]")}>{likeCount}</span>
+          </div>
           <button
             onClick={(e) => { e.stopPropagation(); if (!user) return navigate("/auth"); setTipOpen(true); }}
             className="tap inline-flex items-center gap-1.5 text-primary"
@@ -167,6 +172,20 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
           >
             <IconSend size={18} />
           </button>
+          <BookmarkSave
+            checked={bookmarked}
+            onChange={(e) => {
+              e.stopPropagation();
+              const next = !bookmarked;
+              setBookmarked(next);
+              const set = readBookmarks();
+              if (next) set.add(post.id); else set.delete(post.id);
+              writeBookmarks(set);
+              toast.success(next ? "Saved" : "Removed");
+            }}
+            size={18}
+            aria-label="Save"
+          />
           <button onClick={handleShare} className="tap" aria-label="Share">
             <Upload className="h-[18px] w-[18px]" strokeWidth={1.6} />
           </button>
