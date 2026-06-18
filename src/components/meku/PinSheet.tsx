@@ -29,7 +29,7 @@ interface Props {
 const PIN_LEN = 6;
 const MIN_LEN = 4;
 
-type SetupStep = "enter" | "confirm" | "recovery";
+type SetupStep = "enter" | "confirm" | "recovery" | "done";
 
 export const PinSheet = ({
   mode,
