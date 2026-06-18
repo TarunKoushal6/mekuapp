@@ -4,9 +4,9 @@
 //   "confirm" → enter PIN to authorise; exposes "Forgot PIN?" link
 //   "recover" → answer the 3 stored questions; on success the caller wipes
 //               the old PIN and re-opens setup
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { ArrowLeft, Delete, KeyRound, Loader2, Lock, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Check, Delete, KeyRound, Loader2, Lock, ShieldCheck, Sparkles } from "lucide-react";
 import { RECOVERY_QUESTIONS } from "@/lib/pin";
 
 export type PinMode = "setup" | "confirm" | "recover";
@@ -29,7 +29,7 @@ interface Props {
 const PIN_LEN = 6;
 const MIN_LEN = 4;
 
-type SetupStep = "enter" | "confirm" | "recovery";
+type SetupStep = "enter" | "confirm" | "recovery" | "done";
 
 export const PinSheet = ({
   mode,
@@ -89,13 +89,19 @@ export const PinSheet = ({
         onCancel={onCancel}
         onSubmit={async (qs, answers) => {
           if (!onSaveRecovery) {
-            onCancel();
+            setStep("done");
             return null;
           }
-          return onSaveRecovery(qs, answers);
+          const err = await onSaveRecovery(qs, answers);
+          if (!err) setStep("done");
+          return err;
         }}
       />
     );
+  }
+
+  if (isSetup && step === "done") {
+    return <PinSuccessDialog onDone={onCancel} />;
   }
 
   const press = (digit: string) => {
@@ -420,27 +426,26 @@ const RecoveryDialog = ({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const setAnswer = (i: number, v: string) =>
+  const setAnswer = useCallback((i: number, v: string) => {
     setAnswers((a) => {
+      if (a[i] === v) return a;
       const next = [...a] as [string, string, string];
       next[i] = v;
       return next;
     });
+  }, []);
 
-  const setQuestion = (i: number, v: string) => {
+  const setQuestion = useCallback((i: number, v: string) => {
     if (!editable) return;
     setQs((current) => {
+      if (current[i] === v) return current;
       // prevent duplicates across the 3 slots
-      if (current.includes(v) && current[i] !== v) {
-        setError("Pick a different question for each slot.");
-        return current;
-      }
-      setError(null);
+      if (current.includes(v)) return current;
       const next = [...current] as [string, string, string];
       next[i] = v;
       return next;
     });
-  };
+  }, [editable]);
 
   const canSubmit = answers.every((a) => a.trim().length >= 2);
 
@@ -591,6 +596,104 @@ const RecoveryDialog = ({
             "
           >
             {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : ctaLabel}
+          </button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+// ------------------------------------------------------------------
+// PinSuccessDialog — celebratory confirmation after setup completes.
+// Matches the pastel/blob language used by PinSheet & RecoveryDialog.
+// ------------------------------------------------------------------
+const PinSuccessDialog = ({ onDone }: { onDone: () => void }) => {
+  useEffect(() => {
+    const t = setTimeout(onDone, 2600);
+    return () => clearTimeout(t);
+  }, [onDone]);
+
+  return (
+    <Dialog open onOpenChange={(o) => !o && onDone()}>
+      <DialogContent
+        className="
+          max-w-[420px] gap-0 overflow-hidden border-0 bg-background p-0
+          rounded-[28px] shadow-2xl
+          h-[100dvh] sm:h-auto sm:max-h-[92vh] sm:my-4
+          flex flex-col items-center justify-center text-center
+        "
+      >
+        <div className="relative mx-auto h-[180px] w-[220px] shrink-0">
+          <span
+            aria-hidden
+            className="absolute left-1/2 top-1/2 h-[170px] w-[170px] -translate-x-1/2 -translate-y-1/2 rounded-full"
+            style={{ background: "radial-gradient(closest-side, hsl(160 85% 90%), transparent 70%)" }}
+          />
+          <span
+            aria-hidden
+            className="absolute left-[6%] top-[12%] h-9 w-9 rounded-[10px] rotate-[18deg] opacity-80 animate-[pin-float_5.5s_ease-in-out_infinite]"
+            style={{ background: "linear-gradient(135deg, #d8f5e6, #8fd9b6)" }}
+          />
+          <span
+            aria-hidden
+            className="absolute right-[8%] top-[18%] h-10 w-10 rounded-full opacity-90 animate-[pin-float-rev_6.5s_ease-in-out_infinite]"
+            style={{ background: "linear-gradient(135deg, #b6d4ff, #6aa6ff)" }}
+          />
+          <span
+            aria-hidden
+            className="absolute left-[18%] bottom-[6%] h-6 w-6 rounded-full opacity-90 animate-[pin-float_4.5s_ease-in-out_infinite]"
+            style={{ background: "linear-gradient(135deg, #ffd6ee, #c89bff)" }}
+          />
+          <Sparkles
+            aria-hidden
+            size={18}
+            className="absolute right-[14%] bottom-[18%] text-[#10b48a] animate-[pin-float_4s_ease-in-out_infinite]"
+          />
+          <Sparkles
+            aria-hidden
+            size={14}
+            className="absolute left-[10%] top-[38%] text-[#5b9dff] animate-[pin-float-rev_5s_ease-in-out_infinite]"
+          />
+
+          <div className="relative mx-auto mt-7 flex h-[110px] w-[110px] items-center justify-center">
+            <span
+              aria-hidden
+              className="absolute inset-0 rounded-full blur-md opacity-70 animate-[pin-glow_2.6s_ease-in-out_infinite]"
+              style={{ background: "radial-gradient(closest-side, #34e0b8, transparent 70%)" }}
+            />
+            <div className="relative flex h-[96px] w-[96px] items-center justify-center rounded-full bg-gradient-to-br from-[#34e0b8] to-[#10b48a] text-white shadow-[0_18px_36px_-14px_rgba(16,180,138,0.6)] animate-[pin-bob_4s_ease-in-out_infinite]">
+              <Check size={48} strokeWidth={3} />
+            </div>
+          </div>
+        </div>
+
+        <div className="px-8 pb-8 pt-2">
+          <h2 className="text-[24px] font-semibold leading-[1.15] tracking-tight text-foreground">
+            You're all{" "}
+            <span
+              className="bg-clip-text text-transparent"
+              style={{
+                backgroundImage:
+                  "linear-gradient(90deg, #6ee7c4 0%, #5b9dff 60%, #8b7aff 100%)",
+              }}
+            >
+              set!
+            </span>
+          </h2>
+          <p className="mx-auto mt-2 max-w-[280px] text-[13.5px] leading-snug text-muted-foreground">
+            Your wallet PIN and recovery questions are saved. You can now send, swap and bridge securely.
+          </p>
+
+          <button
+            onClick={onDone}
+            className="
+              tap mt-6 inline-flex h-[46px] items-center justify-center gap-2
+              rounded-2xl bg-[#10b48a] px-6 text-[14.5px] font-semibold text-white
+              shadow-[0_10px_24px_-10px_rgba(16,180,138,0.55)]
+              transition-all active:scale-[0.985]
+            "
+          >
+            <Sparkles size={16} /> Let's go
           </button>
         </div>
       </DialogContent>

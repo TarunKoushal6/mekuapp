@@ -102,13 +102,29 @@ Deno.serve(async (req) => {
       const amountUnits = BigInt(Math.round(Number(body.amount) * 1_000_000)).toString();
       const mintRecipientBytes32 = "0x" + recipient.replace(/^0x/, "").toLowerCase().padStart(64, "0");
 
+      // CCTP requires the TokenMessenger to be approved to spend USDC first.
+      // Submit ERC20.approve(tokenMessenger, amount) before depositForBurn.
+      const approveCipher = await entitySecretCiphertext();
+      await circleFetch("/developer/transactions/contractExecution", {
+        method: "POST",
+        body: JSON.stringify({
+          idempotencyKey: uuid(),
+          entitySecretCiphertext: approveCipher,
+          walletId,
+          contractAddress: src.usdc,
+          abiFunctionSignature: "approve(address,uint256)",
+          abiParameters: [src.tokenMessenger, amountUnits],
+          feeLevel: "MEDIUM",
+        }),
+      });
+
       // depositForBurn(uint256 amount, uint32 destinationDomain, bytes32 mintRecipient, address burnToken)
-      const ciphertext = await entitySecretCiphertext();
+      const burnCipher = await entitySecretCiphertext();
       const exec = await circleFetch("/developer/transactions/contractExecution", {
         method: "POST",
         body: JSON.stringify({
           idempotencyKey: uuid(),
-          entitySecretCiphertext: ciphertext,
+          entitySecretCiphertext: burnCipher,
           walletId,
           contractAddress: src.tokenMessenger,
           abiFunctionSignature: "depositForBurn(uint256,uint32,bytes32,address)",
