@@ -1,5 +1,6 @@
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Link } from "react-router-dom";
+import { Bookmark } from "lucide-react";
 import { Logo } from "./Logo";
 import {
   IconHome, IconWallet, IconCommunity, IconBell, IconProfile,
@@ -15,6 +16,7 @@ const items = [
   { to: "/home", label: "Home", icon: IconHome },
   { to: "/explore", label: "Friends", icon: IconCommunity },
   { to: "/wallet", label: "Wallet", icon: IconWallet },
+  { to: "/bookmarks", label: "Bookmarks", icon: (p: any) => <Bookmark size={p.size ?? 18} strokeWidth={1.7} /> },
   { to: "/notifications", label: "Notifications", icon: IconBell },
   { to: "/profile", label: "Profile", icon: IconProfile },
   { to: "/settings", label: "Settings", icon: IconSettings },

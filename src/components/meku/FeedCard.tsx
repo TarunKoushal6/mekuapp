@@ -1,4 +1,4 @@
-import { MessageCircle, Repeat2, Upload, BadgeCheck } from "lucide-react";
+import { MessageCircle, Repeat2, Upload, BadgeCheck, Coins } from "lucide-react";
 import { Avatar } from "./Avatar";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -6,7 +6,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { toggleLike, toggleRepost, isReposted, getRepostCount, type Post, timeAgo } from "@/lib/social";
-import { IconSend, IconMore } from "./MekuIcon";
 import { SendSheet } from "./SendSheet";
 import { InlineActionCard, parseInlineAction } from "./InlineActionCard";
 import { PostBody } from "./PostBody";
@@ -78,7 +77,9 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
     setLikeCount((c) => c + (next ? 1 : -1));
     try {
       await toggleLike(post.id, user.id, liked);
-      onChanged?.();
+      // Intentionally do NOT call onChanged here — the optimistic local state
+      // already reflects the new value; refetching the whole feed causes a
+      // jarring scroll/re-mount.
     } catch (err: any) {
       setLiked(!next);
       setLikeCount((c) => c + (next ? -1 : 1));
@@ -116,8 +117,12 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
           <span className="text-[14px] text-muted-foreground">·</span>
           <span className="shrink-0 text-[14px] text-muted-foreground">{timeAgo(post.created_at)}</span>
         </div>
-        <button aria-label="More" onClick={(e) => e.stopPropagation()} className="tap -mr-2 -mt-1 inline-flex h-8 w-8 items-center justify-center text-muted-foreground">
-          <IconMore size={18} />
+        <button
+          aria-label="Tip USDC"
+          onClick={(e) => { e.stopPropagation(); if (!user) return navigate("/auth"); setTipOpen(true); }}
+          className="tap -mr-2 -mt-1 inline-flex h-8 w-8 items-center justify-center rounded-full text-amber-500 hover:bg-amber-500/10"
+        >
+          <Coins size={18} strokeWidth={1.8} />
         </button>
       </header>
 
@@ -165,13 +170,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
             />
             <span className={cn("text-[13px] tabular-nums", liked && "text-[#ff5b89]")}>{likeCount}</span>
           </div>
-          <button
-            onClick={(e) => { e.stopPropagation(); if (!user) return navigate("/auth"); setTipOpen(true); }}
-            className="tap inline-flex items-center gap-1.5 text-primary"
-            aria-label="Tip USDC"
-          >
-            <IconSend size={18} />
-          </button>
+          {/* Tip moved to header (top-right). Keep this slot empty for layout balance. */}
           <BookmarkSave
             checked={bookmarked}
             onChange={(e) => {
