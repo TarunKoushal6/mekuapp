@@ -300,6 +300,42 @@ export type Database = {
           },
         ]
       }
+      wallet_pin_recovery: {
+        Row: {
+          a1_hash: string
+          a2_hash: string
+          a3_hash: string
+          created_at: string
+          q1: string
+          q2: string
+          q3: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          a1_hash: string
+          a2_hash: string
+          a3_hash: string
+          created_at?: string
+          q1: string
+          q2: string
+          q3: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          a1_hash?: string
+          a2_hash?: string
+          a3_hash?: string
+          created_at?: string
+          q1?: string
+          q2?: string
+          q3?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       wallets: {
         Row: {
           address: string | null
