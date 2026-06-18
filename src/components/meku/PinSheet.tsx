@@ -104,7 +104,7 @@ export const PinSheet = ({
   }
 
   if (isSetup && step === "done") {
-    return <PinSuccessDialog onDone={onCancel} />;
+    return <PinSuccessDialog onDone={() => (onComplete ? onComplete() : onCancel())} />;
   }
 
   const press = (digit: string) => {
