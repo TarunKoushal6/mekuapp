@@ -37,7 +37,6 @@ const Bookmarks = () => {
         </div>
       ) : posts.length === 0 ? (
         <EmptyState
-          icon={<Bookmark className="h-8 w-8" strokeWidth={1.6} />}
           title="No bookmarks yet"
           description="Tap the bookmark icon on any post to save it here for later."
         />
