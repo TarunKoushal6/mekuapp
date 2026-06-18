@@ -25,10 +25,10 @@ export async function getPinHash(userId: string): Promise<string | null> {
 
 export async function setPin(userId: string, pin: string): Promise<void> {
   const hash = await hashPin(pin);
+  // Upsert so first-time users without a profile row still get their PIN saved.
   const { error } = await supabase
     .from("profiles")
-    .update({ pin_hash: hash })
-    .eq("id", userId);
+    .upsert({ id: userId, pin_hash: hash }, { onConflict: "id" });
   if (error) throw error;
 }
 
