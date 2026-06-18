@@ -119,10 +119,15 @@ const PostDetail = () => {
 
   const handleLike = async () => {
     if (!user || !post) { navigate("/auth"); return; }
+    const wasLiked = !!post.liked_by_me;
+    // optimistic — no full reload so the page doesn't flash
+    setPost({ ...post, liked_by_me: !wasLiked, like_count: post.like_count + (wasLiked ? -1 : 1) });
     try {
-      await toggleLike(post.id, user.id, post.liked_by_me);
-      load();
-    } catch (e: any) { toast.error(e.message); }
+      await toggleLike(post.id, user.id, wasLiked);
+    } catch (e: any) {
+      setPost({ ...post });
+      toast.error(e.message);
+    }
   };
 
   const send = async () => {
