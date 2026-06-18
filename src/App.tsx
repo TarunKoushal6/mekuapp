@@ -19,6 +19,7 @@ import Appearance from "./pages/Appearance.tsx";
 import Privacy from "./pages/Privacy.tsx";
 import Wallet from "./pages/Wallet.tsx";
 import PostDetail from "./pages/PostDetail.tsx";
+import Bookmarks from "./pages/Bookmarks.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import { RequireAuth } from "./components/RequireAuth.tsx";
 
