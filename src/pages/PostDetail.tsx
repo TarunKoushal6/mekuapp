@@ -226,15 +226,15 @@ const PostDetail = () => {
       </section>
 
       <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[440px] hairline-t bg-background/95 px-3 py-2 backdrop-blur-xl" style={{ paddingBottom: "max(env(safe-area-inset-bottom), 8px)" }}>
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 items-center gap-2">
           <input
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && send()}
             placeholder="Add a comment…"
-            className="h-[44px] flex-1 rounded-full border border-border bg-surface px-4 text-[14px] outline-none focus:border-primary"
+            className="h-[44px] min-w-0 flex-1 rounded-full border border-border bg-surface px-4 text-[14px] outline-none focus:border-primary"
           />
-          <button onClick={send} disabled={sending || !draft.trim()} className="tap rounded-full bg-primary px-4 py-2.5 text-[13px] font-bold text-primary-foreground disabled:opacity-40">
+          <button onClick={send} disabled={sending || !draft.trim()} className="tap shrink-0 rounded-full bg-primary px-4 py-2.5 text-[13px] font-bold text-primary-foreground disabled:opacity-40">
             {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Reply"}
           </button>
         </div>
