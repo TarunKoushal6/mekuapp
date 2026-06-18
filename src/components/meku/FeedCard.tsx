@@ -180,7 +180,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
               const set = readBookmarks();
               if (next) set.add(post.id); else set.delete(post.id);
               writeBookmarks(set);
-              toast.success(next ? "Saved" : "Removed");
+              // No toast — interaction is its own feedback (animation).
             }}
             size={18}
             aria-label="Save"

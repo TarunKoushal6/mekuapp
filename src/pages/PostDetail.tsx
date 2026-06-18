@@ -108,6 +108,11 @@ const PostDetail = () => {
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
 
+  const [bookmarked, setBookmarked] = useState<boolean>(() => {
+    try { return (JSON.parse(localStorage.getItem("meku.bookmarks.v1") ?? "[]") as string[]).includes(id); }
+    catch { return false; }
+  });
+
   const load = useCallback(async () => {
     const [p, c] = await Promise.all([fetchPost(id, user?.id), fetchComments(id)]);
     setPost(p);
@@ -193,14 +198,15 @@ const PostDetail = () => {
           <button className="tap inline-flex items-center gap-1.5"><Repeat2 className="h-[20px] w-[20px]" strokeWidth={1.6} /></button>
           <HeartLike checked={!!post.liked_by_me} onChange={() => handleLike()} size={22} aria-label="Like" />
           <BookmarkSave
-            checked={(() => { try { return (JSON.parse(localStorage.getItem("meku.bookmarks.v1") ?? "[]") as string[]).includes(post.id); } catch { return false; } })()}
+            checked={bookmarked}
             onChange={() => {
+              const next = !bookmarked;
+              setBookmarked(next);
               try {
                 const arr = JSON.parse(localStorage.getItem("meku.bookmarks.v1") ?? "[]") as string[];
                 const set = new Set(arr);
-                if (set.has(post.id)) set.delete(post.id); else set.add(post.id);
+                if (next) set.add(post.id); else set.delete(post.id);
                 localStorage.setItem("meku.bookmarks.v1", JSON.stringify([...set]));
-                toast.success(set.has(post.id) ? "Saved" : "Removed");
               } catch {}
             }}
             size={20}
@@ -220,15 +226,15 @@ const PostDetail = () => {
       </section>
 
       <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[440px] hairline-t bg-background/95 px-3 py-2 backdrop-blur-xl" style={{ paddingBottom: "max(env(safe-area-inset-bottom), 8px)" }}>
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 items-center gap-2">
           <input
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && send()}
             placeholder="Add a comment…"
-            className="h-[44px] flex-1 rounded-full border border-border bg-surface px-4 text-[14px] outline-none focus:border-primary"
+            className="h-[44px] min-w-0 flex-1 rounded-full border border-border bg-surface px-4 text-[14px] outline-none focus:border-primary"
           />
-          <button onClick={send} disabled={sending || !draft.trim()} className="tap rounded-full bg-primary px-4 py-2.5 text-[13px] font-bold text-primary-foreground disabled:opacity-40">
+          <button onClick={send} disabled={sending || !draft.trim()} className="tap shrink-0 rounded-full bg-primary px-4 py-2.5 text-[13px] font-bold text-primary-foreground disabled:opacity-40">
             {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Reply"}
           </button>
         </div>
