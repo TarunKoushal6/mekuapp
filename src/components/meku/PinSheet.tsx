@@ -565,8 +565,11 @@ const RecoveryDialog = ({
                 )}
                 <input
                   value={answers[i]}
-                  onChange={(e) => { setError(null); setAnswer(i, e.target.value); }}
+                  onChange={(e) => { if (error) setError(null); setAnswer(i, e.target.value); }}
                   placeholder="Your answer"
+                  type="text"
+                  inputMode="text"
+                  autoComplete="off"
                   autoCapitalize="off"
                   autoCorrect="off"
                   spellCheck={false}
