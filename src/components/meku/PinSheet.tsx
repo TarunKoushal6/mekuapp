@@ -304,7 +304,7 @@ const Key = ({
     onClick={onClick}
     disabled={disabled}
     className={`
-      tap relative flex h-[54px] items-center justify-center rounded-2xl
+      tap relative flex h-[46px] items-center justify-center rounded-xl
       text-[22px] font-medium text-foreground
       transition-all duration-150 active:scale-[0.94]
       disabled:opacity-40
