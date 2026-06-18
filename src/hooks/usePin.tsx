@@ -29,6 +29,7 @@ export const PinProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [mode, setMode] = useState<Mode>(null);
   const resolverRef = useRef<((ok: boolean) => void) | null>(null);
+  const autoPromptedRef = useRef<string | null>(null);
 
   const refresh = useCallback(async () => {
     if (!user) { setHash(null); setLoading(false); return; }
@@ -37,6 +38,20 @@ export const PinProvider = ({ children }: { children: ReactNode }) => {
   }, [user]);
 
   useEffect(() => { refresh(); }, [refresh]);
+
+  // Auto-prompt PIN setup right after signup / first sign-in so every user
+  // has a transaction PIN before they can send, swap or bridge.
+  useEffect(() => {
+    if (!user || loading || hash || mode) return;
+    if (autoPromptedRef.current === user.id) return;
+    autoPromptedRef.current = user.id;
+    setMode({ kind: "setup", resolve: () => {} });
+  }, [user, loading, hash, mode]);
+
+  // Reset auto-prompt guard on sign-out so a new user gets prompted too.
+  useEffect(() => {
+    if (!user) autoPromptedRef.current = null;
+  }, [user]);
 
   const requirePin = useCallback(async () => {
     if (!user) return false;
