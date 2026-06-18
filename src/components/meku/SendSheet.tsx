@@ -86,12 +86,26 @@ export const SendSheet = ({ open, onOpenChange, defaults, recipientLabel, title 
         />
 
         {needsAddress && (
-          <input
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            placeholder="Recipient address (0x…)"
-            className="mt-3 h-12 w-full rounded-2xl border border-border bg-surface px-4 text-[13px] outline-none focus:border-primary font-mono"
-          />
+          <>
+            <input
+              value={address}
+              onChange={(e) => {
+                const v = e.target.value.trim();
+                const cleaned = v.startsWith("0x") || v.startsWith("0X")
+                  ? "0x" + v.slice(2).replace(/[^0-9a-fA-F]/g, "").slice(0, 40)
+                  : v.replace(/[^0-9a-fA-Fx]/g, "").slice(0, 42);
+                setAddress(cleaned);
+              }}
+              spellCheck={false}
+              autoCapitalize="off"
+              autoCorrect="off"
+              placeholder="Recipient address (0x…)"
+              className="mt-3 h-12 w-full rounded-2xl border border-border bg-surface px-4 text-[13px] outline-none focus:border-primary font-mono"
+            />
+            {address.length > 0 && !/^0x[a-fA-F0-9]{40}$/.test(address) && (
+              <p className="mt-1.5 text-[11.5px] text-destructive">Enter a valid 0x address (40 hex chars).</p>
+            )}
+          </>
         )}
 
         <div className="mt-3 grid grid-cols-4 gap-2">
@@ -108,7 +122,7 @@ export const SendSheet = ({ open, onOpenChange, defaults, recipientLabel, title 
 
         <button
           onClick={submit}
-          disabled={busy || !amount || Number(amount) <= 0 || (needsAddress && !address)}
+          disabled={busy || !amount || Number(amount) <= 0 || (needsAddress && !/^0x[a-fA-F0-9]{40}$/.test(address))}
           className="tap mt-5 flex h-[52px] w-full items-center justify-center rounded-full bg-primary text-[15px] font-bold text-primary-foreground shadow-purple disabled:opacity-40"
         >
           {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : "Confirm transfer"}
