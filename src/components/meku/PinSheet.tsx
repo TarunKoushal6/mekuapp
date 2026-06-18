@@ -426,27 +426,26 @@ const RecoveryDialog = ({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const setAnswer = (i: number, v: string) =>
+  const setAnswer = useCallback((i: number, v: string) => {
     setAnswers((a) => {
+      if (a[i] === v) return a;
       const next = [...a] as [string, string, string];
       next[i] = v;
       return next;
     });
+  }, []);
 
-  const setQuestion = (i: number, v: string) => {
+  const setQuestion = useCallback((i: number, v: string) => {
     if (!editable) return;
     setQs((current) => {
+      if (current[i] === v) return current;
       // prevent duplicates across the 3 slots
-      if (current.includes(v) && current[i] !== v) {
-        setError("Pick a different question for each slot.");
-        return current;
-      }
-      setError(null);
+      if (current.includes(v)) return current;
       const next = [...current] as [string, string, string];
       next[i] = v;
       return next;
     });
-  };
+  }, [editable]);
 
   const canSubmit = answers.every((a) => a.trim().length >= 2);
 
