@@ -108,6 +108,11 @@ const PostDetail = () => {
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
 
+  const [bookmarked, setBookmarked] = useState<boolean>(() => {
+    try { return (JSON.parse(localStorage.getItem("meku.bookmarks.v1") ?? "[]") as string[]).includes(id); }
+    catch { return false; }
+  });
+
   const load = useCallback(async () => {
     const [p, c] = await Promise.all([fetchPost(id, user?.id), fetchComments(id)]);
     setPost(p);
