@@ -2,7 +2,7 @@
 // Runs entirely server-side using the user's developer-controlled wallet.
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { AppKit } from "npm:@circle-fin/app-kit";
+import { SwapKit } from "npm:@circle-fin/swap-kit";
 import { createCircleWalletsAdapter } from "npm:@circle-fin/adapter-circle-wallets";
 
 Deno.serve(async (req) => {
