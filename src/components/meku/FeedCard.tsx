@@ -60,6 +60,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
     setRepostCount((c) => c + (next ? 1 : -1));
     try {
       await toggleRepost(user.id, post.id, reposted);
+      if (next) notifyOne({ userId: post.user_id, actorId: user.id, kind: "repost", postId: post.id });
     } catch (err: any) {
       setReposted(!next);
       setRepostCount((c) => c + (next ? -1 : 1));
