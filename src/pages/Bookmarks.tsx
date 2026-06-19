@@ -6,12 +6,7 @@ import { useEffect, useState } from "react";
 import { fetchPost, type Post } from "@/lib/social";
 import { useAuth } from "@/hooks/useAuth";
 import { Loader2 } from "lucide-react";
-
-const BOOKMARK_KEY = "meku.bookmarks.v1";
-const readBookmarks = (): string[] => {
-  try { return JSON.parse(localStorage.getItem(BOOKMARK_KEY) ?? "[]"); }
-  catch { return []; }
-};
+import { readBookmarks } from "@/lib/bookmarks";
 
 const Bookmarks = () => {
   const { user } = useAuth();
@@ -20,7 +15,7 @@ const Bookmarks = () => {
 
   const load = async () => {
     setLoading(true);
-    const ids = readBookmarks();
+    const ids = [...readBookmarks(user?.id)];
     const results = await Promise.all(ids.map((id) => fetchPost(id, user?.id)));
     setPosts(results.filter((p): p is Post => !!p));
     setLoading(false);
