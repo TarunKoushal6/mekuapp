@@ -62,9 +62,13 @@ const Onchain = () => {
         });
         const errMsg = (data as any)?.error ?? error?.message;
         if (errMsg) {
-          toast.info("Swap is coming soon", { description: errMsg });
+          toast.error("Swap failed", { description: errMsg });
         } else {
-          toast.success("Swap submitted");
+          const r = (data as any)?.result;
+          toast.success(`Swapped ${r?.amountIn ?? payAmount} ${tokenIn.symbol} → ${r?.amountOut ?? "…"} ${tokenOut.symbol}`, {
+            description: r?.explorerUrl ? "Tap View to open explorer" : undefined,
+            action: r?.explorerUrl ? { label: "View", onClick: () => window.open(r.explorerUrl, "_blank") } : undefined,
+          });
         }
       } else if (tab === "Bridge") {
         const { data, error } = await supabase.functions.invoke("circle-bridge", {
