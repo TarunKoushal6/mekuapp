@@ -49,7 +49,7 @@ Deno.serve(async (req) => {
     const address = wallet?.dcw_address ?? wallet?.address;
     if (!address) return json({ error: "Wallet not provisioned yet" }, 400);
 
-    const kit = new AppKit();
+    const kit = new SwapKit();
     const adapter = createCircleWalletsAdapter({ apiKey, entitySecret });
 
     const params: any = {
@@ -66,7 +66,7 @@ Deno.serve(async (req) => {
     };
 
     if (estimateOnly) {
-      const estimate = await kit.estimateSwap(params);
+      const estimate = await kit.estimate(params);
       return json({ estimate });
     }
 
