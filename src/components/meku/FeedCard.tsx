@@ -11,15 +11,8 @@ import { InlineActionCard, parseInlineAction } from "./InlineActionCard";
 import { PostBody } from "./PostBody";
 import { HeartLike } from "./HeartLike";
 import { BookmarkSave } from "./BookmarkSave";
-
-const BOOKMARK_KEY = "meku.bookmarks.v1";
-const readBookmarks = (): Set<string> => {
-  try { return new Set(JSON.parse(localStorage.getItem(BOOKMARK_KEY) ?? "[]")); }
-  catch { return new Set(); }
-};
-const writeBookmarks = (s: Set<string>) => {
-  try { localStorage.setItem(BOOKMARK_KEY, JSON.stringify([...s])); } catch {}
-};
+import { readBookmarks, toggleBookmark } from "@/lib/bookmarks";
+import { notifyOne } from "@/lib/notifications";
 
 interface FeedCardProps {
   post: Post;
