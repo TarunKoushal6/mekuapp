@@ -48,6 +48,9 @@ const CommentNode = ({ node, postId, onReplied, depth = 0 }: { node: TreeNode; p
     setBusy(true);
     try {
       await createComment(postId, user.id, text, node.id);
+      // notify the parent comment author + post author + any @mentions
+      notifyOne({ userId: node.user_id, actorId: user.id, kind: "comment", postId });
+      notifyMentions({ actorId: user.id, text, postId });
       setDraft("");
       setShowReply(false);
       onReplied();
