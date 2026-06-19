@@ -1,14 +1,10 @@
-// Bridge USDC across chains via Circle W3S REST (CCTP).
-// Submits a contract execution (TokenMessenger.depositForBurn) using the
-// caller's developer-controlled wallet, then records a pending transaction
-// row. The client polls circle-sync-transaction to update the final status.
+// Bridge USDC across chains using Circle App Kit + the Circle Wallets adapter.
+// The Forwarding Service handles attestation fetch + destination mint, so we
+// don't need a destination wallet or IRIS polling.
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
-import {
-  circleFetch,
-  entitySecretCiphertext,
-  uuid,
-} from "../_shared/circle.ts";
+import { AppKit } from "npm:@circle-fin/app-kit";
+import { createCircleWalletsAdapter } from "npm:@circle-fin/adapter-circle-wallets";
 
 interface Body {
   fromChain?: string;
@@ -17,37 +13,12 @@ interface Body {
   recipientAddress?: string;
 }
 
-// CCTP v2 TokenMessenger + USDC addresses per Circle testnet docs.
-const CHAINS: Record<string, {
-  blockchain: string;
-  usdc: string;
-  tokenMessenger: string;
-  destinationDomain: number;
-}> = {
-  Arc_Testnet: {
-    blockchain: "ARC-TESTNET",
-    usdc: "0x5fd84259d66Cd46123540766Be93DFE6D43130D7",
-    tokenMessenger: "0x8FE6B999Dc680CcFDD5Bf7EB0974218be2542DAA",
-    destinationDomain: 13,
-  },
-  Base_Sepolia: {
-    blockchain: "BASE-SEPOLIA",
-    usdc: "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
-    tokenMessenger: "0x8FE6B999Dc680CcFDD5Bf7EB0974218be2542DAA",
-    destinationDomain: 6,
-  },
-  Ethereum_Sepolia: {
-    blockchain: "ETH-SEPOLIA",
-    usdc: "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
-    tokenMessenger: "0x8FE6B999Dc680CcFDD5Bf7EB0974218be2542DAA",
-    destinationDomain: 0,
-  },
-  Arbitrum_Sepolia: {
-    blockchain: "ARB-SEPOLIA",
-    usdc: "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d",
-    tokenMessenger: "0x8FE6B999Dc680CcFDD5Bf7EB0974218be2542DAA",
-    destinationDomain: 3,
-  },
+// Map UI keys -> App Kit chain identifiers.
+const CHAINS: Record<string, string> = {
+  Arc_Testnet: "Arc_Testnet",
+  Base_Sepolia: "Base_Sepolia",
+  Ethereum_Sepolia: "Ethereum_Sepolia",
+  Arbitrum_Sepolia: "Arbitrum_Sepolia",
 };
 
 Deno.serve(async (req) => {
@@ -70,23 +41,31 @@ Deno.serve(async (req) => {
     if (!body?.amount || Number(body.amount) <= 0) return json({ error: "amount required" }, 400);
     if (!body.fromChain || !body.toChain) return json({ error: "fromChain and toChain required" }, 400);
 
-    const src = CHAINS[body.fromChain];
-    const dst = CHAINS[body.toChain];
-    if (!src || !dst) return json({ error: `Unsupported chain pair ${body.fromChain} -> ${body.toChain}` }, 400);
+    const fromChain = CHAINS[body.fromChain];
+    const toChain = CHAINS[body.toChain];
+    if (!fromChain || !toChain) {
+      return json({ error: `Unsupported chain pair ${body.fromChain} -> ${body.toChain}` }, 400);
+    }
+    if (fromChain === toChain) return json({ error: "fromChain and toChain must differ" }, 400);
 
     const admin = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
-
     const { data: wallet } = await admin
       .from("wallets").select("*").eq("user_id", user.id).maybeSingle();
     const walletId = wallet?.dcw_wallet_id;
     if (!walletId) {
-      return json({ error: "DCW wallet not provisioned. Open Wallet to initialize." }, 400);
+      return json({ error: "Wallet not provisioned. Open Wallet to initialize." }, 400);
     }
-    const recipient = body.recipientAddress ?? wallet?.dcw_address ?? wallet?.address;
-    if (!recipient) return json({ error: "recipientAddress required" }, 400);
+    const recipient = (body.recipientAddress ?? wallet?.dcw_address ?? wallet?.address ?? "").trim();
+    if (!/^0x[a-fA-F0-9]{40}$/.test(recipient)) {
+      return json({ error: "Valid recipientAddress required" }, 400);
+    }
+
+    const apiKey = Deno.env.get("CIRCLE_API_KEY");
+    const entitySecret = Deno.env.get("CIRCLE_ENTITY_SECRET");
+    if (!apiKey || !entitySecret) return json({ error: "Circle credentials not configured" }, 500);
 
     const { data: txRow } = await admin.from("transactions").insert({
       user_id: user.id,
@@ -95,50 +74,48 @@ Deno.serve(async (req) => {
       amount: body.amount,
       counterparty_address: recipient,
       status: "pending",
+      metadata: { fromChain, toChain },
     }).select().single();
 
     try {
-      // amount in USDC units (6 decimals)
-      const amountUnits = BigInt(Math.round(Number(body.amount) * 1_000_000)).toString();
-      const mintRecipientBytes32 = "0x" + recipient.replace(/^0x/, "").toLowerCase().padStart(64, "0");
+      const adapter = createCircleWalletsAdapter({ apiKey, entitySecret, walletId });
+      const kit = new AppKit();
 
-      // CCTP requires the TokenMessenger to be approved to spend USDC first.
-      // Submit ERC20.approve(tokenMessenger, amount) before depositForBurn.
-      const approveCipher = await entitySecretCiphertext();
-      await circleFetch("/developer/transactions/contractExecution", {
-        method: "POST",
-        body: JSON.stringify({
-          idempotencyKey: uuid(),
-          entitySecretCiphertext: approveCipher,
-          walletId,
-          contractAddress: src.usdc,
-          abiFunctionSignature: "approve(address,uint256)",
-          abiParameters: [src.tokenMessenger, amountUnits],
-          feeLevel: "MEDIUM",
-        }),
+      const result = await kit.bridge({
+        from: { adapter, chain: fromChain },
+        to: { recipientAddress: recipient, chain: toChain, useForwarder: true },
+        amount: String(body.amount),
       });
 
-      // depositForBurn(uint256 amount, uint32 destinationDomain, bytes32 mintRecipient, address burnToken)
-      const burnCipher = await entitySecretCiphertext();
-      const exec = await circleFetch("/developer/transactions/contractExecution", {
-        method: "POST",
-        body: JSON.stringify({
-          idempotencyKey: uuid(),
-          entitySecretCiphertext: burnCipher,
-          walletId,
-          contractAddress: src.tokenMessenger,
-          abiFunctionSignature: "depositForBurn(uint256,uint32,bytes32,address)",
-          abiParameters: [amountUnits, String(dst.destinationDomain), mintRecipientBytes32, src.usdc],
-          feeLevel: "MEDIUM",
-        }),
-      });
+      const burnStep = (result?.steps ?? []).find((s: any) => s.name === "burn");
+      const mintStep = (result?.steps ?? []).find((s: any) => s.name === "mint");
+      const txHash = mintStep?.txHash ?? burnStep?.txHash ?? null;
+      const status = result?.state === "success" ? "confirmed"
+        : result?.state === "error" ? "failed" : "pending";
 
-      const circleTxId = exec?.data?.id ?? exec?.id ?? null;
-      await admin.from("transactions").update({ circle_tx_id: circleTxId }).eq("id", txRow?.id);
+      await admin.from("transactions").update({
+        status,
+        tx_hash: txHash,
+        metadata: { fromChain, toChain, bridge: result },
+      }).eq("id", txRow?.id);
 
-      return json({ transactionId: txRow?.id, circleTxId, status: "pending" });
+      if (status === "failed") {
+        const failed = (result?.steps ?? []).find((s: any) => s.state === "error");
+        return json({
+          transactionId: txRow?.id,
+          status,
+          error: failed?.error ?? "Bridge failed",
+          result,
+        }, 500);
+      }
+
+      return json({ transactionId: txRow?.id, status, txHash, result });
     } catch (sdkErr: any) {
-      await admin.from("transactions").update({ status: "failed" }).eq("id", txRow?.id);
+      console.error("circle-bridge SDK error", sdkErr);
+      await admin.from("transactions").update({
+        status: "failed",
+        metadata: { fromChain, toChain, error: String(sdkErr?.message ?? sdkErr) },
+      }).eq("id", txRow?.id);
       return json({ error: sdkErr?.message ?? "Bridge submission failed" }, 500);
     }
   } catch (e: any) {
