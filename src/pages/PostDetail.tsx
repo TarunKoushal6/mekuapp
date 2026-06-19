@@ -18,6 +18,8 @@ import {
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { PostBody } from "@/components/meku/PostBody";
+import { readBookmarks, toggleBookmark } from "@/lib/bookmarks";
+import { notifyOne, notifyMentions } from "@/lib/notifications";
 
 interface TreeNode extends CommentRow { children: TreeNode[]; }
 
