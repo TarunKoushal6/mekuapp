@@ -23,6 +23,7 @@ import Bookmarks from "./pages/Bookmarks.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import { RequireAuth } from "./components/RequireAuth.tsx";
 import ScrollToTop from "./components/ScrollToTop.tsx";
+import { NotificationsListener } from "./hooks/useNotifications.tsx";
 
 const queryClient = new QueryClient();
 
