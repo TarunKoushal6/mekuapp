@@ -149,6 +149,8 @@ const PostDetail = () => {
     setSending(true);
     try {
       await createComment(id, user.id, text);
+      if (post) notifyOne({ userId: post.user_id, actorId: user.id, kind: "comment", postId: id });
+      notifyMentions({ actorId: user.id, text, postId: id });
       setDraft("");
       load();
     } catch (e: any) { toast.error(e.message); }
