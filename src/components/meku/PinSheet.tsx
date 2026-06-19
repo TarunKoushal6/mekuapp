@@ -4,9 +4,9 @@
 //   "confirm" → enter PIN to authorise; exposes "Forgot PIN?" link
 //   "recover" → answer the 3 stored questions; on success the caller wipes
 //               the old PIN and re-opens setup
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useId, useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { ArrowLeft, Check, Delete, KeyRound, Loader2, Lock, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowLeft, Check, ChevronDown, Delete, Eye, EyeOff, KeyRound, Loader2, Lock, ShieldCheck, Sparkles } from "lucide-react";
 import { RECOVERY_QUESTIONS } from "@/lib/pin";
 
 export type PinMode = "setup" | "confirm" | "recover";
@@ -544,38 +544,16 @@ const RecoveryDialog = ({
         <div className="mt-3 flex-1 overflow-y-auto px-5">
           <div className="space-y-3">
             {[0, 1, 2].map((i) => (
-              <div
+              <RecoveryRow
                 key={i}
-                className="rounded-2xl border border-border bg-muted/30 p-3"
-              >
-                {editable ? (
-                  <select
-                    value={qs[i]}
-                    onChange={(e) => setQuestion(i, e.target.value)}
-                    className="w-full bg-transparent text-[12.5px] font-semibold text-foreground/80 outline-none"
-                  >
-                    {RECOVERY_QUESTIONS.map((q) => (
-                      <option key={q} value={q}>{q}</option>
-                    ))}
-                  </select>
-                ) : (
-                  <p className="text-[12.5px] font-semibold text-foreground/80">
-                    {qs[i]}
-                  </p>
-                )}
-                <input
-                  value={answers[i]}
-                  onChange={(e) => { if (error) setError(null); setAnswer(i, e.target.value); }}
-                  placeholder="Your answer"
-                  type="text"
-                  inputMode="text"
-                  autoComplete="off"
-                  autoCapitalize="off"
-                  autoCorrect="off"
-                  spellCheck={false}
-                  className="mt-1.5 w-full bg-transparent text-[15px] font-medium text-foreground outline-none placeholder:text-muted-foreground/50"
-                />
-              </div>
+                index={i}
+                editable={!!editable}
+                question={qs[i]}
+                answer={answers[i]}
+                onQuestion={(v) => setQuestion(i, v)}
+                onAnswer={(v) => { if (error) setError(null); setAnswer(i, v); }}
+                usedQuestions={qs}
+              />
             ))}
           </div>
         </div>
