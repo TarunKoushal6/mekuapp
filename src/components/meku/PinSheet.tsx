@@ -588,6 +588,94 @@ const RecoveryDialog = ({
 };
 
 // ------------------------------------------------------------------
+// RecoveryRow — one question + answer pair.
+// Answer field uses type=password to defeat iOS QuickType / autocorrect
+// (which was silently replacing typed words with predictions).
+// Includes a Show/Hide eye toggle so users can verify spelling.
+// ------------------------------------------------------------------
+const RecoveryRow = ({
+  index,
+  editable,
+  question,
+  answer,
+  onQuestion,
+  onAnswer,
+  usedQuestions,
+}: {
+  index: number;
+  editable: boolean;
+  question: string;
+  answer: string;
+  onQuestion: (v: string) => void;
+  onAnswer: (v: string) => void;
+  usedQuestions: [string, string, string];
+}) => {
+  const [reveal, setReveal] = useState(false);
+  const uid = useId();
+  return (
+    <div className="rounded-2xl border border-border bg-muted/40 p-3 transition-colors focus-within:border-primary/60 focus-within:bg-background">
+      {editable ? (
+        <label className="relative block">
+          <span className="sr-only">Security question {index + 1}</span>
+          <select
+            value={question}
+            onChange={(e) => onQuestion(e.target.value)}
+            className="
+              w-full appearance-none bg-transparent pr-6 text-[12.5px] font-semibold
+              text-foreground/80 outline-none cursor-pointer
+            "
+          >
+            {RECOVERY_QUESTIONS.map((q) => {
+              const takenElsewhere = usedQuestions.includes(q) && q !== question;
+              return (
+                <option key={q} value={q} disabled={takenElsewhere}>
+                  {q}{takenElsewhere ? " (used)" : ""}
+                </option>
+              );
+            })}
+          </select>
+          <ChevronDown
+            size={14}
+            className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 text-muted-foreground"
+          />
+        </label>
+      ) : (
+        <p className="text-[12.5px] font-semibold text-foreground/80">{question}</p>
+      )}
+      <div className="mt-1.5 flex items-center gap-2">
+        <input
+          id={`${uid}-ans`}
+          name={`recovery-answer-${index}-${uid}`}
+          value={answer}
+          onChange={(e) => onAnswer(e.target.value)}
+          placeholder="Your answer"
+          type={reveal ? "text" : "password"}
+          inputMode="text"
+          autoComplete="off"
+          autoCapitalize="off"
+          autoCorrect="off"
+          spellCheck={false}
+          data-1p-ignore
+          data-lpignore="true"
+          className="
+            flex-1 bg-transparent text-[15px] font-medium text-foreground outline-none
+            placeholder:text-muted-foreground/50
+          "
+        />
+        <button
+          type="button"
+          onClick={() => setReveal((r) => !r)}
+          aria-label={reveal ? "Hide answer" : "Show answer"}
+          className="tap flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
+        >
+          {reveal ? <EyeOff size={14} /> : <Eye size={14} />}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// ------------------------------------------------------------------
 // PinSuccessDialog — celebratory confirmation after setup completes.
 // Matches the pastel/blob language used by PinSheet & RecoveryDialog.
 // ------------------------------------------------------------------
