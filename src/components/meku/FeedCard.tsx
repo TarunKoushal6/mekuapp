@@ -178,10 +178,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
               e.stopPropagation();
               const next = !bookmarked;
               setBookmarked(next);
-              const set = readBookmarks();
-              if (next) set.add(post.id); else set.delete(post.id);
-              writeBookmarks(set);
-              // No toast — interaction is its own feedback (animation).
+              toggleBookmark(user?.id, post.id, next);
             }}
             size={18}
             aria-label="Save"
