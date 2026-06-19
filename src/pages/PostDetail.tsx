@@ -211,12 +211,7 @@ const PostDetail = () => {
             onChange={() => {
               const next = !bookmarked;
               setBookmarked(next);
-              try {
-                const arr = JSON.parse(localStorage.getItem("meku.bookmarks.v1") ?? "[]") as string[];
-                const set = new Set(arr);
-                if (next) set.add(post.id); else set.delete(post.id);
-                localStorage.setItem("meku.bookmarks.v1", JSON.stringify([...set]));
-              } catch {}
+              toggleBookmark(user?.id, post.id, next);
             }}
             size={20}
             aria-label="Save"
