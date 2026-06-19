@@ -1,62 +1,57 @@
+Five fixes grouped by area. I'll ship them in this order.
 
-## Recommendation: Circle User-Controlled Wallets (UCW)
+## 1. Per-account bookmarks/likes/reposts
+The likes/reposts are already user-scoped in DB — the bug is that `FeedCard`'s local optimistic state isn't refreshed after a logout/login (component holds the previous user's initial values). Bookmarks are the real bug: stored in a single `localStorage` key.
 
-For a social app where users own their funds and trigger tx from posts/comments, **User-Controlled Wallets** is the right fit:
-- Built-in **email OTP login** (= your "Circle auth" requirement, no Supabase auth needed for sign-in).
-- **Auto wallet creation** on first login (one wallet per user on Arc Testnet).
-- Non-custodial via MPC + user PIN — you never hold keys, users sign every tx with PIN.
-- Works on Arc Testnet with USDC.
+- Namespace bookmarks per user: `meku.bookmarks.v1:<userId>` (anonymous bucket for logged-out).
+- On `user.id` change in `FeedCard`, reset `liked/likeCount/bookmarked/reposted` from current props/DB.
+- `Bookmarks` page reads the per-user key.
 
-Modular Wallets (passkey) is slicker UX but adds complexity; Dev-Controlled makes you custodian (bad for a social app). UCW is the standard pick for consumer social + onchain.
+## 2. Real-time notifications
+Add a `notifications` table + realtime publication. Insert rows from existing flows (likes, reposts, comments, @mentions in `Create.tsx`/`PostDetail.tsx` comment submit). Subscribe in a top-level `useNotifications` hook that:
+- Loads unread on mount.
+- Subscribes via `supabase.channel('notif:'+userId)` filtered to `user_id=eq.<me>`.
+- Pops a `toast.info(...)` and updates a badge on the bell icon in `TopBar`.
 
-## Scope
+Schema:
+```sql
+create table public.notifications(
+  id uuid pk default gen_random_uuid(),
+  user_id uuid not null,           -- recipient
+  actor_id uuid,                   -- who did it
+  kind text not null,              -- 'like' | 'repost' | 'comment' | 'mention' | 'tip'
+  post_id uuid,
+  comment_id uuid,
+  read_at timestamptz,
+  created_at timestamptz default now()
+);
+-- GRANTs + RLS: recipient can select/update; service_role full.
+alter publication supabase_realtime add table public.notifications;
+```
+Inserts done client-side right after the social action (RLS allows authenticated insert when `actor_id = auth.uid()`).
 
-### 1. Auth & wallet bootstrap
-- Remove Supabase email/password auth UI. Keep Supabase only as **app DB** (posts/comments/profiles) — auth state will come from Circle session.
-- Add Circle UCW SDK + edge function `circle-session` that:
-  - issues user token from `CIRCLE_API_KEY` + `CIRCLE_ENTITY_SECRET`
-  - creates wallet on Arc Testnet on first sign-in
-- New `useCircleAuth` hook replaces `useAuth`. Email OTP screen + PIN setup screen.
-- Sync Circle `userId` → `profiles.id` so existing posts/comments keep working.
+## 3. Confirmation cards for Send / Swap / Bridge
+Replace the "Review" button's direct execute path with a `ConfirmSheet` (shared component) showing:
+- From / To (address or chain)
+- Amount in + amount out (estimate for swap, 1:1 for bridge, single for send)
+- Network fee, route, slippage
+- Big "Confirm" button using `SendFlyButton`
 
-### 2. Wallet screen (replaces current mock)
-- Live USDC balance on Arc Testnet (Circle `getWalletTokenBalance`).
-- Tx history list.
-- Top action grid using your icons: Send · Swap · Bridge · Assets.
-- Receive sheet with address + QR.
+Send already has `SendSheet` — refactor it to a two-step (compose → confirm) using the same shared `ConfirmSheet`.
 
-### 3. Send / Swap / Bridge sheets
-- **Send** — Circle UCW `createTransaction` (USDC on Arc), PIN challenge.
-- **Swap** — Circle App Kit `kit.swap` via edge function `circle-swap` (uses `KIT_KEY`).
-- **Bridge** — Circle App Kit `kit.bridge` (CCTP) via edge function `circle-bridge`. Arc Testnet ↔ Base/Eth Sepolia.
+## 4. Button animations on success
+- `SendFlyButton` already animates the plane flying. Extend it: after `flying` finishes, swap to a `success` state — green bg + checkmark icon for ~1.2s before sheet closes. Use for Send + Bridge.
+- For Swap, build `SwapCardButton` mimicking the "credit card" flip animation (card slides in, flips to a check). Pure CSS keyframes, no new deps.
 
-### 4. Inline onchain UX in feed
-- **Tip button** on every post + comment → opens preset USDC tip sheet → PIN → send to author's wallet.
-- **Payment-request post type** — new `posts.kind = 'request'` with `amount_usdc`, `recipient_wallet`. Renders as a card with "Pay X USDC" button.
-- **@mention send command** — when composing a post/comment, parser detects `@handle send <n> usdc` → renders an inline "Send" action card on the post; tapping it opens PIN sheet and executes the transfer to that handle's wallet. Mentioned user gets a notification.
-- All executed tx show inline confirmation chip with tx hash → Arc explorer link.
-
-### 5. Icon set
-Replace lucide icons with the 10 from your reference (Send, Swap, Bridge, Reply, Assets, Wallet, Explore, Notifications, Community, Activity) as a local `MekuIcon` component using minimal stroke SVGs that match the line weight in your screenshot.
+## 5. Destination-chain dropdown (Bridge)
+Replace the list of buttons with a proper `<Select>` (shadcn) anchored on the "Destination chain" row. Add more chains: Base Sepolia, Ethereum Sepolia, Arbitrum Sepolia, Optimism Sepolia, Polygon Amoy, Avalanche Fuji (Circle CCTP testnet set).
 
 ## Technical notes
+- No new packages. Pure Tailwind/CSS for animations.
+- Edge functions unchanged (still gated on the Fly.io swap node for execution — confirmation UX still works and shows the 501 error inline).
+- Migration adds `notifications` table + grants + RLS + realtime publication.
 
-- New tables (migration):
-  - `wallets (user_id pk, circle_user_id, wallet_id, address, chain)`
-  - `transactions (id, user_id, tx_hash, kind, amount, token, counterparty, post_id?, created_at, status)`
-  - `posts.kind` enum + `amount_usdc`, `recipient_user_id` nullable columns for request posts.
-- Edge functions: `circle-session`, `circle-wallet`, `circle-send`, `circle-swap`, `circle-bridge`, `circle-balance`.
-- Secrets needed (I'll prompt securely): `CIRCLE_API_KEY`, `CIRCLE_ENTITY_SECRET`, `KIT_KEY`.
-- Skills I'll follow: `use-user-controlled-wallets`, `use-arc`, `use-usdc`, `swap-tokens`, `bridge-stablecoin`.
+## Out of scope (deferred per user)
+- Actually getting `circle-swap` to execute end-to-end (still needs Fly.io node).
 
-## Order of execution
-
-1. Add secrets prompt → install Circle SDKs + skills.
-2. Migration (wallets, transactions, post kinds).
-3. Edge functions (session/wallet/balance/send first; swap/bridge second).
-4. Auth swap: Circle email OTP + PIN screens, kill Supabase auth UI.
-5. Wallet screen + Send/Swap/Bridge sheets.
-6. Tip button + payment-request post type + @mention-send parser.
-7. Replace icon set.
-
-Shall I proceed? On approval I'll start by requesting the three secrets.
+Shall I proceed?
