@@ -1,6 +1,6 @@
-// Animated "send" button — plane flies up-right on submit, label slides off.
-// Inspired by Uiverse / adamgiebl, rebound to MEKU tokens + submit-success.
-import { Loader2 } from "lucide-react";
+// Animated "send" button — plane flies up-right on submit, then morphs
+// into a green check pill on success. Used on Send + Bridge cards.
+import { Check, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -8,7 +8,9 @@ interface Props {
   disabled?: boolean;
   busy?: boolean;
   flying?: boolean;
+  success?: boolean;
   label?: string;
+  successLabel?: string;
   className?: string;
   type?: "button" | "submit";
   size?: "lg" | "sm";
@@ -19,7 +21,9 @@ export const SendFlyButton = ({
   disabled,
   busy,
   flying,
+  success,
   label = "Send",
+  successLabel = "Sent",
   className,
   type = "button",
   size = "lg",
@@ -28,20 +32,24 @@ export const SendFlyButton = ({
     <button
       type={type}
       onClick={onClick}
-      disabled={disabled}
+      disabled={disabled || success}
       data-flying={flying ? "true" : "false"}
+      data-success={success ? "true" : "false"}
       className={cn(
-        "send-fly group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full bg-primary font-bold text-primary-foreground shadow-purple transition-transform active:scale-[0.98] disabled:opacity-40",
+        "send-fly group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full font-bold text-primary-foreground shadow-purple transition-all duration-300 active:scale-[0.98] disabled:opacity-40",
+        success ? "bg-emerald-500 shadow-none" : "bg-primary",
         size === "lg" ? "h-[52px] w-full px-6 text-[15px]" : "h-10 px-4 text-[13px]",
         className,
       )}
     >
-      <span className="send-fly__label inline-block transition-all duration-300 group-data-[flying=true]:translate-x-3 group-data-[flying=true]:opacity-0">
+      {/* label */}
+      <span className="send-fly__label inline-block transition-all duration-300 group-data-[flying=true]:translate-x-3 group-data-[flying=true]:opacity-0 group-data-[success=true]:opacity-0">
         {busy && !flying ? <Loader2 className="h-5 w-5 animate-spin" /> : label}
       </span>
+      {/* plane (hides on success) */}
       <svg
         viewBox="0 0 24 24"
-        className="send-fly__plane h-[18px] w-[18px] transition-transform duration-500"
+        className="send-fly__plane h-[18px] w-[18px] transition-transform duration-500 group-data-[success=true]:opacity-0"
         fill="none"
         stroke="currentColor"
         strokeWidth={1.8}
@@ -51,6 +59,11 @@ export const SendFlyButton = ({
         <path d="M21.4 2.6 2.9 9.7a.5.5 0 0 0 0 .94l7.1 2.66 2.66 7.1a.5.5 0 0 0 .94 0L21.4 2.6Z" />
         <path d="M10 14 21.4 2.6" />
       </svg>
+      {/* success state */}
+      <span className="pointer-events-none absolute inset-0 inline-flex items-center justify-center gap-2 opacity-0 transition-opacity duration-200 group-data-[success=true]:opacity-100">
+        <Check className="h-5 w-5" strokeWidth={2.4} />
+        <span>{successLabel}</span>
+      </span>
       <style>{`
         .send-fly[data-flying="true"] .send-fly__plane {
           animation: meku-fly 0.7s cubic-bezier(.65,.05,.36,1) forwards;
