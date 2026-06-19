@@ -32,6 +32,14 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
   const name = author?.display_name || author?.username || "Anonymous";
   const handle = author?.username || "anon";
 
+  // Reset local optimistic state when post or signed-in user changes
+  // (prevents one account's likes/bookmarks leaking to another).
+  useEffect(() => {
+    setLiked(post.liked_by_me);
+    setLikeCount(post.like_count);
+    setBookmarked(readBookmarks(user?.id).has(post.id));
+  }, [post.id, post.liked_by_me, post.like_count, user?.id]);
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
