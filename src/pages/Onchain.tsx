@@ -71,7 +71,23 @@ const Onchain = () => {
           body: { fromChain: "Arc_Testnet", toChain: destinationChain, amount: payAmount, recipientAddress: wallet.address },
         });
         if (error || (data as any)?.error) throw new Error((data as any)?.error ?? error?.message);
-        toast.success("Bridge submitted");
+        const transactionId = (data as any)?.transactionId;
+        toast.success("Bridge burn submitted", { description: "Waiting for Circle attestation…" });
+        // Kick off mint completion in background (attestation can take 15–90s).
+        if (transactionId) {
+          (async () => {
+            for (let i = 0; i < 6; i++) {
+              const { data: c } = await supabase.functions.invoke("circle-bridge-complete", { body: { transactionId } });
+              if ((c as any)?.status === "confirmed") {
+                toast.success("Bridge complete", { description: "USDC minted on destination chain." });
+                refresh();
+                return;
+              }
+              await new Promise((r) => setTimeout(r, 15000));
+            }
+            toast.info("Bridge still settling", { description: "It will appear once Circle finalizes." });
+          })();
+        }
       }
       refresh();
     } catch (e: any) {
