@@ -11,15 +11,8 @@ import { InlineActionCard, parseInlineAction } from "./InlineActionCard";
 import { PostBody } from "./PostBody";
 import { HeartLike } from "./HeartLike";
 import { BookmarkSave } from "./BookmarkSave";
-
-const BOOKMARK_KEY = "meku.bookmarks.v1";
-const readBookmarks = (): Set<string> => {
-  try { return new Set(JSON.parse(localStorage.getItem(BOOKMARK_KEY) ?? "[]")); }
-  catch { return new Set(); }
-};
-const writeBookmarks = (s: Set<string>) => {
-  try { localStorage.setItem(BOOKMARK_KEY, JSON.stringify([...s])); } catch {}
-};
+import { readBookmarks, toggleBookmark } from "@/lib/bookmarks";
+import { notifyOne } from "@/lib/notifications";
 
 interface FeedCardProps {
   post: Post;
@@ -34,10 +27,18 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
   const [tipOpen, setTipOpen] = useState(false);
   const [reposted, setReposted] = useState(false);
   const [repostCount, setRepostCount] = useState(0);
-  const [bookmarked, setBookmarked] = useState(() => readBookmarks().has(post.id));
+  const [bookmarked, setBookmarked] = useState(() => readBookmarks(user?.id).has(post.id));
   const author = post.author;
   const name = author?.display_name || author?.username || "Anonymous";
   const handle = author?.username || "anon";
+
+  // Reset local optimistic state when post or signed-in user changes
+  // (prevents one account's likes/bookmarks leaking to another).
+  useEffect(() => {
+    setLiked(post.liked_by_me);
+    setLikeCount(post.like_count);
+    setBookmarked(readBookmarks(user?.id).has(post.id));
+  }, [post.id, post.liked_by_me, post.like_count, user?.id]);
 
   useEffect(() => {
     let cancelled = false;
@@ -59,6 +60,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
     setRepostCount((c) => c + (next ? 1 : -1));
     try {
       await toggleRepost(user.id, post.id, reposted);
+      if (next) notifyOne({ userId: post.user_id, actorId: user.id, kind: "repost", postId: post.id });
     } catch (err: any) {
       setReposted(!next);
       setRepostCount((c) => c + (next ? -1 : 1));
@@ -77,9 +79,8 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
     setLikeCount((c) => c + (next ? 1 : -1));
     try {
       await toggleLike(post.id, user.id, liked);
-      // Intentionally do NOT call onChanged here — the optimistic local state
-      // already reflects the new value; refetching the whole feed causes a
-      // jarring scroll/re-mount.
+      if (next) notifyOne({ userId: post.user_id, actorId: user.id, kind: "like", postId: post.id });
+      // Intentionally do NOT call onChanged — optimistic state suffices.
     } catch (err: any) {
       setLiked(!next);
       setLikeCount((c) => c + (next ? -1 : 1));
@@ -177,10 +178,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
               e.stopPropagation();
               const next = !bookmarked;
               setBookmarked(next);
-              const set = readBookmarks();
-              if (next) set.add(post.id); else set.delete(post.id);
-              writeBookmarks(set);
-              // No toast — interaction is its own feedback (animation).
+              toggleBookmark(user?.id, post.id, next);
             }}
             size={18}
             aria-label="Save"

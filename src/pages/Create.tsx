@@ -5,6 +5,7 @@ import { useRef, useState } from "react";
 import { TopBar, IconButton } from "@/components/meku/TopBar";
 import { useAuth } from "@/hooks/useAuth";
 import { createPost } from "@/lib/social";
+import { notifyMentions } from "@/lib/notifications";
 import { MentionAutocomplete } from "@/components/meku/MentionAutocomplete";
 import { toast } from "sonner";
 
@@ -24,7 +25,9 @@ const Create = () => {
     if (!canPublish || busy) return;
     setBusy(true);
     try {
-      await createPost(user.id, body.trim(), title.trim());
+      const post = await createPost(user.id, body.trim(), title.trim());
+      const fullText = `${title.trim()} ${body.trim()}`;
+      notifyMentions({ actorId: user.id, text: fullText, postId: (post as any)?.id ?? null });
       toast.success("Posted");
       navigate("/home");
     } catch (e: any) {

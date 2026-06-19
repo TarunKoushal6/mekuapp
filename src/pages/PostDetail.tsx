@@ -18,6 +18,8 @@ import {
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { PostBody } from "@/components/meku/PostBody";
+import { readBookmarks, toggleBookmark } from "@/lib/bookmarks";
+import { notifyOne, notifyMentions } from "@/lib/notifications";
 
 interface TreeNode extends CommentRow { children: TreeNode[]; }
 
@@ -46,6 +48,9 @@ const CommentNode = ({ node, postId, onReplied, depth = 0 }: { node: TreeNode; p
     setBusy(true);
     try {
       await createComment(postId, user.id, text, node.id);
+      // notify the parent comment author + post author + any @mentions
+      notifyOne({ userId: node.user_id, actorId: user.id, kind: "comment", postId });
+      notifyMentions({ actorId: user.id, text, postId });
       setDraft("");
       setShowReply(false);
       onReplied();
@@ -108,10 +113,11 @@ const PostDetail = () => {
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
 
-  const [bookmarked, setBookmarked] = useState<boolean>(() => {
-    try { return (JSON.parse(localStorage.getItem("meku.bookmarks.v1") ?? "[]") as string[]).includes(id); }
-    catch { return false; }
-  });
+  const [bookmarked, setBookmarked] = useState<boolean>(() => readBookmarks(user?.id).has(id));
+
+  useEffect(() => {
+    setBookmarked(readBookmarks(user?.id).has(id));
+  }, [user?.id, id]);
 
   const load = useCallback(async () => {
     const [p, c] = await Promise.all([fetchPost(id, user?.id), fetchComments(id)]);
@@ -129,6 +135,7 @@ const PostDetail = () => {
     setPost({ ...post, liked_by_me: !wasLiked, like_count: post.like_count + (wasLiked ? -1 : 1) });
     try {
       await toggleLike(post.id, user.id, wasLiked);
+      if (!wasLiked) notifyOne({ userId: post.user_id, actorId: user.id, kind: "like", postId: post.id });
     } catch (e: any) {
       setPost({ ...post });
       toast.error(e.message);
@@ -142,6 +149,8 @@ const PostDetail = () => {
     setSending(true);
     try {
       await createComment(id, user.id, text);
+      if (post) notifyOne({ userId: post.user_id, actorId: user.id, kind: "comment", postId: id });
+      notifyMentions({ actorId: user.id, text, postId: id });
       setDraft("");
       load();
     } catch (e: any) { toast.error(e.message); }
@@ -202,12 +211,7 @@ const PostDetail = () => {
             onChange={() => {
               const next = !bookmarked;
               setBookmarked(next);
-              try {
-                const arr = JSON.parse(localStorage.getItem("meku.bookmarks.v1") ?? "[]") as string[];
-                const set = new Set(arr);
-                if (next) set.add(post.id); else set.delete(post.id);
-                localStorage.setItem("meku.bookmarks.v1", JSON.stringify([...set]));
-              } catch {}
+              toggleBookmark(user?.id, post.id, next);
             }}
             size={20}
             aria-label="Save"
