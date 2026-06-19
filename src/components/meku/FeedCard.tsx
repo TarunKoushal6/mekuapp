@@ -79,9 +79,8 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
     setLikeCount((c) => c + (next ? 1 : -1));
     try {
       await toggleLike(post.id, user.id, liked);
-      // Intentionally do NOT call onChanged here — the optimistic local state
-      // already reflects the new value; refetching the whole feed causes a
-      // jarring scroll/re-mount.
+      if (next) notifyOne({ userId: post.user_id, actorId: user.id, kind: "like", postId: post.id });
+      // Intentionally do NOT call onChanged — optimistic state suffices.
     } catch (err: any) {
       setLiked(!next);
       setLikeCount((c) => c + (next ? -1 : 1));
