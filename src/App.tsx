@@ -34,6 +34,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <ScrollToTop />
+        <NotificationsListener />
         <Routes>
           <Route path="/" element={<Intro />} />
           <Route path="/auth" element={<Auth />} />
