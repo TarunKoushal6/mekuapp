@@ -5,6 +5,7 @@ import { useRef, useState } from "react";
 import { TopBar, IconButton } from "@/components/meku/TopBar";
 import { useAuth } from "@/hooks/useAuth";
 import { createPost } from "@/lib/social";
+import { notifyMentions } from "@/lib/notifications";
 import { MentionAutocomplete } from "@/components/meku/MentionAutocomplete";
 import { toast } from "sonner";
 
