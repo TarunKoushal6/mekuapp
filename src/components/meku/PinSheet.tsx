@@ -4,9 +4,9 @@
 //   "confirm" → enter PIN to authorise; exposes "Forgot PIN?" link
 //   "recover" → answer the 3 stored questions; on success the caller wipes
 //               the old PIN and re-opens setup
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useId, useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { ArrowLeft, Check, Delete, KeyRound, Loader2, Lock, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowLeft, Check, ChevronDown, Delete, Eye, EyeOff, KeyRound, Loader2, Lock, ShieldCheck, Sparkles } from "lucide-react";
 import { RECOVERY_QUESTIONS } from "@/lib/pin";
 
 export type PinMode = "setup" | "confirm" | "recover";
@@ -544,38 +544,16 @@ const RecoveryDialog = ({
         <div className="mt-3 flex-1 overflow-y-auto px-5">
           <div className="space-y-3">
             {[0, 1, 2].map((i) => (
-              <div
+              <RecoveryRow
                 key={i}
-                className="rounded-2xl border border-border bg-muted/30 p-3"
-              >
-                {editable ? (
-                  <select
-                    value={qs[i]}
-                    onChange={(e) => setQuestion(i, e.target.value)}
-                    className="w-full bg-transparent text-[12.5px] font-semibold text-foreground/80 outline-none"
-                  >
-                    {RECOVERY_QUESTIONS.map((q) => (
-                      <option key={q} value={q}>{q}</option>
-                    ))}
-                  </select>
-                ) : (
-                  <p className="text-[12.5px] font-semibold text-foreground/80">
-                    {qs[i]}
-                  </p>
-                )}
-                <input
-                  value={answers[i]}
-                  onChange={(e) => { if (error) setError(null); setAnswer(i, e.target.value); }}
-                  placeholder="Your answer"
-                  type="text"
-                  inputMode="text"
-                  autoComplete="off"
-                  autoCapitalize="off"
-                  autoCorrect="off"
-                  spellCheck={false}
-                  className="mt-1.5 w-full bg-transparent text-[15px] font-medium text-foreground outline-none placeholder:text-muted-foreground/50"
-                />
-              </div>
+                index={i}
+                editable={!!editable}
+                question={qs[i]}
+                answer={answers[i]}
+                onQuestion={(v) => setQuestion(i, v)}
+                onAnswer={(v) => { if (error) setError(null); setAnswer(i, v); }}
+                usedQuestions={qs}
+              />
             ))}
           </div>
         </div>
@@ -606,6 +584,94 @@ const RecoveryDialog = ({
         </div>
       </DialogContent>
     </Dialog>
+  );
+};
+
+// ------------------------------------------------------------------
+// RecoveryRow — one question + answer pair.
+// Answer field uses type=password to defeat iOS QuickType / autocorrect
+// (which was silently replacing typed words with predictions).
+// Includes a Show/Hide eye toggle so users can verify spelling.
+// ------------------------------------------------------------------
+const RecoveryRow = ({
+  index,
+  editable,
+  question,
+  answer,
+  onQuestion,
+  onAnswer,
+  usedQuestions,
+}: {
+  index: number;
+  editable: boolean;
+  question: string;
+  answer: string;
+  onQuestion: (v: string) => void;
+  onAnswer: (v: string) => void;
+  usedQuestions: [string, string, string];
+}) => {
+  const [reveal, setReveal] = useState(false);
+  const uid = useId();
+  return (
+    <div className="rounded-2xl border border-border bg-muted/40 p-3 transition-colors focus-within:border-primary/60 focus-within:bg-background">
+      {editable ? (
+        <label className="relative block">
+          <span className="sr-only">Security question {index + 1}</span>
+          <select
+            value={question}
+            onChange={(e) => onQuestion(e.target.value)}
+            className="
+              w-full appearance-none bg-transparent pr-6 text-[12.5px] font-semibold
+              text-foreground/80 outline-none cursor-pointer
+            "
+          >
+            {RECOVERY_QUESTIONS.map((q) => {
+              const takenElsewhere = usedQuestions.includes(q) && q !== question;
+              return (
+                <option key={q} value={q} disabled={takenElsewhere}>
+                  {q}{takenElsewhere ? " (used)" : ""}
+                </option>
+              );
+            })}
+          </select>
+          <ChevronDown
+            size={14}
+            className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 text-muted-foreground"
+          />
+        </label>
+      ) : (
+        <p className="text-[12.5px] font-semibold text-foreground/80">{question}</p>
+      )}
+      <div className="mt-1.5 flex items-center gap-2">
+        <input
+          id={`${uid}-ans`}
+          name={`recovery-answer-${index}-${uid}`}
+          value={answer}
+          onChange={(e) => onAnswer(e.target.value)}
+          placeholder="Your answer"
+          type={reveal ? "text" : "password"}
+          inputMode="text"
+          autoComplete="off"
+          autoCapitalize="off"
+          autoCorrect="off"
+          spellCheck={false}
+          data-1p-ignore
+          data-lpignore="true"
+          className="
+            flex-1 bg-transparent text-[15px] font-medium text-foreground outline-none
+            placeholder:text-muted-foreground/50
+          "
+        />
+        <button
+          type="button"
+          onClick={() => setReveal((r) => !r)}
+          aria-label={reveal ? "Hide answer" : "Show answer"}
+          className="tap flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
+        >
+          {reveal ? <EyeOff size={14} /> : <Eye size={14} />}
+        </button>
+      </div>
+    </div>
   );
 };
 

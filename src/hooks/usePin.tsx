@@ -47,10 +47,18 @@ export const PinProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => { refresh(); }, [refresh]);
 
   // Auto-prompt PIN setup right after signup / first sign-in.
+  // Persist the "we already offered" flag per-user so a dismissed setup
+  // doesn't keep popping back on every render / refresh.
   useEffect(() => {
     if (!user || loading || hash || mode) return;
+    const key = `meku.pin.autoPrompted.${user.id}`;
     if (autoPromptedRef.current === user.id) return;
+    if (typeof window !== "undefined" && window.localStorage.getItem(key)) {
+      autoPromptedRef.current = user.id;
+      return;
+    }
     autoPromptedRef.current = user.id;
+    try { window.localStorage.setItem(key, "1"); } catch {}
     setMode({ kind: "setup", resolve: () => {} });
   }, [user, loading, hash, mode]);
 
@@ -119,8 +127,8 @@ export const PinProvider = ({ children }: { children: ReactNode }) => {
     if (!user) return "Not signed in";
     try {
       await saveRecovery(user.id, qs, answers);
-      // Do NOT close here — let PinSheet transition to the success step.
-      // PinSuccessDialog's onDone will fire `onComplete` which closes & resolves true.
+      // Re-sync hash from DB so the auto-prompt effect doesn't re-fire.
+      await refresh();
       return null;
     } catch (e: any) {
       return e?.message ?? "Could not save recovery questions";
