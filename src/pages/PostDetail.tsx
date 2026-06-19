@@ -135,6 +135,7 @@ const PostDetail = () => {
     setPost({ ...post, liked_by_me: !wasLiked, like_count: post.like_count + (wasLiked ? -1 : 1) });
     try {
       await toggleLike(post.id, user.id, wasLiked);
+      if (!wasLiked) notifyOne({ userId: post.user_id, actorId: user.id, kind: "like", postId: post.id });
     } catch (e: any) {
       setPost({ ...post });
       toast.error(e.message);
