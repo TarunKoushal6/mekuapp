@@ -1,6 +1,7 @@
-// Credit-card flip button — used for Swap confirmation.
-// Card slides in from the right and flips to reveal a green check on success.
-import { Check, Loader2 } from "lucide-react";
+// Credit-card animation — Uiverse.io by Admin12121.
+// Triggers on click (data-active) instead of hover. On success the green
+// side fills the whole pill and shows a check.
+import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -22,63 +23,225 @@ export const SwapCardButton = ({
   successLabel = "Swap submitted",
   className,
 }: Props) => {
+  const active = busy || success;
   return (
     <button
       type="button"
       onClick={onClick}
       disabled={disabled || busy || success}
-      data-busy={busy ? "true" : "false"}
+      data-active={active ? "true" : "false"}
       data-success={success ? "true" : "false"}
-      className={cn(
-        "swap-card group relative h-[56px] w-full overflow-hidden rounded-full font-bold text-primary-foreground transition-colors duration-300 active:scale-[0.98] disabled:opacity-40",
-        success ? "bg-emerald-500" : "bg-foreground text-background",
-        className,
-      )}
+      className={cn("meku-swap-wrap", className)}
+      aria-label={label}
     >
-      {/* default label */}
-      <span className="swap-card__label absolute inset-0 inline-flex items-center justify-center gap-2 text-[15px] transition-opacity duration-200 group-data-[busy=true]:opacity-0 group-data-[success=true]:opacity-0">
-        {label}
-      </span>
-
-      {/* flying credit card */}
-      <span
-        className={cn(
-          "swap-card__card pointer-events-none absolute left-1/2 top-1/2 h-[36px] w-[56px] -translate-x-1/2 -translate-y-1/2 rounded-md opacity-0",
-          "bg-gradient-to-br from-fuchsia-400 via-primary to-cyan-400 shadow-lg",
-        )}
-        aria-hidden
-      >
-        <span className="absolute left-1.5 top-1.5 h-2 w-3 rounded-sm bg-yellow-300/90" />
-        <span className="absolute bottom-1.5 left-1.5 right-1.5 h-1 rounded-full bg-white/40" />
-      </span>
-
-      {/* busy spinner */}
-      <span className="absolute inset-0 inline-flex items-center justify-center opacity-0 transition-opacity duration-200 group-data-[busy=true]:opacity-100 group-data-[success=true]:opacity-0">
-        <Loader2 className="h-5 w-5 animate-spin" />
-      </span>
-
-      {/* success */}
-      <span className="absolute inset-0 inline-flex items-center justify-center gap-2 text-[15px] opacity-0 transition-opacity duration-200 group-data-[success=true]:opacity-100">
-        <Check className="h-5 w-5" strokeWidth={2.4} />
-        {successLabel}
-      </span>
-
+      <div className="container">
+        <div className="left-side">
+          <div className="card">
+            <div className="card-line" />
+            <div className="buttons" />
+          </div>
+          <div className="post">
+            <div className="post-line" />
+            <div className="screen">
+              <div className="dollar">$</div>
+            </div>
+            <div className="numbers" />
+            <div className="numbers-line2" />
+          </div>
+          {success && (
+            <div className="success-check">
+              <Check size={26} strokeWidth={3} />
+            </div>
+          )}
+        </div>
+        <div className="right-side">
+          <div className="new">{success ? successLabel : label}</div>
+          <svg className="arrow" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 451.846 451.847">
+            <path
+              d="M345.441 248.292L151.154 442.573c-12.359 12.365-32.397 12.365-44.75 0-12.354-12.354-12.354-32.391 0-44.744L278.318 225.92 106.409 54.017c-12.354-12.359-12.354-32.394 0-44.748 12.354-12.359 32.391-12.359 44.75 0L345.441 203.55c6.179 6.18 9.262 14.271 9.262 22.366 0 8.099-3.091 16.196-9.262 22.376z"
+              fill="#1f1f1f"
+            />
+          </svg>
+        </div>
+      </div>
       <style>{`
-        .swap-card[data-busy="true"] .swap-card__card {
-          animation: meku-card-swipe 1.1s cubic-bezier(.6,.05,.4,1) forwards;
+        .meku-swap-wrap {
+          display: inline-block;
+          background: transparent;
+          border: none;
+          padding: 0;
+          cursor: pointer;
+          width: 100%;
         }
-        .swap-card[data-success="true"] .swap-card__card {
-          animation: meku-card-flip 0.7s ease-out forwards;
+        .meku-swap-wrap:disabled { cursor: not-allowed; opacity: 0.6; }
+        .meku-swap-wrap .container {
+          background-color: #ffffff;
+          display: flex;
+          width: 100%;
+          max-width: 460px;
+          margin: 0 auto;
+          height: 84px;
+          position: relative;
+          border-radius: 12px;
+          transition: 0.3s ease-in-out;
+          overflow: hidden;
         }
-        @keyframes meku-card-swipe {
-          0%   { transform: translate(140%, -50%) rotate(-8deg); opacity: 0; }
-          25%  { transform: translate(0%, -50%)   rotate(0deg);  opacity: 1; }
-          75%  { transform: translate(0%, -50%)   rotate(0deg);  opacity: 1; }
-          100% { transform: translate(-140%, -50%) rotate(8deg); opacity: 0; }
+        .meku-swap-wrap:not(:disabled):hover .container,
+        .meku-swap-wrap[data-active="true"] .container {
+          transform: scale(1.02);
         }
-        @keyframes meku-card-flip {
-          0%   { transform: translate(-50%, -50%) rotateY(0deg);  opacity: 1; }
-          100% { transform: translate(-50%, -50%) rotateY(180deg); opacity: 0; }
+        .meku-swap-wrap[data-active="true"] .container {
+          width: 160px;
+        }
+        .meku-swap-wrap .left-side {
+          background-color: #5de2a3;
+          width: 110px;
+          height: 84px;
+          border-radius: 8px;
+          position: relative;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          transition: 0.3s;
+          flex-shrink: 0;
+          overflow: hidden;
+        }
+        .meku-swap-wrap[data-active="true"] .left-side {
+          width: 100%;
+        }
+        .meku-swap-wrap .right-side {
+          width: calc(100% - 110px);
+          display: flex;
+          align-items: center;
+          overflow: hidden;
+          justify-content: space-between;
+          white-space: nowrap;
+          transition: 0.3s;
+        }
+        .meku-swap-wrap .arrow { width: 18px; height: 18px; margin-right: 16px; }
+        .meku-swap-wrap .new {
+          font-size: 17px;
+          font-weight: 700;
+          color: #1f1f1f;
+          margin-left: 16px;
+          font-family: inherit;
+        }
+        .meku-swap-wrap .card {
+          width: 60px;
+          height: 38px;
+          background-color: #c7ffbc;
+          border-radius: 6px;
+          position: absolute;
+          display: flex;
+          z-index: 10;
+          flex-direction: column;
+          align-items: center;
+          box-shadow: 7px 7px 7px -2px rgba(77,200,143,.72);
+        }
+        .meku-swap-wrap .card-line {
+          width: 55px; height: 10px;
+          background-color: #80ea69;
+          border-radius: 2px;
+          margin-top: 6px;
+        }
+        .meku-swap-wrap .buttons {
+          width: 7px; height: 7px;
+          background-color: #379e1f;
+          box-shadow: 0 -9px 0 0 #26850e, 0 9px 0 0 #56be3e;
+          border-radius: 50%;
+          transform: rotate(90deg);
+          margin: 6px 0 0 -26px;
+        }
+        .meku-swap-wrap[data-active="true"] .card {
+          animation: meku-slide-top 1.2s cubic-bezier(.645,.045,.355,1) both;
+        }
+        .meku-swap-wrap[data-active="true"] .post {
+          animation: meku-slide-post 1s cubic-bezier(.165,.84,.44,1) both;
+        }
+        @keyframes meku-slide-top {
+          0% { transform: translateY(0); }
+          50% { transform: translateY(-60px) rotate(90deg); }
+          60% { transform: translateY(-60px) rotate(90deg); }
+          100% { transform: translateY(-6px) rotate(90deg); }
+        }
+        .meku-swap-wrap .post {
+          width: 55px; height: 66px;
+          background-color: #dddde0;
+          position: absolute;
+          z-index: 11;
+          bottom: 10px;
+          top: 84px;
+          border-radius: 6px;
+          overflow: hidden;
+        }
+        .meku-swap-wrap .post-line {
+          width: 42px; height: 8px;
+          background-color: #545354;
+          position: absolute;
+          border-radius: 0 0 3px 3px;
+          right: 6px; top: 6px;
+        }
+        .meku-swap-wrap .post-line:before {
+          content: "";
+          position: absolute;
+          width: 42px; height: 8px;
+          background-color: #757375;
+          top: -7px;
+        }
+        .meku-swap-wrap .screen {
+          width: 42px; height: 20px;
+          background-color: #ffffff;
+          position: absolute;
+          top: 19px; right: 6px;
+          border-radius: 3px;
+        }
+        .meku-swap-wrap .numbers {
+          width: 10px; height: 10px;
+          background-color: #838183;
+          box-shadow: 0 -15px 0 0 #838183, 0 15px 0 0 #838183;
+          border-radius: 2px;
+          position: absolute;
+          transform: rotate(90deg);
+          left: 22px; top: 46px;
+        }
+        .meku-swap-wrap .numbers-line2 {
+          width: 10px; height: 10px;
+          background-color: #aaa9ab;
+          box-shadow: 0 -15px 0 0 #aaa9ab, 0 15px 0 0 #aaa9ab;
+          border-radius: 2px;
+          position: absolute;
+          transform: rotate(90deg);
+          left: 22px; top: 60px;
+        }
+        @keyframes meku-slide-post {
+          50% { transform: translateY(0); }
+          100% { transform: translateY(-60px); }
+        }
+        .meku-swap-wrap .dollar {
+          position: absolute;
+          font-size: 15px;
+          font-weight: 700;
+          width: 100%;
+          left: 0; top: 1px;
+          color: #4b953b;
+          text-align: center;
+        }
+        .meku-swap-wrap[data-active="true"] .dollar {
+          animation: meku-fade-in-fwd .3s 1s backwards;
+        }
+        @keyframes meku-fade-in-fwd {
+          0% { opacity: 0; transform: translateY(-5px); }
+          100% { opacity: 1; transform: translateY(0); }
+        }
+        .meku-swap-wrap .success-check {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          z-index: 20;
+          animation: meku-fade-in-fwd .3s both;
         }
       `}</style>
     </button>
