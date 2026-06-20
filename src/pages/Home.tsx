@@ -91,7 +91,7 @@ const Home = () => {
             }
           />
         ) : (
-          posts.map((p) => <FeedCard key={p.id} post={p} onChanged={load} />)
+          <div className="animate-fade-in">{posts.map((p) => <FeedCard key={p.id} post={p} onChanged={load} />)}</div>
         )}
       </section>
     </AppShell>
