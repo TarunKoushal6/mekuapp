@@ -1,7 +1,7 @@
 import { AppShell } from "@/components/meku/AppShell";
 import { FeedCard } from "@/components/meku/FeedCard";
 import { EmptyState } from "@/components/meku/EmptyState";
-import { Loader2, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 import { IconBell, IconPlus } from "@/components/meku/MekuIcon";
 import { Logo } from "@/components/meku/Logo";
 import { SideMenu } from "@/components/meku/SideMenu";
@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { fetchPosts, type Post } from "@/lib/social";
 import { supabase } from "@/integrations/supabase/client";
+import { PostListSkeleton } from "@/components/meku/Skeletons";
 
 const tabs = ["For You", "Following"] as const;
 type Tab = (typeof tabs)[number];
