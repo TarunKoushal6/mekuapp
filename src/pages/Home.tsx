@@ -77,7 +77,7 @@ const Home = () => {
 
       <section className="pb-6">
         {loading ? (
-          <div className="flex justify-center py-16"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
+          <PostListSkeleton count={5} />
         ) : posts.length === 0 ? (
           <EmptyState
             pose="sitting"
