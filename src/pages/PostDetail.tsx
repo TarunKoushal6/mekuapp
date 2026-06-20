@@ -253,6 +253,7 @@ const PostDetail = () => {
           </button>
         </div>
       </div>
+      </div>
     </AppShell>
   );
 };
