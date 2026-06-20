@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import { PostBody } from "@/components/meku/PostBody";
 import { readBookmarks, toggleBookmark } from "@/lib/bookmarks";
 import { notifyOne, notifyMentions } from "@/lib/notifications";
+import { PostCardSkeleton } from "@/components/meku/Skeletons";
 
 interface TreeNode extends CommentRow { children: TreeNode[]; }
 
