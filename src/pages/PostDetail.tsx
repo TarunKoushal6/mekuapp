@@ -158,7 +158,16 @@ const PostDetail = () => {
   };
 
   if (loading) return (
-    <AppShell hideNav><div className="flex min-h-svh items-center justify-center"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div></AppShell>
+    <AppShell hideNav>
+      <header className="sticky top-0 z-30 flex h-[56px] items-center justify-between bg-background/90 px-3 backdrop-blur-xl">
+        <button onClick={() => navigate(-1)} aria-label="Back" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full">
+          <ChevronLeft className="h-[22px] w-[22px]" strokeWidth={1.6} />
+        </button>
+        <p className="text-[14px] font-bold">Post</p>
+        <span className="w-10" />
+      </header>
+      <div className="animate-fade-in"><PostCardSkeleton /><PostCardSkeleton /></div>
+    </AppShell>
   );
   if (!post) return (
     <AppShell hideNav><div className="p-8 text-center text-muted-foreground">Post not found</div></AppShell>
@@ -169,6 +178,7 @@ const PostDetail = () => {
 
   return (
     <AppShell hideNav>
+      <div className="animate-fade-in">
       <header className="sticky top-0 z-30 flex h-[56px] items-center justify-between bg-background/90 px-3 backdrop-blur-xl">
         <button onClick={() => navigate(-1)} aria-label="Back" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full">
           <ChevronLeft className="h-[22px] w-[22px]" strokeWidth={1.6} />
