@@ -1,5 +1,5 @@
-// Animated "send" button — plane flies up-right on submit, then morphs
-// into a green check pill on success. Used on Send + Bridge cards.
+// Send button — Uiverse.io by adamgiebl, adapted to trigger on click
+// (flying) instead of hover, plus a success state (green pill + check).
 import { Check, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -13,7 +13,6 @@ interface Props {
   successLabel?: string;
   className?: string;
   type?: "button" | "submit";
-  size?: "lg" | "sm";
 }
 
 export const SendFlyButton = ({
@@ -26,52 +25,95 @@ export const SendFlyButton = ({
   successLabel = "Sent",
   className,
   type = "button",
-  size = "lg",
 }: Props) => {
+  const active = flying || success;
   return (
     <button
       type={type}
       onClick={onClick}
-      disabled={disabled || success}
-      data-flying={flying ? "true" : "false"}
+      disabled={disabled || success || busy}
+      data-active={active ? "true" : "false"}
       data-success={success ? "true" : "false"}
-      className={cn(
-        "send-fly group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full font-bold text-primary-foreground shadow-purple transition-all duration-300 active:scale-[0.98] disabled:opacity-40",
-        success ? "bg-emerald-500 shadow-none" : "bg-primary",
-        size === "lg" ? "h-[52px] w-full px-6 text-[15px]" : "h-10 px-4 text-[13px]",
-        className,
-      )}
+      className={cn("meku-send-btn", className)}
     >
-      {/* label */}
-      <span className="send-fly__label inline-block transition-all duration-300 group-data-[flying=true]:translate-x-3 group-data-[flying=true]:opacity-0 group-data-[success=true]:opacity-0">
-        {busy && !flying ? <Loader2 className="h-5 w-5 animate-spin" /> : label}
-      </span>
-      {/* plane (hides on success) */}
-      <svg
-        viewBox="0 0 24 24"
-        className="send-fly__plane h-[18px] w-[18px] transition-transform duration-500 group-data-[success=true]:opacity-0"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={1.8}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M21.4 2.6 2.9 9.7a.5.5 0 0 0 0 .94l7.1 2.66 2.66 7.1a.5.5 0 0 0 .94 0L21.4 2.6Z" />
-        <path d="M10 14 21.4 2.6" />
-      </svg>
-      {/* success state */}
-      <span className="pointer-events-none absolute inset-0 inline-flex items-center justify-center gap-2 opacity-0 transition-opacity duration-200 group-data-[success=true]:opacity-100">
-        <Check className="h-5 w-5" strokeWidth={2.4} />
-        <span>{successLabel}</span>
-      </span>
+      <div className="svg-wrapper-1">
+        <div className="svg-wrapper">
+          {success ? (
+            <Check size={22} strokeWidth={2.6} />
+          ) : busy && !flying ? (
+            <Loader2 size={22} className="animate-spin" />
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22">
+              <path fill="none" d="M0 0h24v24H0z" />
+              <path
+                fill="currentColor"
+                d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z"
+              />
+            </svg>
+          )}
+        </div>
+      </div>
+      <span>{success ? successLabel : label}</span>
       <style>{`
-        .send-fly[data-flying="true"] .send-fly__plane {
-          animation: meku-fly 0.7s cubic-bezier(.65,.05,.36,1) forwards;
+        .meku-send-btn {
+          font-family: inherit;
+          font-size: 17px;
+          background: hsl(var(--primary));
+          color: hsl(var(--primary-foreground));
+          padding: 0.7em 1em;
+          padding-left: 0.9em;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+          border: none;
+          border-radius: 9999px;
+          overflow: hidden;
+          transition: all 0.2s;
+          cursor: pointer;
+          font-weight: 700;
         }
-        @keyframes meku-fly {
-          40% { transform: translate(8px,-8px) rotate(15deg); opacity: 1; }
-          60% { transform: translate(14px,-14px) rotate(25deg); opacity: 0.9; }
-          100% { transform: translate(60px,-60px) rotate(35deg); opacity: 0; }
+        .meku-send-btn[data-success="true"] {
+          background: #10b981;
+        }
+        .meku-send-btn:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+        .meku-send-btn span {
+          display: block;
+          margin-left: 0.3em;
+          transition: all 0.3s ease-in-out;
+        }
+        .meku-send-btn svg {
+          display: block;
+          transform-origin: center center;
+          transition: transform 0.3s ease-in-out;
+        }
+        .meku-send-btn:not([data-active="true"]):not(:disabled):hover .svg-wrapper {
+          animation: meku-fly-1 0.6s ease-in-out infinite alternate;
+        }
+        .meku-send-btn:not([data-active="true"]):not(:disabled):hover svg {
+          transform: translateX(1.2em) rotate(45deg) scale(1.1);
+        }
+        .meku-send-btn:not([data-active="true"]):not(:disabled):hover span {
+          transform: translateX(5em);
+        }
+        .meku-send-btn[data-active="true"][data-success="false"] .svg-wrapper {
+          animation: meku-fly-1 0.6s ease-in-out infinite alternate;
+        }
+        .meku-send-btn[data-active="true"][data-success="false"] svg {
+          transform: translateX(1.2em) rotate(45deg) scale(1.1);
+        }
+        .meku-send-btn[data-active="true"][data-success="false"] span {
+          transform: translateX(5em);
+        }
+        .meku-send-btn:active {
+          transform: scale(0.95);
+        }
+        @keyframes meku-fly-1 {
+          from { transform: translateY(0.1em); }
+          to { transform: translateY(-0.1em); }
         }
       `}</style>
     </button>

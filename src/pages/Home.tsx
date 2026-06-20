@@ -1,7 +1,7 @@
 import { AppShell } from "@/components/meku/AppShell";
 import { FeedCard } from "@/components/meku/FeedCard";
 import { EmptyState } from "@/components/meku/EmptyState";
-import { Loader2, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 import { IconBell, IconPlus } from "@/components/meku/MekuIcon";
 import { Logo } from "@/components/meku/Logo";
 import { SideMenu } from "@/components/meku/SideMenu";
@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { fetchPosts, type Post } from "@/lib/social";
 import { supabase } from "@/integrations/supabase/client";
+import { PostListSkeleton } from "@/components/meku/Skeletons";
 
 const tabs = ["For You", "Following"] as const;
 type Tab = (typeof tabs)[number];
@@ -76,7 +77,7 @@ const Home = () => {
 
       <section className="pb-6">
         {loading ? (
-          <div className="flex justify-center py-16"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
+          <PostListSkeleton count={5} />
         ) : posts.length === 0 ? (
           <EmptyState
             pose="sitting"
@@ -90,7 +91,7 @@ const Home = () => {
             }
           />
         ) : (
-          posts.map((p) => <FeedCard key={p.id} post={p} onChanged={load} />)
+          <div className="animate-fade-in">{posts.map((p) => <FeedCard key={p.id} post={p} onChanged={load} />)}</div>
         )}
       </section>
     </AppShell>

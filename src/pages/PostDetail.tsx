@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import { PostBody } from "@/components/meku/PostBody";
 import { readBookmarks, toggleBookmark } from "@/lib/bookmarks";
 import { notifyOne, notifyMentions } from "@/lib/notifications";
+import { PostCardSkeleton } from "@/components/meku/Skeletons";
 
 interface TreeNode extends CommentRow { children: TreeNode[]; }
 
@@ -158,7 +159,16 @@ const PostDetail = () => {
   };
 
   if (loading) return (
-    <AppShell hideNav><div className="flex min-h-svh items-center justify-center"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div></AppShell>
+    <AppShell hideNav>
+      <header className="sticky top-0 z-30 flex h-[56px] items-center justify-between bg-background/90 px-3 backdrop-blur-xl">
+        <button onClick={() => navigate(-1)} aria-label="Back" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full">
+          <ChevronLeft className="h-[22px] w-[22px]" strokeWidth={1.6} />
+        </button>
+        <p className="text-[14px] font-bold">Post</p>
+        <span className="w-10" />
+      </header>
+      <div className="animate-fade-in"><PostCardSkeleton /><PostCardSkeleton /></div>
+    </AppShell>
   );
   if (!post) return (
     <AppShell hideNav><div className="p-8 text-center text-muted-foreground">Post not found</div></AppShell>
@@ -169,6 +179,7 @@ const PostDetail = () => {
 
   return (
     <AppShell hideNav>
+      <div className="animate-fade-in">
       <header className="sticky top-0 z-30 flex h-[56px] items-center justify-between bg-background/90 px-3 backdrop-blur-xl">
         <button onClick={() => navigate(-1)} aria-label="Back" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full">
           <ChevronLeft className="h-[22px] w-[22px]" strokeWidth={1.6} />
@@ -242,6 +253,7 @@ const PostDetail = () => {
             {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Reply"}
           </button>
         </div>
+      </div>
       </div>
     </AppShell>
   );
