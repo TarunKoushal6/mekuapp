@@ -1,5 +1,5 @@
 import { AppShell } from "@/components/meku/AppShell";
-import { BadgeCheck, Loader2 } from "lucide-react";
+import { BadgeCheck } from "lucide-react";
 import { IconBack, IconMore, IconSettings, IconCopy, IconExternal } from "@/components/meku/MekuIcon";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect, useCallback } from "react";
@@ -15,6 +15,7 @@ import {
 } from "@/lib/social";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
+import { PostListSkeleton, ProfileHeaderSkeleton } from "@/components/meku/Skeletons";
 
 const tabs = ["Posts", "Replies", "Media", "Likes"] as const;
 type Tab = (typeof tabs)[number];
