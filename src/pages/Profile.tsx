@@ -74,8 +74,8 @@ const Profile = () => {
     } finally { setFollowBusy(false); }
   };
 
-  const isMe = user && profile && user.id === profile.id;
-  const name = profile?.display_name || profile?.username || (user?.email ?? "Profile");
+  const isMe = !!user && !!profile && user.id === profile.id;
+  const name = profile?.display_name || profile?.username || "Profile";
   const stats = { posts: posts.length, followers: counts.followers, following: counts.following };
 
   return (
@@ -126,7 +126,7 @@ const Profile = () => {
           <PostListSkeleton count={3} />
         </>
       ) : (
-        <div className="animate-fade-in">
+        <div className="meku-page-in">
           <section className="px-5 pb-5 pt-2">
             <div className="relative inline-block">
               <span className="absolute -inset-[3px] rounded-full bg-gradient-to-br from-primary via-primary to-primary-glow" />

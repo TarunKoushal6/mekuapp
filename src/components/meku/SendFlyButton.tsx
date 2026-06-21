@@ -1,6 +1,6 @@
 // Send button — Uiverse.io by adamgiebl, adapted to trigger on click
 // (flying) instead of hover, plus a success state (green pill + check).
-import { Check, Loader2 } from "lucide-react";
+import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -26,7 +26,9 @@ export const SendFlyButton = ({
   className,
   type = "button",
 }: Props) => {
-  const active = flying || success;
+  // The plane should keep flying whenever the button is working OR after
+  // the user clicked confirm — never show a generic spinner.
+  const active = flying || busy || success;
   return (
     <button
       type={type}
@@ -40,8 +42,6 @@ export const SendFlyButton = ({
         <div className="svg-wrapper">
           {success ? (
             <Check size={22} strokeWidth={2.6} />
-          ) : busy && !flying ? (
-            <Loader2 size={22} className="animate-spin" />
           ) : (
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -69,27 +69,30 @@ export const SendFlyButton = ({
           border: none;
           border-radius: 9999px;
           overflow: hidden;
-          transition: all 0.2s;
+          transition: all 0.25s cubic-bezier(.22,.61,.36,1);
           cursor: pointer;
           font-weight: 700;
+          will-change: transform;
         }
         .meku-send-btn[data-success="true"] {
           background: #10b981;
         }
         .meku-send-btn:disabled {
-          opacity: 0.5;
+          opacity: 0.6;
           cursor: not-allowed;
         }
+        .meku-send-btn[data-success="true"]:disabled { opacity: 1; }
         .meku-send-btn span {
           display: block;
           margin-left: 0.3em;
-          transition: all 0.3s ease-in-out;
+          transition: transform 0.3s cubic-bezier(.22,.61,.36,1), opacity .25s;
         }
         .meku-send-btn svg {
           display: block;
           transform-origin: center center;
-          transition: transform 0.3s ease-in-out;
+          transition: transform 0.3s cubic-bezier(.22,.61,.36,1);
         }
+        /* Hover preview */
         .meku-send-btn:not([data-active="true"]):not(:disabled):hover .svg-wrapper {
           animation: meku-fly-1 0.6s ease-in-out infinite alternate;
         }
@@ -99,6 +102,7 @@ export const SendFlyButton = ({
         .meku-send-btn:not([data-active="true"]):not(:disabled):hover span {
           transform: translateX(5em);
         }
+        /* Active state — plane flies off, label slides out */
         .meku-send-btn[data-active="true"][data-success="false"] .svg-wrapper {
           animation: meku-fly-1 0.6s ease-in-out infinite alternate;
         }
@@ -107,10 +111,9 @@ export const SendFlyButton = ({
         }
         .meku-send-btn[data-active="true"][data-success="false"] span {
           transform: translateX(5em);
+          opacity: 0;
         }
-        .meku-send-btn:active {
-          transform: scale(0.95);
-        }
+        .meku-send-btn:active { transform: scale(0.97); }
         @keyframes meku-fly-1 {
           from { transform: translateY(0.1em); }
           to { transform: translateY(-0.1em); }
