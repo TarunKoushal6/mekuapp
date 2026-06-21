@@ -45,6 +45,52 @@ Deno.serve(async (req) => {
       ...(userToken ? { userToken } : {}),
     });
 
+    // Best-effort: sync inbound Circle transactions (e.g. faucet drops) into
+    // our own `transactions` table so the Activity tab reflects them.
+    try {
+      const list = await circleFetch(
+        `/transactions?walletIds=${walletId}&order=DESC&pageSize=25`,
+        { method: "GET", ...(userToken ? { userToken } : {}) },
+      );
+      const txs: any[] = list?.data?.transactions ?? [];
+      const myAddr = (wallet?.address ?? "").toLowerCase();
+      for (const t of txs) {
+        const dest = (t?.destinationAddress ?? "").toLowerCase();
+        const src  = (t?.sourceAddress ?? "").toLowerCase();
+        // Only inbound (we are destination, not source).
+        if (!myAddr || dest !== myAddr || src === myAddr) continue;
+        const circleTxId = t?.id;
+        if (!circleTxId) continue;
+        const { data: existing } = await admin
+          .from("transactions").select("id").eq("circle_tx_id", circleTxId).maybeSingle();
+        if (existing) continue;
+        const amount = String(
+          t?.amounts?.[0] ?? t?.amount ?? "0",
+        );
+        const tokenSymbol = t?.tokenSymbol ?? t?.token?.symbol ?? "USDC";
+        const status =
+          ["COMPLETE","CONFIRMED","SUCCESS"].includes(String(t?.state ?? "").toUpperCase())
+            ? "confirmed"
+            : ["FAILED","DENIED","CANCELLED"].includes(String(t?.state ?? "").toUpperCase())
+              ? "failed"
+              : "pending";
+        await admin.from("transactions").insert({
+          user_id: user.id,
+          kind: "receive",
+          token: tokenSymbol,
+          amount: Number(amount) || 0,
+          counterparty_address: t?.sourceAddress ?? null,
+          chain: t?.blockchain ?? "ARC-TESTNET",
+          tx_hash: t?.txHash ?? null,
+          status,
+          circle_tx_id: circleTxId,
+          metadata: { source: "circle-balance-sync" },
+        });
+      }
+    } catch (e) {
+      console.warn("receive sync skipped", e);
+    }
+
     return json({ wallet, balances: res?.data?.tokenBalances ?? [] });
   } catch (e: any) {
     console.error("circle-balance", e);
