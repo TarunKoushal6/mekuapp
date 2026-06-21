@@ -1,4 +1,4 @@
-import { MessageCircle, Repeat2, Upload, BadgeCheck, Coins } from "lucide-react";
+import { MessageCircle, Repeat2, Upload, BadgeCheck, Coins, MoreHorizontal, Trash2 } from "lucide-react";
 import { Avatar } from "./Avatar";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -13,6 +13,8 @@ import { HeartLike } from "./HeartLike";
 import { BookmarkSave } from "./BookmarkSave";
 import { readBookmarks, toggleBookmark } from "@/lib/bookmarks";
 import { notifyOne } from "@/lib/notifications";
+import { supabase } from "@/integrations/supabase/client";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 interface FeedCardProps {
   post: Post;
