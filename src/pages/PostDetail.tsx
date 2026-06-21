@@ -1,5 +1,5 @@
 import { AppShell } from "@/components/meku/AppShell";
-import { ChevronLeft, MoreHorizontal, BadgeCheck, MessageCircle, Repeat2, Upload, Loader2 } from "lucide-react";
+import { ChevronLeft, MoreHorizontal, BadgeCheck, MessageCircle, Repeat2, Upload, Loader2, Coins, Trash2 } from "lucide-react";
 import { HeartLike } from "@/components/meku/HeartLike";
 import { BookmarkSave } from "@/components/meku/BookmarkSave";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -21,6 +21,9 @@ import { PostBody } from "@/components/meku/PostBody";
 import { readBookmarks, toggleBookmark } from "@/lib/bookmarks";
 import { notifyOne, notifyMentions } from "@/lib/notifications";
 import { PostCardSkeleton } from "@/components/meku/Skeletons";
+import { SendSheet } from "@/components/meku/SendSheet";
+import { supabase } from "@/integrations/supabase/client";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 interface TreeNode extends CommentRow { children: TreeNode[]; }
 
