@@ -102,31 +102,62 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
     } catch {}
   };
 
+  const isOwn = !!user && user.id === post.user_id;
+
+  const handleDelete = async (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    if (!isOwn) return;
+    if (!confirm("Delete this post? This cannot be undone.")) return;
+    const { error } = await supabase.from("posts").delete().eq("id", post.id);
+    if (error) return toast.error(error.message);
+    toast.success("Post deleted");
+    onChanged?.();
+  };
+
   return (
     <article
       onClick={() => navigate(`/p/${post.id}`)}
-      className="hairline-b fade-in cursor-pointer px-4 py-4 transition-colors hover:bg-surface/40"
+      className="hairline-b animate-fade-in cursor-pointer px-4 py-4 transition-colors duration-200 hover:bg-surface/40 active:bg-surface/60"
     >
       <header className="flex items-start gap-3">
         <Link to={`/u/${handle}`} onClick={(e) => e.stopPropagation()}>
           <Avatar name={name} src={author?.avatar_url ?? undefined} size="md" />
         </Link>
-        <div className="flex min-w-0 flex-1 items-center gap-1.5">
-          <p className="truncate text-[15px] font-semibold text-foreground">{name}</p>
-          {author?.verified && (
-            <BadgeCheck className="h-[14px] w-[14px] shrink-0 fill-primary text-background" strokeWidth={2.2} />
-          )}
-          <span className="truncate text-[14px] text-muted-foreground">@{handle}</span>
-          <span className="text-[14px] text-muted-foreground">·</span>
-          <span className="shrink-0 text-[14px] text-muted-foreground">{timeAgo(post.created_at)}</span>
+        <div className="flex min-w-0 flex-1 flex-col">
+          <div className="flex min-w-0 items-center gap-1">
+            <p className="truncate text-[15px] font-semibold text-foreground">{name}</p>
+            {author?.verified && (
+              <BadgeCheck className="h-[14px] w-[14px] shrink-0 fill-primary text-background" strokeWidth={2.2} />
+            )}
+            <span className="ml-1 shrink-0 text-[12.5px] text-muted-foreground">· {timeAgo(post.created_at)}</span>
+          </div>
+          <span className="truncate text-[12.5px] text-muted-foreground">@{handle}</span>
         </div>
         <button
           aria-label="Tip USDC"
           onClick={(e) => { e.stopPropagation(); if (!user) return navigate("/auth"); setTipOpen(true); }}
-          className="tap -mr-2 -mt-1 inline-flex h-8 w-8 items-center justify-center rounded-full text-amber-500 hover:bg-amber-500/10"
+          className="tap -mt-1 inline-flex h-8 w-8 items-center justify-center rounded-full text-amber-500 transition-colors hover:bg-amber-500/10"
         >
           <Coins size={18} strokeWidth={1.8} />
         </button>
+        {isOwn && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                aria-label="More"
+                onClick={(e) => e.stopPropagation()}
+                className="tap -mr-2 -mt-1 inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-surface-2"
+              >
+                <MoreHorizontal size={18} />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()} className="rounded-2xl">
+              <DropdownMenuItem onClick={(e) => handleDelete(e as any)} className="text-destructive focus:text-destructive">
+                <Trash2 size={16} className="mr-2" /> Delete post
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </header>
 
       <div className="ml-[52px] mt-1.5">
@@ -134,12 +165,12 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
         {post.body && (
           <PostBody
             text={post.body}
-            className={(post.title ? "mt-1 " : "") + "whitespace-pre-wrap text-[15.5px] leading-[1.4] font-medium tracking-[-0.005em] text-foreground"}
+            className={(post.title ? "mt-1 " : "") + "whitespace-pre-wrap text-[15px] leading-[1.45] tracking-[-0.003em] text-foreground/95"}
           />
         )}
         {post.image_url && (
-          <div className="mt-3 overflow-hidden rounded-[14px] border border-border bg-surface-2">
-            <img src={post.image_url} alt="" loading="lazy" className="aspect-[5/4] w-full object-cover" />
+          <div className="mt-3 overflow-hidden rounded-[16px] border border-border bg-surface-2">
+            <img src={post.image_url} alt="" loading="lazy" className="aspect-[5/4] w-full object-cover transition-transform duration-500 hover:scale-[1.02]" />
           </div>
         )}
         {(() => {
@@ -150,7 +181,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
         <div className="mt-3 flex items-center justify-between pr-1 text-muted-foreground">
           <button
             onClick={(e) => { e.stopPropagation(); navigate(`/p/${post.id}`); }}
-            className="tap inline-flex items-center gap-1.5"
+            className="tap inline-flex items-center gap-1.5 transition-colors hover:text-foreground"
             aria-label="Comment"
           >
             <MessageCircle className="h-[18px] w-[18px]" strokeWidth={1.6} />
@@ -158,7 +189,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
           </button>
           <button
             onClick={handleRepost}
-            className={cn("tap inline-flex items-center gap-1.5", reposted && "text-emerald-500")}
+            className={cn("tap inline-flex items-center gap-1.5 transition-colors", reposted ? "text-emerald-500" : "hover:text-foreground")}
             aria-label="Repost"
           >
             <Repeat2 className="h-[18px] w-[18px]" strokeWidth={1.6} />
@@ -173,7 +204,6 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
             />
             <span className={cn("text-[13px] tabular-nums", liked && "text-[#ff5b89]")}>{likeCount}</span>
           </div>
-          {/* Tip moved to header (top-right). Keep this slot empty for layout balance. */}
           <BookmarkSave
             checked={bookmarked}
             onChange={(e) => {
@@ -185,12 +215,12 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
             size={18}
             aria-label="Save"
           />
-          <button onClick={handleShare} className="tap" aria-label="Share">
+          <button onClick={handleShare} className="tap transition-colors hover:text-foreground" aria-label="Share">
             <Upload className="h-[18px] w-[18px]" strokeWidth={1.6} />
           </button>
         </div>
       </div>
-      {tipOpen && author && (
+      {tipOpen && (
         <SendSheet
           open={tipOpen}
           onOpenChange={setTipOpen}
@@ -202,3 +232,4 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
     </article>
   );
 };
+
