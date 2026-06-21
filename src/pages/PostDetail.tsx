@@ -297,6 +297,15 @@ const PostDetail = () => {
         </div>
       </div>
       </div>
+      {tipOpen && post && (
+        <SendSheet
+          open={tipOpen}
+          onOpenChange={setTipOpen}
+          defaults={{ recipientUserId: post.user_id, postId: post.id, kind: "tip", amount: "1" }}
+          recipientLabel={`@${post.author?.username ?? "anon"}`}
+          title="Tip USDC"
+        />
+      )}
     </AppShell>
   );
 };
