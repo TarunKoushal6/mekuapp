@@ -126,7 +126,7 @@ const Profile = () => {
           <PostListSkeleton count={3} />
         </>
       ) : (
-        <div className="animate-fade-in">
+        <div className="meku-page-in">
           <section className="px-5 pb-5 pt-2">
             <div className="relative inline-block">
               <span className="absolute -inset-[3px] rounded-full bg-gradient-to-br from-primary via-primary to-primary-glow" />
