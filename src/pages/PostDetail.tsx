@@ -116,6 +116,7 @@ const PostDetail = () => {
   const [loading, setLoading] = useState(true);
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
+  const [tipOpen, setTipOpen] = useState(false);
 
   const [bookmarked, setBookmarked] = useState<boolean>(() => readBookmarks(user?.id).has(id));
 
