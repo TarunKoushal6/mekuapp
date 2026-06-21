@@ -181,30 +181,67 @@ const PostDetail = () => {
   const name = post.author?.display_name || post.author?.username || "Anonymous";
   const tree = buildTree(comments);
 
+  const isOwn = !!user && user.id === post.user_id;
+
+  const handleDelete = async () => {
+    if (!isOwn) return;
+    if (!confirm("Delete this post? This cannot be undone.")) return;
+    const { error } = await supabase.from("posts").delete().eq("id", post.id);
+    if (error) return toast.error(error.message);
+    toast.success("Post deleted");
+    navigate(-1);
+  };
+
   return (
     <AppShell hideNav>
-      <div className="animate-fade-in">
+      <div className="meku-page-in">
       <header className="sticky top-0 z-30 flex h-[56px] items-center justify-between bg-background/90 px-3 backdrop-blur-xl">
         <button onClick={() => navigate(-1)} aria-label="Back" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full">
           <ChevronLeft className="h-[22px] w-[22px]" strokeWidth={1.6} />
         </button>
         <p className="text-[14px] font-bold">Post</p>
-        <button aria-label="More" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full">
-          <MoreHorizontal className="h-[20px] w-[20px]" strokeWidth={1.6} />
-        </button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button aria-label="More" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full">
+              <MoreHorizontal className="h-[20px] w-[20px]" strokeWidth={1.6} />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="rounded-2xl">
+            {isOwn ? (
+              <DropdownMenuItem onClick={handleDelete} className="text-destructive focus:text-destructive">
+                <Trash2 size={16} className="mr-2" /> Delete post
+              </DropdownMenuItem>
+            ) : (
+              <DropdownMenuItem onClick={() => { if (!user) return navigate("/auth"); setTipOpen(true); }}>
+                <Coins size={16} className="mr-2" /> Tip USDC
+              </DropdownMenuItem>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </header>
 
       <article className="px-4 py-4">
-        <Link to={`/u/${post.author?.username ?? ""}`} className="flex items-center gap-3">
-          <Avatar name={name} src={post.author?.avatar_url ?? undefined} size="md" />
-          <div>
-            <div className="flex items-center gap-1.5">
-              <p className="text-[15px] font-semibold text-foreground">{name}</p>
-              {post.author?.verified && <BadgeCheck className="h-[14px] w-[14px] fill-primary text-background" strokeWidth={2.2} />}
+        <div className="flex items-start justify-between gap-3">
+          <Link to={`/u/${post.author?.username ?? ""}`} className="flex items-center gap-3">
+            <Avatar name={name} src={post.author?.avatar_url ?? undefined} size="md" />
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5">
+                <p className="truncate text-[15px] font-semibold text-foreground">{name}</p>
+                {post.author?.verified && <BadgeCheck className="h-[14px] w-[14px] fill-primary text-background" strokeWidth={2.2} />}
+              </div>
+              <p className="truncate text-[12.5px] text-muted-foreground">@{post.author?.username ?? "anon"}</p>
             </div>
-            <p className="text-[13px] text-muted-foreground">@{post.author?.username ?? "anon"}</p>
-          </div>
-        </Link>
+          </Link>
+          {!isOwn && (
+            <button
+              aria-label="Tip"
+              onClick={() => { if (!user) return navigate("/auth"); setTipOpen(true); }}
+              className="tap inline-flex h-9 items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 text-[12.5px] font-semibold text-amber-500 hover:bg-amber-500/15"
+            >
+              <Coins size={14} /> Tip
+            </button>
+          )}
+        </div>
 
         {post.title && <h1 className="mt-4 text-[20px] font-bold leading-tight tracking-[-0.01em] text-foreground">{post.title}</h1>}
         <PostBody text={post.body} className="mt-2 whitespace-pre-wrap break-words text-[16px] leading-[1.55] text-foreground/90" />
@@ -234,6 +271,7 @@ const PostDetail = () => {
           <button className="tap"><Upload className="h-[20px] w-[20px]" strokeWidth={1.6} /></button>
         </div>
       </article>
+
 
       <section className="px-4 pb-[120px]">
         <h2 className="mb-1 text-[13px] font-bold uppercase tracking-wider text-muted-foreground">Comments</h2>
