@@ -74,8 +74,8 @@ const Profile = () => {
     } finally { setFollowBusy(false); }
   };
 
-  const isMe = user && profile && user.id === profile.id;
-  const name = profile?.display_name || profile?.username || (user?.email ?? "Profile");
+  const isMe = !!user && !!profile && user.id === profile.id;
+  const name = profile?.display_name || profile?.username || "Profile";
   const stats = { posts: posts.length, followers: counts.followers, following: counts.following };
 
   return (
