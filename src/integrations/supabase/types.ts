@@ -416,7 +416,25 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      create_notification_if_needed: {
+        Args: {
+          _actor_id: string
+          _comment_id?: string
+          _kind: string
+          _post_id?: string
+          _user_id: string
+        }
+        Returns: undefined
+      }
+      notify_mentions_in_text: {
+        Args: {
+          _actor_id: string
+          _comment_id?: string
+          _post_id?: string
+          _text: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
