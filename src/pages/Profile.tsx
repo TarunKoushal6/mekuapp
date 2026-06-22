@@ -23,7 +23,7 @@ type Tab = (typeof tabs)[number];
 const Profile = () => {
   const navigate = useNavigate();
   const { handle } = useParams();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [tab, setTab] = useState<Tab>("Posts");
   const [profile, setProfile] = useState<ProfileT | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
@@ -33,6 +33,7 @@ const Profile = () => {
   const [followBusy, setFollowBusy] = useState(false);
 
   const load = useCallback(async () => {
+    if (authLoading) return;
     setLoading(true);
     try {
       let p: ProfileT | null = null;
@@ -59,7 +60,7 @@ const Profile = () => {
         setFollowing(follows);
       }
     } finally { setLoading(false); }
-  }, [handle, user]);
+  }, [authLoading, handle, user]);
 
   useEffect(() => { load(); }, [load]);
 
