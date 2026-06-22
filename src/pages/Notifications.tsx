@@ -41,7 +41,9 @@ const Notifications = () => {
     const rows = await fetchNotifications(user.id);
     setItems(rows);
     setLoading(false);
-    markAllRead(user.id).catch(() => {});
+    markAllRead(user.id)
+      .then(() => setItems((current) => current.map((n) => n.read_at ? n : { ...n, read_at: new Date().toISOString() })))
+      .catch(() => {});
   };
 
   useEffect(() => { load(); }, [user?.id]);
