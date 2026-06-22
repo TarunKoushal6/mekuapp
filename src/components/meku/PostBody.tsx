@@ -8,7 +8,7 @@ export const PostBody = ({ text, className }: { text: string; className?: string
   return (
     <p className={className}>
       {parts.map((part, i) => {
-        if (MENTION_RE.test(part)) {
+        if (/^@[A-Za-z0-9_]{1,32}$/.test(part)) {
           const handle = part.slice(1).toLowerCase();
           return (
             <Link
