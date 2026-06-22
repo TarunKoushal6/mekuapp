@@ -74,6 +74,21 @@ export const SendFlyButton = ({
           font-weight: 700;
           will-change: transform;
         }
+        .meku-send-btn .svg-wrapper-1 {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 1.35em;
+          height: 1.35em;
+          flex: 0 0 1.35em;
+        }
+        .meku-send-btn .svg-wrapper {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+          height: 100%;
+        }
         .meku-send-btn[data-success="true"] {
           background: #10b981;
         }
@@ -89,6 +104,7 @@ export const SendFlyButton = ({
         }
         .meku-send-btn svg {
           display: block;
+          margin: auto;
           transform-origin: center center;
           transition: transform 0.3s cubic-bezier(.22,.61,.36,1);
         }

@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
+import { useUnreadNotifications } from "@/hooks/useNotifications";
 import { fetchPosts, type Post } from "@/lib/social";
 import { supabase } from "@/integrations/supabase/client";
 import { PostListSkeleton } from "@/components/meku/Skeletons";
@@ -22,6 +23,7 @@ const Home = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
+  const { hasUnread } = useUnreadNotifications();
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -53,7 +55,7 @@ const Home = () => {
         </div>
         <Link to="/notifications" aria-label="Notifications" className="tap relative inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground">
           <IconBell size={20} />
-          <span className="absolute right-2 top-2 h-[7px] w-[7px] rounded-full bg-primary" />
+          {hasUnread && <span className="absolute right-2 top-2 h-[7px] w-[7px] rounded-full bg-primary" />}
         </Link>
       </header>
 

@@ -1,8 +1,8 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import type { NotificationRow } from "@/lib/notifications";
+import { unreadCount, type NotificationRow } from "@/lib/notifications";
 
 const KIND_TEXT: Record<string, (actor: string) => string> = {
   like: (a) => `${a} liked your post`,
@@ -60,4 +60,32 @@ export const NotificationsListener = () => {
   }, [user?.id]);
 
   return null;
+};
+
+export const useUnreadNotifications = () => {
+  const { user } = useAuth();
+  const [count, setCount] = useState(0);
+
+  const refresh = useCallback(async () => {
+    if (!user) { setCount(0); return; }
+    setCount(await unreadCount(user.id));
+  }, [user?.id]);
+
+  useEffect(() => { refresh(); }, [refresh]);
+
+  useEffect(() => {
+    if (!user) return;
+    const channel = supabase
+      .channel(`notif-count:${user.id}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
+        () => refresh(),
+      )
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [refresh, user?.id]);
+
+  return { count, hasUnread: count > 0, refresh };
 };
