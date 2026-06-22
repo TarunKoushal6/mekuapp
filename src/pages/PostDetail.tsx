@@ -19,7 +19,6 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { PostBody } from "@/components/meku/PostBody";
 import { readBookmarks, toggleBookmark } from "@/lib/bookmarks";
-import { notifyOne, notifyMentions } from "@/lib/notifications";
 import { PostCardSkeleton } from "@/components/meku/Skeletons";
 import { SendSheet } from "@/components/meku/SendSheet";
 import { supabase } from "@/integrations/supabase/client";
@@ -52,9 +51,6 @@ const CommentNode = ({ node, postId, onReplied, depth = 0 }: { node: TreeNode; p
     setBusy(true);
     try {
       await createComment(postId, user.id, text, node.id);
-      // notify the parent comment author + post author + any @mentions
-      notifyOne({ userId: node.user_id, actorId: user.id, kind: "comment", postId });
-      notifyMentions({ actorId: user.id, text, postId });
       setDraft("");
       setShowReply(false);
       onReplied();
@@ -140,7 +136,6 @@ const PostDetail = () => {
     setPost({ ...post, liked_by_me: !wasLiked, like_count: post.like_count + (wasLiked ? -1 : 1) });
     try {
       await toggleLike(post.id, user.id, wasLiked);
-      if (!wasLiked) notifyOne({ userId: post.user_id, actorId: user.id, kind: "like", postId: post.id });
     } catch (e: any) {
       setPost({ ...post });
       toast.error(e.message);
@@ -154,8 +149,6 @@ const PostDetail = () => {
     setSending(true);
     try {
       await createComment(id, user.id, text);
-      if (post) notifyOne({ userId: post.user_id, actorId: user.id, kind: "comment", postId: id });
-      notifyMentions({ actorId: user.id, text, postId: id });
       setDraft("");
       load();
     } catch (e: any) { toast.error(e.message); }

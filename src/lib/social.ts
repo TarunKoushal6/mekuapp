@@ -111,8 +111,14 @@ export async function isFollowing(viewerId: string, targetId: string) {
 }
 
 export async function followUser(viewerId: string, targetId: string) {
-  const { error } = await supabase.from("follows").insert({ follower_id: viewerId, followee_id: targetId });
-  if (error && !String(error.message).toLowerCase().includes("duplicate")) throw error;
+  if (!viewerId || !targetId || viewerId === targetId) return;
+  const { error } = await supabase
+    .from("follows")
+    .upsert(
+      { follower_id: viewerId, followee_id: targetId },
+      { onConflict: "follower_id,followee_id", ignoreDuplicates: true },
+    );
+  if (error) throw error;
 }
 
 export async function unfollowUser(viewerId: string, targetId: string) {
