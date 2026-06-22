@@ -37,7 +37,12 @@ const Profile = () => {
     try {
       let p: ProfileT | null = null;
       if (handle) {
-        const { data } = await supabase.from("profiles").select("*").eq("username", handle).maybeSingle();
+        const { data } = await supabase
+          .from("profiles")
+          .select("*")
+          .ilike("username", handle)
+          .limit(1)
+          .maybeSingle();
         p = (data as ProfileT) ?? null;
       } else if (user) {
         p = await getProfile(user.id);
@@ -60,6 +65,7 @@ const Profile = () => {
 
   const toggleFollow = async () => {
     if (!user || !profile || followBusy) { if (!user) navigate("/auth"); return; }
+    if (user.id === profile.id) return;
     setFollowBusy(true);
     const next = !following;
     setFollowing(next);
@@ -160,7 +166,7 @@ const Profile = () => {
               ) : (
                 <button
                   onClick={toggleFollow}
-                  disabled={followBusy}
+                  disabled={followBusy || !profile}
                   className={cn(
                     "tap flex-1 rounded-full py-[11px] text-[14px] font-bold disabled:opacity-60",
                     following
