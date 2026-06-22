@@ -12,7 +12,6 @@ import { PostBody } from "./PostBody";
 import { HeartLike } from "./HeartLike";
 import { BookmarkSave } from "./BookmarkSave";
 import { readBookmarks, toggleBookmark } from "@/lib/bookmarks";
-import { notifyOne } from "@/lib/notifications";
 import { supabase } from "@/integrations/supabase/client";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
@@ -62,7 +61,6 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
     setRepostCount((c) => c + (next ? 1 : -1));
     try {
       await toggleRepost(user.id, post.id, reposted);
-      if (next) notifyOne({ userId: post.user_id, actorId: user.id, kind: "repost", postId: post.id });
     } catch (err: any) {
       setReposted(!next);
       setRepostCount((c) => c + (next ? -1 : 1));
@@ -81,7 +79,6 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
     setLikeCount((c) => c + (next ? 1 : -1));
     try {
       await toggleLike(post.id, user.id, liked);
-      if (next) notifyOne({ userId: post.user_id, actorId: user.id, kind: "like", postId: post.id });
       // Intentionally do NOT call onChanged — optimistic state suffices.
     } catch (err: any) {
       setLiked(!next);
