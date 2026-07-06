@@ -96,9 +96,10 @@ Deno.serve(async (req) => {
     const circleTxId = tx?.data?.id ?? null;
     const { data: txRow } = await admin.from("transactions").insert({
       user_id: userId,
-      kind: body.kind ?? "send",
+      kind,
       token: "USDC",
       amount: body.amount,
+
       counterparty_user_id: body.recipientUserId ?? null,
       counterparty_address: dest,
       post_id: body.postId ?? null,
