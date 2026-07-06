@@ -134,14 +134,52 @@
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  /* iOS-style page push: slide + fade, very short and smooth */
-  .meku-page-in { animation: meku-page-in 320ms cubic-bezier(.22,.61,.36,1) both; transform-origin: center top; }
+  /* iOS-style page push: spring-eased slide + fade */
+  .meku-page-in {
+    animation: meku-page-in 380ms cubic-bezier(.22,1,.36,1) both;
+    transform-origin: center top;
+    will-change: transform, opacity;
+  }
   @keyframes meku-page-in {
-    from { opacity: 0; transform: translateY(8px) scale(0.985); }
+    from { opacity: 0; transform: translateY(10px) scale(0.985); }
     to   { opacity: 1; transform: translateY(0)    scale(1); }
   }
+
+  /* Spring press for interactive elements */
+  .spring-press {
+    transition: transform 260ms cubic-bezier(.22,1,.36,1), opacity 200ms var(--ease);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .spring-press:active { transform: scale(0.94); }
+
+  /* Floating glass surface used by nav / sticky headers */
+  .glass-floating {
+    background: hsl(var(--background) / 0.72);
+    backdrop-filter: saturate(180%) blur(24px);
+    -webkit-backdrop-filter: saturate(180%) blur(24px);
+    border: 1px solid hsl(var(--border) / 0.6);
+  }
+
+  /* Skeleton shimmer — replaces spinners */
+  .shimmer {
+    position: relative;
+    overflow: hidden;
+    background: hsl(var(--muted));
+  }
+  .shimmer::after {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent, hsl(var(--foreground) / 0.06), transparent);
+    transform: translateX(-100%);
+    animation: shimmer 1.4s cubic-bezier(.4,0,.2,1) infinite;
+  }
+  @keyframes shimmer {
+    100% { transform: translateX(100%); }
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    .meku-page-in { animation: none; }
+    .meku-page-in, .shimmer::after { animation: none; }
+    .spring-press { transition: none; }
   }
 
   .gradient-purple { background: var(--gradient-purple); }
