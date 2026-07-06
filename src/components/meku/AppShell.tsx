@@ -9,9 +9,9 @@ interface AppShellProps {
 
 export const AppShell = ({ children, hideNav }: AppShellProps) => {
   return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto flex min-h-screen w-full max-w-[440px] flex-col">
-        <main className={hideNav ? "flex-1" : "flex-1 pb-[88px]"}>{children}</main>
+    <div className="min-h-screen overflow-x-hidden bg-background">
+      <div className="mx-auto flex min-h-screen w-full max-w-[440px] flex-col overflow-x-hidden">
+        <main className={hideNav ? "flex-1 min-w-0" : "flex-1 min-w-0 pb-[88px]"}>{children}</main>
       </div>
       {!hideNav && <BottomNav />}
     </div>
