@@ -7,6 +7,7 @@ export interface Profile {
   bio: string | null;
   avatar_url: string | null;
   verified: boolean;
+  verification_kind?: "none" | "verified" | "premium" | null;
 }
 
 export interface Post {
