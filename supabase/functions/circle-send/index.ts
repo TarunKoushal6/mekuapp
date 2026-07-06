@@ -32,7 +32,16 @@ Deno.serve(async (req) => {
     const userId = user.id;
 
     const body = (await req.json()) as Body;
-    if (!body?.amount) return json({ error: "amount required" }, 400);
+    const amountNum = Number(body?.amount);
+    if (!body?.amount || !Number.isFinite(amountNum) || amountNum <= 0) {
+      return json({ error: "amount must be a positive number" }, 400);
+    }
+    const ALLOWED_KINDS = ["send", "tip", "request"] as const;
+    const kind: (typeof ALLOWED_KINDS)[number] =
+      (ALLOWED_KINDS as readonly string[]).includes(body.kind ?? "")
+        ? (body.kind as (typeof ALLOWED_KINDS)[number])
+        : "send";
+
 
     const admin = createClient(
       Deno.env.get("SUPABASE_URL")!,
@@ -87,9 +96,10 @@ Deno.serve(async (req) => {
     const circleTxId = tx?.data?.id ?? null;
     const { data: txRow } = await admin.from("transactions").insert({
       user_id: userId,
-      kind: body.kind ?? "send",
+      kind,
       token: "USDC",
       amount: body.amount,
+
       counterparty_user_id: body.recipientUserId ?? null,
       counterparty_address: dest,
       post_id: body.postId ?? null,
