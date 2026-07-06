@@ -16,21 +16,21 @@ export async function hashPin(pin: string): Promise<string> {
 
 export async function getPinHash(userId: string): Promise<string | null> {
   const { data } = await supabase
-    .from("profiles")
+    .from("wallet_pins")
     .select("pin_hash")
-    .eq("id", userId)
+    .eq("user_id", userId)
     .maybeSingle();
   return (data as any)?.pin_hash ?? null;
 }
 
 export async function setPin(userId: string, pin: string): Promise<void> {
   const hash = await hashPin(pin);
-  // Upsert so first-time users without a profile row still get their PIN saved.
   const { error } = await supabase
-    .from("profiles")
-    .upsert({ id: userId, pin_hash: hash }, { onConflict: "id" });
+    .from("wallet_pins")
+    .upsert({ user_id: userId, pin_hash: hash }, { onConflict: "user_id" });
   if (error) throw error;
 }
+
 
 export async function verifyPin(userId: string, pin: string): Promise<boolean> {
   const stored = await getPinHash(userId);
@@ -109,8 +109,9 @@ export async function verifyRecovery(
 
 export async function clearPin(userId: string): Promise<void> {
   const { error } = await supabase
-    .from("profiles")
-    .update({ pin_hash: null })
-    .eq("id", userId);
+    .from("wallet_pins")
+    .delete()
+    .eq("user_id", userId);
   if (error) throw error;
 }
+
