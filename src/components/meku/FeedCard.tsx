@@ -118,25 +118,57 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
       className="hairline-b animate-fade-in cursor-pointer px-4 py-4 transition-colors duration-200 hover:bg-surface/40 active:bg-surface/60"
     >
       <header className="flex items-start gap-3">
-        <Link to={`/u/${handle}`} onClick={(e) => e.stopPropagation()}>
+        <Link to={`/u/${handle}`} onClick={(e) => e.stopPropagation()} className="shrink-0">
           <Avatar name={name} src={author?.avatar_url ?? undefined} size="md" />
         </Link>
-        <div className="flex min-w-0 flex-1 flex-col">
+        <div className="flex min-w-0 flex-1 flex-col leading-tight">
           <div className="flex min-w-0 items-center gap-1">
-            <p className="truncate text-[15px] font-semibold text-foreground">{name}</p>
-            <VerificationBadge kind={(author?.verification_kind ?? (author?.verified ? "verified" : "none")) as any} size={14} className="shrink-0" />
-            <span className="ml-1 shrink-0 text-[12.5px] text-muted-foreground">· {timeAgo(post.created_at)}</span>
+            <Link
+              to={`/u/${handle}`}
+              onClick={(e) => e.stopPropagation()}
+              className="truncate text-[15px] font-bold tracking-[-0.01em] text-foreground hover:underline"
+            >
+              {name}
+            </Link>
+            <VerificationBadge
+              kind={(author?.verification_kind ?? (author?.verified ? "verified" : "none")) as any}
+              size={15}
+              className="shrink-0"
+            />
           </div>
-          <span className="truncate text-[12.5px] text-muted-foreground">@{handle}</span>
+          <span className="truncate text-[13px] text-muted-foreground">@{handle}</span>
         </div>
-        <button
-          aria-label="Tip USDC"
-          onClick={(e) => { e.stopPropagation(); if (!user) return navigate("/auth"); setTipOpen(true); }}
-          className="tap -mt-1 inline-flex h-8 w-8 items-center justify-center rounded-full text-amber-500 transition-colors hover:bg-amber-500/10"
-        >
-          <Coins size={18} strokeWidth={1.8} />
-        </button>
-        {isOwn && (
+        <div className="ml-2 flex shrink-0 items-start gap-1">
+          <span className="mt-[2px] whitespace-nowrap text-[12.5px] text-muted-foreground tabular-nums">
+            {timeAgo(post.created_at)}
+          </span>
+          <button
+            aria-label="Tip USDC"
+            onClick={(e) => { e.stopPropagation(); if (!user) return navigate("/auth"); setTipOpen(true); }}
+            className="tap -mt-1 inline-flex h-8 w-8 items-center justify-center rounded-full text-amber-500 transition-colors hover:bg-amber-500/10"
+          >
+            <Coins size={16} strokeWidth={1.8} />
+          </button>
+          {isOwn && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  aria-label="More"
+                  onClick={(e) => e.stopPropagation()}
+                  className="tap -mt-1 inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-surface-2"
+                >
+                  <MoreHorizontal size={18} />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()} className="rounded-2xl">
+                <DropdownMenuItem onClick={(e) => handleDelete(e as any)} className="text-destructive focus:text-destructive">
+                  <Trash2 size={16} className="mr-2" /> Delete post
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
+      </header>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
