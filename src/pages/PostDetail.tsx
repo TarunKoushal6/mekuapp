@@ -1,5 +1,6 @@
 import { AppShell } from "@/components/meku/AppShell";
-import { ChevronLeft, MoreHorizontal, BadgeCheck, MessageCircle, Repeat2, Upload, Loader2, Coins, Trash2 } from "lucide-react";
+import { ChevronLeft, MoreHorizontal, MessageCircle, Repeat2, Upload, Loader2, Coins, Trash2 } from "lucide-react";
+import { VerificationBadge } from "@/components/meku/VerificationBadge";
 import { HeartLike } from "@/components/meku/HeartLike";
 import { BookmarkSave } from "@/components/meku/BookmarkSave";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -220,7 +221,7 @@ const PostDetail = () => {
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
                 <p className="truncate text-[15px] font-semibold text-foreground">{name}</p>
-                {post.author?.verified && <BadgeCheck className="h-[14px] w-[14px] fill-primary text-background" strokeWidth={2.2} />}
+                <VerificationBadge kind={(post.author?.verification_kind ?? (post.author?.verified ? "verified" : "none")) as any} size={14} />
               </div>
               <p className="truncate text-[12.5px] text-muted-foreground">@{post.author?.username ?? "anon"}</p>
             </div>

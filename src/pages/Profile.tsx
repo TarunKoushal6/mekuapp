@@ -1,5 +1,5 @@
 import { AppShell } from "@/components/meku/AppShell";
-import { BadgeCheck } from "lucide-react";
+import { VerificationBadge } from "@/components/meku/VerificationBadge";
 import { IconBack, IconMore, IconSettings, IconCopy, IconExternal } from "@/components/meku/MekuIcon";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect, useCallback } from "react";
@@ -142,7 +142,7 @@ const Profile = () => {
 
             <div className="mt-5 flex items-center gap-2">
               <h1 className="text-[26px] font-bold tracking-[-0.02em] text-foreground">{name}</h1>
-              {profile?.verified && <BadgeCheck className="h-[18px] w-[18px] fill-primary text-background" strokeWidth={2.2} />}
+              <VerificationBadge kind={(profile?.verification_kind ?? (profile?.verified ? "verified" : "none")) as any} size={20} />
             </div>
             <p className="mt-1 text-[14px] text-muted-foreground">@{profile?.username ?? "—"}</p>
 

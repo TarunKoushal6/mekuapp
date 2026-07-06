@@ -1,4 +1,5 @@
-import { MessageCircle, Repeat2, Upload, BadgeCheck, Coins, MoreHorizontal, Trash2 } from "lucide-react";
+import { MessageCircle, Repeat2, Upload, Coins, MoreHorizontal, Trash2 } from "lucide-react";
+import { VerificationBadge } from "./VerificationBadge";
 import { Avatar } from "./Avatar";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -123,9 +124,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
         <div className="flex min-w-0 flex-1 flex-col">
           <div className="flex min-w-0 items-center gap-1">
             <p className="truncate text-[15px] font-semibold text-foreground">{name}</p>
-            {author?.verified && (
-              <BadgeCheck className="h-[14px] w-[14px] shrink-0 fill-primary text-background" strokeWidth={2.2} />
-            )}
+            <VerificationBadge kind={(author?.verification_kind ?? (author?.verified ? "verified" : "none")) as any} size={14} className="shrink-0" />
             <span className="ml-1 shrink-0 text-[12.5px] text-muted-foreground">· {timeAgo(post.created_at)}</span>
           </div>
           <span className="truncate text-[12.5px] text-muted-foreground">@{handle}</span>
