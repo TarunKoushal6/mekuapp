@@ -91,11 +91,10 @@
   }
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Satoshi', ui-sans-serif, system-ui, -apple-system, 'SF Pro Text', 'Segoe UI', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    letter-spacing: -0.01em;
-    /* Apple-style momentum scrolling */
+    letter-spacing: -0.011em;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: contain;
   }
