@@ -188,9 +188,9 @@ const Onchain = () => {
                 onChange={(e) => setPayAmount(e.target.value.replace(/[^0-9.]/g, ""))}
                 placeholder="0"
                 inputMode="decimal"
-                className="mt-1 w-full bg-transparent text-[34px] font-bold tracking-[-0.02em] text-foreground outline-none"
+                className="mt-1 w-full min-w-0 bg-transparent text-[28px] font-bold tracking-[-0.02em] text-foreground outline-none sm:text-[34px]"
               />
-              <p className="text-[12px] text-muted-foreground">Balance {usdc} {tokenIn.symbol}</p>
+              <p className="truncate text-[12px] text-muted-foreground">Balance {usdc} {tokenIn.symbol}</p>
             </div>
             <TokenChip token={tokenIn} onClick={() => setPickerFor("in")} />
           </div>
