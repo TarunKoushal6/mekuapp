@@ -1,5 +1,5 @@
 import { AppShell } from "@/components/meku/AppShell";
-import { BadgeCheck } from "lucide-react";
+import { VerificationBadge } from "@/components/meku/VerificationBadge";
 import { IconBack, IconMore, IconSettings, IconCopy, IconExternal } from "@/components/meku/MekuIcon";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect, useCallback } from "react";

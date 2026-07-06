@@ -1,4 +1,5 @@
-import { MessageCircle, Repeat2, Upload, BadgeCheck, Coins, MoreHorizontal, Trash2 } from "lucide-react";
+import { MessageCircle, Repeat2, Upload, Coins, MoreHorizontal, Trash2 } from "lucide-react";
+import { VerificationBadge } from "./VerificationBadge";
 import { Avatar } from "./Avatar";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
