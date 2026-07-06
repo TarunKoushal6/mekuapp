@@ -1,5 +1,5 @@
 import { AppShell } from "@/components/meku/AppShell";
-import { IconBridge, IconLogout, IconPalette, IconProfile, IconShield, IconWallet } from "@/components/meku/MekuIcon";
+import { IconBridge, IconLogout, IconProfile, IconShield, IconWallet } from "@/components/meku/MekuIcon";
 import { Bell, ChevronLeft, ChevronRight, HelpCircle } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -51,7 +51,6 @@ const Settings = () => {
 
         <p className="px-4 pt-5 text-[12px] font-bold uppercase tracking-wider text-muted-foreground">Preferences</p>
         <Row icon={Bell} label="Notifications" to="/notifications" />
-        <Row icon={IconPalette} label="Appearance" to="/settings/appearance" />
         <Row icon={IconShield} label="Privacy & security" to="/settings/privacy" />
 
         <p className="px-4 pt-5 text-[12px] font-bold uppercase tracking-wider text-muted-foreground">Onchain</p>
