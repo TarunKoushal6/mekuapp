@@ -1,13 +1,32 @@
 // Public webhook receiver for Circle notifications.
-// Marks transactions.status = "confirmed" / "failed" when Circle reports
-// terminal state for a previously created transfer.
-//
-// Register the public URL of this function in Circle's notification settings.
+// Verifies the request originates from Circle before applying any state change:
+//   1. If CIRCLE_WEBHOOK_SECRET is configured, require it in X-Webhook-Secret
+//      (shared-secret model — set the same value in Circle's webhook config).
+//   2. As defense-in-depth, always re-fetch the transaction from Circle's API
+//      and derive status from the authoritative response, ignoring the
+//      client-supplied state.
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { circleStateToStatus, getCircleTransaction } from "../_shared/circle.ts";
+
+function safeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let mismatch = 0;
+  for (let i = 0; i < a.length; i++) mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return mismatch === 0;
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  // Shared-secret gate (optional but recommended).
+  const configuredSecret = Deno.env.get("CIRCLE_WEBHOOK_SECRET");
+  if (configuredSecret) {
+    const provided = req.headers.get("X-Webhook-Secret") ?? "";
+    if (!safeEqual(provided, configuredSecret)) {
+      return new Response("unauthorized", { status: 401 });
+    }
+  }
 
   let payload: any = null;
   try {
@@ -16,38 +35,42 @@ Deno.serve(async (req) => {
     return new Response("bad json", { status: 400 });
   }
 
-  // Circle sends a {notificationType, notification: {...}} envelope. Also
-  // accept a flat shape for testing.
   const n = payload?.notification ?? payload ?? {};
   const circleTxId: string | undefined =
     n?.id ?? n?.transactionId ?? n?.transaction?.id ?? payload?.id;
-  const state: string | undefined = (
-    n?.state ?? n?.status ?? n?.transaction?.state ?? payload?.state ?? ""
-  ).toString().toUpperCase();
-  const txHash: string | undefined =
-    n?.txHash ?? n?.transaction?.txHash ?? null;
 
-  if (!circleTxId) {
+  if (!circleTxId || typeof circleTxId !== "string") {
     return new Response(JSON.stringify({ ok: true, ignored: "no tx id" }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 
-  const TERMINAL_OK = new Set(["COMPLETE", "CONFIRMED", "SUCCESS"]);
-  const TERMINAL_FAIL = new Set(["FAILED", "DENIED", "CANCELLED"]);
-  let status: string | null = null;
-  if (TERMINAL_OK.has(state)) status = "confirmed";
-  else if (TERMINAL_FAIL.has(state)) status = "failed";
+  // Authoritative state: re-fetch from Circle rather than trusting the payload.
+  let authoritative: any = null;
+  try {
+    authoritative = await getCircleTransaction(circleTxId);
+  } catch (e) {
+    console.error("circle-webhook: verify fetch failed", e);
+    return new Response("upstream verification failed", { status: 502 });
+  }
+  if (!authoritative) {
+    return new Response(JSON.stringify({ ok: true, ignored: "unknown tx" }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  const status = circleStateToStatus(authoritative?.state ?? authoritative?.status);
+  const txHash: string | null = authoritative?.txHash ?? null;
 
   const admin = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
   );
 
-  if (status) {
+  if (status && status !== "pending") {
     await admin
       .from("transactions")
-      .update({ status })
+      .update({ status, tx_hash: txHash, metadata: { circle: authoritative } })
       .eq("circle_tx_id", circleTxId);
   }
 
