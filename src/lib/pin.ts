@@ -109,8 +109,9 @@ export async function verifyRecovery(
 
 export async function clearPin(userId: string): Promise<void> {
   const { error } = await supabase
-    .from("profiles")
-    .update({ pin_hash: null })
-    .eq("id", userId);
+    .from("wallet_pins")
+    .delete()
+    .eq("user_id", userId);
   if (error) throw error;
 }
+
