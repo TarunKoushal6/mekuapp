@@ -169,24 +169,6 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
           )}
         </div>
       </header>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                aria-label="More"
-                onClick={(e) => e.stopPropagation()}
-                className="tap -mr-2 -mt-1 inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-surface-2"
-              >
-                <MoreHorizontal size={18} />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()} className="rounded-2xl">
-              <DropdownMenuItem onClick={(e) => handleDelete(e as any)} className="text-destructive focus:text-destructive">
-                <Trash2 size={16} className="mr-2" /> Delete post
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
-      </header>
 
       <div className="ml-[52px] mt-1.5">
         {post.title && <h2 className="text-[17px] font-bold leading-[1.3] tracking-[-0.01em] text-foreground">{post.title}</h2>}
