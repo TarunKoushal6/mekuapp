@@ -217,7 +217,7 @@ const Onchain = () => {
                   {tab === "Bridge" ? (
                     <div className="mt-2">
                       <Select value={destinationChain} onValueChange={(v) => setDestinationChain(v as ChainId)}>
-                        <SelectTrigger className="h-12 w-full rounded-2xl border-border bg-background text-[15px] font-semibold">
+                        <SelectTrigger className="h-12 w-full min-w-0 rounded-2xl border-border bg-background text-[15px] font-semibold">
                           <SelectValue placeholder="Select chain" />
                         </SelectTrigger>
                         <SelectContent>
@@ -233,7 +233,7 @@ const Onchain = () => {
                     </div>
                   ) : (
                     <>
-                      <p className="mt-1 text-[28px] font-bold tracking-[-0.02em] text-foreground">{payAmount || "0"}</p>
+                      <p className="mt-1 truncate text-[24px] font-bold tracking-[-0.02em] text-foreground sm:text-[28px]">{payAmount || "0"}</p>
                       <p className="text-[12px] text-muted-foreground">Estimated</p>
                     </>
                   )}
