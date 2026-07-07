@@ -1,9 +1,5 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { AppKit } from "npm:@circle-fin/app-kit";
-import { createCircleWalletsAdapter } from "npm:@circle-fin/adapter-circle-wallets";
-
-const kit = new AppKit();
 
 const SUPPORTED_CHAINS = new Set(["Arc_Testnet"]);
 const SUPPORTED_TOKENS = new Set(["USDC", "EURC"]);
@@ -47,6 +43,14 @@ Deno.serve(async (req) => {
       return json({ error: "slippageBps must be between 10 and 500" }, 400);
     }
 
+    const SWAP_URL = Deno.env.get("SWAP_SERVICE_URL");
+    const SWAP_SECRET = Deno.env.get("SWAP_SHARED_SECRET");
+    if (!SWAP_URL || !SWAP_SECRET) {
+      return json({
+        error: "Swap service not configured. Deploy the MEKU swap service and set SWAP_SERVICE_URL + SWAP_SHARED_SECRET.",
+      }, 501);
+    }
+
     const admin = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
@@ -55,32 +59,21 @@ Deno.serve(async (req) => {
     const address = wallet?.dcw_address ?? wallet?.address;
     if (!address) return json({ error: "Wallet not provisioned" }, 400);
 
-    const apiKey = Deno.env.get("CIRCLE_API_KEY");
-    const entitySecret = Deno.env.get("CIRCLE_ENTITY_SECRET");
-    const kitKey = Deno.env.get("KIT_KEY");
-    if (!apiKey || !entitySecret || !kitKey) return json({ error: "Swap credentials are not configured" }, 500);
+    const upstream = await fetch(`${SWAP_URL.replace(/\/$/, "")}/swap`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Shared-Secret": SWAP_SECRET },
+      body: JSON.stringify({ userId, address, chain, tokenIn, tokenOut, amountIn, estimateOnly, slippageBps }),
+    });
+    const data = await upstream.json().catch(() => ({}));
+    if (!upstream.ok) return json({ error: data?.error ?? `Swap service ${upstream.status}` }, upstream.status);
 
-    const adapter = createCircleWalletsAdapter({ apiKey, entitySecret });
-    const swapParams = {
-      from: { adapter, chain, address },
-      tokenIn,
-      tokenOut,
-      amountIn,
-      config: { kitKey, slippageBps, allowanceStrategy: "approve" },
-    } as any;
-
-    const result = estimateOnly
-      ? await kit.estimateSwap(swapParams)
-      : await kit.swap(swapParams);
-    const data = estimateOnly ? { estimate: result } : { result };
-
-    if (!estimateOnly && result) {
+    if (!estimateOnly && data?.result) {
       try {
         await admin.from("transactions").insert({
           user_id: userId, kind: "swap", token: tokenIn,
           amount: Number(amountIn), chain,
-          tx_hash: (result as any)?.txHash ?? null,
-          status: "confirmed", metadata: { result },
+          tx_hash: data.result?.txHash ?? null,
+          status: "confirmed", metadata: { result: data.result },
         });
       } catch (e) { console.warn("tx insert failed", e); }
     }
