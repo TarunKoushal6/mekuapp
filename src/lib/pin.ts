@@ -15,11 +15,12 @@ export async function hashPin(pin: string): Promise<string> {
 }
 
 export async function getPinHash(userId: string): Promise<string | null> {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("wallet_pins")
     .select("pin_hash")
     .eq("user_id", userId)
     .maybeSingle();
+  if (error) throw error;
   return (data as any)?.pin_hash ?? null;
 }
 
