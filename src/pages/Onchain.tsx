@@ -254,7 +254,6 @@ const Onchain = () => {
 
         <button
           onClick={openReview}
-          disabled={!payAmount || Number(payAmount) <= 0}
           disabled={!canReview}
           className="tap mt-5 flex h-[56px] w-full items-center justify-center rounded-full bg-foreground text-[15px] font-bold text-background disabled:opacity-40"
         >
