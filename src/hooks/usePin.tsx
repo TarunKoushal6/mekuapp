@@ -5,6 +5,7 @@ import {
   saveRecovery, verifyRecovery, getRecovery, clearPin,
 } from "@/lib/pin";
 import { PinSheet, PinMode } from "@/components/meku/PinSheet";
+import { toast } from "sonner";
 
 interface PinCtx {
   hasPin: boolean;
@@ -34,14 +35,33 @@ export const PinProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
   const [hash, setHash] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadedUserId, setLoadedUserId] = useState<string | null>(null);
+  const [lookupFailed, setLookupFailed] = useState(false);
   const [mode, setMode] = useState<Mode>(null);
   const resolverRef = useRef<((ok: boolean) => void) | null>(null);
   const autoPromptedRef = useRef<string | null>(null);
 
   const refresh = useCallback(async () => {
-    if (!user) { setHash(null); setLoading(false); return; }
+    if (!user) {
+      setHash(null);
+      setLoadedUserId(null);
+      setLookupFailed(false);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
-    try { setHash(await getPinHash(user.id)); } finally { setLoading(false); }
+    setLookupFailed(false);
+    try {
+      setHash(await getPinHash(user.id));
+      setLoadedUserId(user.id);
+    } catch (e) {
+      console.warn("pin lookup failed", e);
+      setHash(null);
+      setLoadedUserId(null);
+      setLookupFailed(true);
+    } finally {
+      setLoading(false);
+    }
   }, [user]);
 
   useEffect(() => { refresh(); }, [refresh]);
@@ -50,7 +70,7 @@ export const PinProvider = ({ children }: { children: ReactNode }) => {
   // Persist the "we already offered" flag per-user so a dismissed setup
   // doesn't keep popping back on every render / refresh.
   useEffect(() => {
-    if (!user || loading || hash || mode) return;
+    if (!user || loading || loadedUserId !== user.id || lookupFailed || hash || mode) return;
     const key = `meku.pin.autoPrompted.${user.id}`;
     if (autoPromptedRef.current === user.id) return;
     if (typeof window !== "undefined" && window.localStorage.getItem(key)) {
@@ -60,7 +80,7 @@ export const PinProvider = ({ children }: { children: ReactNode }) => {
     autoPromptedRef.current = user.id;
     try { window.localStorage.setItem(key, "1"); } catch {}
     setMode({ kind: "setup", resolve: () => {} });
-  }, [user, loading, hash, mode]);
+  }, [user, loading, loadedUserId, lookupFailed, hash, mode]);
 
   useEffect(() => {
     if (!user) autoPromptedRef.current = null;
@@ -68,7 +88,14 @@ export const PinProvider = ({ children }: { children: ReactNode }) => {
 
   const requirePin = useCallback(async () => {
     if (!user) return false;
-    const current = hash ?? (await getPinHash(user.id));
+    let current: string | null;
+    try {
+      current = hash ?? (await getPinHash(user.id));
+    } catch (e) {
+      console.warn("pin lookup failed", e);
+      toast.error("Could not check your wallet PIN. Try again.");
+      return false;
+    }
     if (!current) {
       setHash(null);
       return new Promise<boolean>((resolve) => {

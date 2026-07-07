@@ -66,19 +66,22 @@ export const SwapCardButton = ({
       </div>
       <style>{`
         .meku-swap-wrap {
-          display: inline-block;
+          display: flex;
+          justify-content: center;
           background: transparent;
           border: none;
           padding: 0;
           cursor: pointer;
           width: 100%;
+          max-width: 100%;
+          overflow: hidden;
         }
         .meku-swap-wrap:disabled { cursor: not-allowed; opacity: 0.6; }
         .meku-swap-wrap .container {
           background-color: #ffffff;
           display: flex;
           width: 100%;
-          max-width: 460px;
+          max-width: 360px;
           margin: 0 auto;
           height: 84px;
           position: relative;
@@ -88,7 +91,7 @@ export const SwapCardButton = ({
         }
         .meku-swap-wrap:not(:disabled):hover .container,
         .meku-swap-wrap[data-active="true"] .container {
-          transform: scale(1.02);
+          transform: scale(1.01);
         }
         .meku-swap-wrap[data-active="true"] .container {
           width: 160px;
@@ -125,6 +128,15 @@ export const SwapCardButton = ({
           color: #1f1f1f;
           margin-left: 16px;
           font-family: inherit;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        @media (max-width: 380px) {
+          .meku-swap-wrap .container { height: 76px; }
+          .meku-swap-wrap .left-side { width: 92px; height: 76px; }
+          .meku-swap-wrap .right-side { width: calc(100% - 92px); }
+          .meku-swap-wrap .new { font-size: 15px; margin-left: 12px; }
+          .meku-swap-wrap .arrow { margin-right: 12px; }
         }
         .meku-swap-wrap .card {
           width: 60px;

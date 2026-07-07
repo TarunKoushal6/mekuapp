@@ -55,6 +55,8 @@ const Onchain = () => {
   const current = tabs.find((t) => t.id === tab)!;
   const Hero = current.icon;
   const destinationLabel = DESTINATION_CHAINS.find((c) => c.id === destinationChain)?.label ?? destinationChain;
+  const amountNumber = Number(payAmount);
+  const canReview = !!payAmount && Number.isFinite(amountNumber) && amountNumber > 0 && (tab !== "Swap" || tokenIn.symbol !== tokenOut.symbol);
 
   const openReview = async () => {
     if (!wallet?.wallet_id) {
@@ -74,7 +76,7 @@ const Onchain = () => {
       const { supabase } = await import("@/integrations/supabase/client");
       if (tab === "Swap") {
         const { data, error } = await supabase.functions.invoke("circle-swap", {
-          body: { chain: "Arc_Testnet", tokenIn: tokenIn.symbol, tokenOut: tokenOut.symbol, amountIn: payAmount },
+          body: { chain: "Arc_Testnet", tokenIn: tokenIn.symbol, tokenOut: tokenOut.symbol, amountIn: payAmount, slippageBps: 50 },
         });
         const errMsg = (data as any)?.error ?? error?.message;
         if (errMsg) throw new Error(errMsg);
@@ -131,7 +133,7 @@ const Onchain = () => {
         }
       />
 
-      <section className="px-5 pb-6 pt-2">
+      <section className="mx-auto w-full max-w-[440px] px-5 pb-6 pt-2">
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="text-[34px] font-bold tracking-[-0.025em] text-foreground">Onchain</h1>
@@ -148,7 +150,7 @@ const Onchain = () => {
         </div>
       </section>
 
-      <div className="px-5">
+      <div className="mx-auto w-full max-w-[440px] px-5">
         <div className="inline-flex w-full items-center gap-1 rounded-full bg-surface-2 p-1">
           {tabs.map(({ id, icon: Icon }) => (
             <button
@@ -166,7 +168,7 @@ const Onchain = () => {
         </div>
       </div>
 
-      <div className="mt-5 px-5">
+      <div className="mx-auto mt-5 w-full max-w-[440px] px-5">
         <div className="rounded-[20px] border border-border bg-surface p-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -253,6 +255,7 @@ const Onchain = () => {
         <button
           onClick={openReview}
           disabled={!payAmount || Number(payAmount) <= 0}
+          disabled={!canReview}
           className="tap mt-5 flex h-[56px] w-full items-center justify-center rounded-full bg-foreground text-[15px] font-bold text-background disabled:opacity-40"
         >
           Review {tab.toLowerCase()}

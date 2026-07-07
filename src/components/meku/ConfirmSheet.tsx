@@ -34,7 +34,7 @@ export const ConfirmSheet = ({
 }: Props) => {
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!busy && !flying) onOpenChange(o); }}>
-      <DialogContent className="max-w-[420px] rounded-3xl border-border bg-background p-6">
+      <DialogContent className="max-h-[calc(100dvh-32px)] w-[calc(100vw-32px)] max-w-[420px] overflow-y-auto rounded-3xl border-border bg-background p-6">
         <DialogHeader>
           <DialogTitle className="text-[18px]">{title}</DialogTitle>
           {subtitle && <DialogDescription>{subtitle}</DialogDescription>}
@@ -42,7 +42,7 @@ export const ConfirmSheet = ({
 
         {headline && (
           <div className="mt-2 flex flex-col items-center text-center">
-            <div className="text-[26px] font-bold tracking-[-0.02em] text-foreground">{headline}</div>
+            <div className="max-w-full break-words text-[24px] font-bold tracking-[-0.02em] text-foreground sm:text-[26px]">{headline}</div>
           </div>
         )}
 
@@ -57,7 +57,7 @@ export const ConfirmSheet = ({
           ))}
         </div>
 
-        <div className="mt-5">
+        <div className="mt-5 flex justify-center overflow-hidden">
           {variant === "swap" ? (
             <SwapCardButton
               onClick={onConfirm}
