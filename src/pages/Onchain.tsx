@@ -69,12 +69,18 @@ const Onchain = () => {
 
   const runAction = async () => {
     if (busy) return;
-    const ok = await requirePin();
-    if (!ok) return;
     setBusy(true);
     try {
       const { supabase } = await import("@/integrations/supabase/client");
       if (tab === "Swap") {
+        const preflight = await supabase.functions.invoke("circle-swap", {
+          body: { chain: "Arc_Testnet", tokenIn: tokenIn.symbol, tokenOut: tokenOut.symbol, amountIn: payAmount, slippageBps: 50, estimateOnly: true },
+        });
+        const preflightErr = (preflight.data as any)?.error ?? preflight.error?.message;
+        if (preflightErr) throw new Error(preflightErr);
+
+        const ok = await requirePin();
+        if (!ok) return;
         const { data, error } = await supabase.functions.invoke("circle-swap", {
           body: { chain: "Arc_Testnet", tokenIn: tokenIn.symbol, tokenOut: tokenOut.symbol, amountIn: payAmount, slippageBps: 50 },
         });
@@ -90,6 +96,8 @@ const Onchain = () => {
           });
         }, 1100);
       } else if (tab === "Bridge") {
+        const ok = await requirePin();
+        if (!ok) return;
         const { data, error } = await supabase.functions.invoke("circle-bridge", {
           body: { fromChain: "Arc_Testnet", toChain: destinationChain, amount: payAmount, recipientAddress: wallet.address },
         });
