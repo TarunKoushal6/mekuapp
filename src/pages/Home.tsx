@@ -35,10 +35,32 @@ const Home = () => {
   useEffect(() => { load(); }, [load]);
   useEffect(() => {
     const ch = supabase.channel("home-posts")
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "posts" }, () => load())
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "posts" }, async (payload) => {
+        const row: any = payload.new;
+        if (!row?.id) return;
+        // Skip if already present (our own optimistic insert or duplicate event)
+        setPosts((prev) => (prev.some((p) => p.id === row.id) ? prev : prev));
+        try {
+          const full = await fetchPost(row.id, user?.id);
+          if (!full) return;
+          if (tab === "Following") {
+            // Only prepend if authored by someone we follow (or ourselves)
+            if (full.user_id !== user?.id) {
+              const { data: f } = await supabase
+                .from("follows")
+                .select("followee_id")
+                .eq("follower_id", user?.id ?? "")
+                .eq("followee_id", full.user_id)
+                .maybeSingle();
+              if (!f) return;
+            }
+          }
+          setPosts((prev) => (prev.some((p) => p.id === full.id) ? prev : [full, ...prev]));
+        } catch { /* ignore realtime errors */ }
+      })
       .subscribe();
     return () => { supabase.removeChannel(ch); };
-  }, [load]);
+  }, [tab, user?.id]);
 
   return (
     <AppShell>
