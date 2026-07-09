@@ -5,6 +5,7 @@ import "@fontsource/sora/500.css";
 import "@fontsource/sora/600.css";
 import "@fontsource/sora/700.css";
 import "@fontsource/sora/800.css";
+// @ts-ignore -- font side-effect import
 import "@fontsource-variable/manrope";
 import "./index.css";
 import { AuthProvider } from "./hooks/useAuth.tsx";
