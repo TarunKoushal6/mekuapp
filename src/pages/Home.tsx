@@ -10,7 +10,7 @@ import { useEffect, useState, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { useUnreadNotifications } from "@/hooks/useNotifications";
-import { fetchPosts, type Post } from "@/lib/social";
+import { fetchPosts, fetchPost, type Post } from "@/lib/social";
 import { supabase } from "@/integrations/supabase/client";
 import { PostListSkeleton } from "@/components/meku/Skeletons";
 
