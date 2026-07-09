@@ -91,12 +91,16 @@
   }
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    font-family: 'Manrope Variable', Manrope, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     letter-spacing: -0.011em;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: contain;
+  }
+  h1, h2, h3, h4, .font-display {
+    font-family: 'Sora', 'Manrope Variable', ui-sans-serif, system-ui, sans-serif;
+    letter-spacing: -0.022em;
   }
   /* Momentum on every scroll container */
   main, [data-scroll], .overflow-y-auto, .overflow-auto, .overflow-x-auto {
