@@ -3,15 +3,33 @@
 // This PIN is purely a local confirmation gate so users can double-check
 // every transaction.
 import { supabase } from "@/integrations/supabase/client";
+import { sha256 } from "js-sha256";
 
 const SALT = "meku.wallet.pin.v1";
 
+/**
+ * SHA-256 helper that works on both secure and insecure origins.
+ * `crypto.subtle` is only available on HTTPS or localhost, so on plain HTTP
+ * deployments (self-hosted VMs, LAN IPs) we fall back to a pure-JS
+ * implementation to keep PIN setup / verification working.
+ */
+async function sha256Hex(input: string): Promise<string> {
+  try {
+    const subtle = (globalThis.crypto as Crypto | undefined)?.subtle;
+    if (subtle) {
+      const buf = await subtle.digest("SHA-256", new TextEncoder().encode(input));
+      return Array.from(new Uint8Array(buf))
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
+    }
+  } catch {
+    // fall through to JS fallback
+  }
+  return sha256(input);
+}
+
 export async function hashPin(pin: string): Promise<string> {
-  const data = new TextEncoder().encode(`${SALT}:${pin}`);
-  const buf = await crypto.subtle.digest("SHA-256", data);
-  return Array.from(new Uint8Array(buf))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
+  return sha256Hex(`${SALT}:${pin}`);
 }
 
 export async function getPinHash(userId: string): Promise<string | null> {
@@ -61,11 +79,7 @@ const ANSWER_SALT = "meku.wallet.recovery.v1";
 
 export async function hashAnswer(answer: string): Promise<string> {
   const normalized = answer.trim().toLowerCase().replace(/\s+/g, " ");
-  const data = new TextEncoder().encode(`${ANSWER_SALT}:${normalized}`);
-  const buf = await crypto.subtle.digest("SHA-256", data);
-  return Array.from(new Uint8Array(buf))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
+  return sha256Hex(`${ANSWER_SALT}:${normalized}`);
 }
 
 export interface RecoveryRow {
