@@ -188,51 +188,45 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
           return action ? <InlineActionCard action={action} postId={post.id} /> : null;
         })()}
 
-        <div className="mt-3 flex items-center justify-between pr-2 text-muted-foreground">
+        <div className="mt-3 flex items-center justify-between pr-1 text-muted-foreground">
           <button
             onClick={(e) => { e.stopPropagation(); navigate(`/p/${post.id}`); }}
-            className="tap group inline-flex items-center gap-1.5 rounded-full px-1.5 py-1 -ml-1.5 transition-colors hover:text-primary"
+            className="tap inline-flex items-center gap-1.5 transition-colors hover:text-foreground"
             aria-label="Comment"
           >
-            <span className="inline-flex h-8 w-8 items-center justify-center rounded-full transition-colors group-hover:bg-primary/10">
-              <MessageCircle className="h-[18px] w-[18px]" strokeWidth={1.7} />
-            </span>
-            <span className="text-[13px] tabular-nums">{post.comment_count || ""}</span>
+            <MessageCircle className="h-[18px] w-[18px]" strokeWidth={1.6} />
+            <span className="text-[13px] tabular-nums">{post.comment_count}</span>
           </button>
           <button
             onClick={handleRepost}
-            className={cn("tap group inline-flex items-center gap-1.5 rounded-full px-1.5 py-1 transition-colors", reposted ? "text-emerald-500" : "hover:text-emerald-500")}
+            className={cn("tap inline-flex items-center gap-1.5 transition-colors", reposted ? "text-emerald-500" : "hover:text-foreground")}
             aria-label="Repost"
           >
-            <span className={cn("inline-flex h-8 w-8 items-center justify-center rounded-full transition-colors", reposted ? "bg-emerald-500/10" : "group-hover:bg-emerald-500/10")}>
-              <Repeat2 className="h-[18px] w-[18px]" strokeWidth={1.7} />
-            </span>
+            <Repeat2 className="h-[18px] w-[18px]" strokeWidth={1.6} />
             {repostCount > 0 && <span className="text-[13px] tabular-nums">{repostCount}</span>}
           </button>
-          <div className="inline-flex items-center gap-1.5 px-1.5 py-1">
+          <div className="inline-flex items-center gap-1.5">
             <HeartLike
               checked={liked}
               onChange={(e) => handleLike(e)}
               size={20}
               aria-label="Like"
             />
-            <span className={cn("text-[13px] tabular-nums", liked && "text-[#ff5b89]")}>{likeCount || ""}</span>
+            <span className={cn("text-[13px] tabular-nums", liked && "text-[#ff5b89]")}>{likeCount}</span>
           </div>
-          <div className="inline-flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-primary/10">
-            <BookmarkSave
-              checked={bookmarked}
-              onChange={(e) => {
-                e.stopPropagation();
-                const next = !bookmarked;
-                setBookmarked(next);
-                toggleBookmark(user?.id, post.id, next);
-              }}
-              size={18}
-              aria-label="Save"
-            />
-          </div>
-          <button onClick={handleShare} className="tap group inline-flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-primary/10 hover:text-primary" aria-label="Share">
-            <Upload className="h-[17px] w-[17px]" strokeWidth={1.7} />
+          <BookmarkSave
+            checked={bookmarked}
+            onChange={(e) => {
+              e.stopPropagation();
+              const next = !bookmarked;
+              setBookmarked(next);
+              toggleBookmark(user?.id, post.id, next);
+            }}
+            size={18}
+            aria-label="Save"
+          />
+          <button onClick={handleShare} className="tap transition-colors hover:text-foreground" aria-label="Share">
+            <Upload className="h-[18px] w-[18px]" strokeWidth={1.6} />
           </button>
         </div>
       </div>

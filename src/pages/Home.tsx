@@ -64,27 +64,27 @@ const Home = () => {
 
   return (
     <AppShell>
-      <header className="sticky top-0 z-30 flex h-[52px] items-center justify-between bg-background/80 px-3 backdrop-blur-xl">
-        <div className="flex items-center gap-1">
+      <header className="sticky top-0 z-30 flex items-center justify-between bg-background/85 px-4 pb-2 pt-3 backdrop-blur-xl">
+        <div className="flex items-center gap-2">
           <button
             onClick={() => setMenuOpen(true)}
             aria-label="Menu"
             className="tap inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground"
           >
-            <Menu className="h-[22px] w-[22px]" strokeWidth={2} />
+            <Menu className="h-[24px] w-[24px]" strokeWidth={2} />
           </button>
-          <Logo size={26} />
+          <Logo size={28} />
         </div>
         <Link to="/notifications" aria-label="Notifications" className="tap relative inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground">
           <IconBell size={20} />
-          {hasUnread && <span className="absolute right-2 top-2 h-[7px] w-[7px] rounded-full bg-primary ring-2 ring-background" />}
+          {hasUnread && <span className="absolute right-2 top-2 h-[7px] w-[7px] rounded-full bg-primary" />}
         </Link>
       </header>
 
       <SideMenu open={menuOpen} onOpenChange={setMenuOpen} />
 
       {/* Tabs — X.com-style */}
-      <nav className="sticky top-[52px] z-20 bg-background/80 backdrop-blur-xl hairline-b">
+      <nav className="sticky top-[52px] z-20 bg-background/85 backdrop-blur-xl hairline-b">
         <div className="flex items-center gap-8 px-5">
           {tabs.map((t) => (
             <button
