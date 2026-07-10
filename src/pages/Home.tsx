@@ -23,6 +23,7 @@ const Home = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [me, setMe] = useState<Profile | null>(null);
   const { hasUnread } = useUnreadNotifications();
 
   const load = useCallback(async () => {
@@ -33,6 +34,10 @@ const Home = () => {
   }, [user?.id, tab]);
 
   useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    if (!user) { setMe(null); return; }
+    getProfile(user.id).then(setMe).catch(() => {});
+  }, [user?.id]);
   useEffect(() => {
     const ch = supabase.channel("home-posts")
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "posts" }, async (payload) => {
