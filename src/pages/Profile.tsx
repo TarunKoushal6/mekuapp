@@ -87,19 +87,19 @@ const Profile = () => {
 
   return (
     <AppShell>
-      <header className="sticky top-0 z-30 flex h-[56px] items-center justify-between bg-background/80 px-3 backdrop-blur-xl">
-        <button onClick={() => navigate(-1)} aria-label="Back" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground">
-          <IconBack size={22} />
+      <header className="sticky top-0 z-30 flex h-[52px] items-center justify-between bg-background/70 px-3 backdrop-blur-xl">
+        <button onClick={() => navigate(-1)} aria-label="Back" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full bg-background/60 text-foreground backdrop-blur">
+          <IconBack size={20} />
         </button>
         <div className="flex items-center gap-1">
           {isMe && (
-            <Link to="/settings" aria-label="Settings" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground">
+            <Link to="/settings" aria-label="Settings" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full bg-background/60 text-foreground backdrop-blur">
               <IconSettings size={18} />
             </Link>
           )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button aria-label="More" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground">
+              <button aria-label="More" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full bg-background/60 text-foreground backdrop-blur">
                 <IconMore size={20} />
               </button>
             </DropdownMenuTrigger>
@@ -134,71 +134,73 @@ const Profile = () => {
         </>
       ) : (
         <div className="meku-page-in">
-          <section className="px-5 pb-5 pt-2">
-            <div className="relative inline-block">
-              <span className="absolute -inset-[3px] rounded-full bg-gradient-to-br from-primary via-primary to-primary-glow" />
-              <Avatar name={name} src={profile?.avatar_url ?? undefined} size="xl" className="relative h-[96px] w-[96px] ring-4 ring-background" />
+          {/* Banner — indigo gradient stand-in until banners exist */}
+          <div className="-mt-[52px] h-[140px] w-full gradient-purple" />
+
+          <section className="px-4 pb-4">
+            <div className="-mt-[46px] flex items-end justify-between">
+              <Avatar
+                name={name}
+                src={profile?.avatar_url ?? undefined}
+                size="xl"
+                className="h-[88px] w-[88px] ring-4 ring-background"
+              />
+              <div className="mb-1">
+                {isMe ? (
+                  <Link to="/settings/profile" className="tap inline-flex h-[36px] items-center rounded-full border border-border bg-transparent px-4 text-[14px] font-bold text-foreground">
+                    Edit profile
+                  </Link>
+                ) : (
+                  <button
+                    onClick={toggleFollow}
+                    disabled={followBusy || !profile}
+                    className={cn(
+                      "tap inline-flex h-[36px] items-center rounded-full px-5 text-[14px] font-bold disabled:opacity-60",
+                      following
+                        ? "border border-border bg-transparent text-foreground"
+                        : "bg-foreground text-background",
+                    )}
+                  >
+                    {following ? "Following" : "Follow"}
+                  </button>
+                )}
+              </div>
             </div>
 
-            <div className="mt-5 flex items-center gap-2">
-              <h1 className="text-[26px] font-bold tracking-[-0.02em] text-foreground">{name}</h1>
-              <VerificationBadge kind={(profile?.verification_kind ?? (profile?.verified ? "verified" : "none")) as any} size={20} />
+            <div className="mt-3 flex items-center gap-1.5">
+              <h1 className="text-[22px] font-bold tracking-[-0.02em] text-foreground">{name}</h1>
+              <VerificationBadge kind={(profile?.verification_kind ?? (profile?.verified ? "verified" : "none")) as any} size={18} />
             </div>
-            <p className="mt-1 text-[14px] text-muted-foreground">@{profile?.username ?? "—"}</p>
+            <p className="text-[14px] text-muted-foreground">@{profile?.username ?? "—"}</p>
 
-            <p className="mt-4 text-[15px] leading-[1.5] text-foreground/85">
-              {profile?.bio || (isMe ? "Add a bio to tell people what you're building." : "No bio yet.")}
+            <p className="mt-3 whitespace-pre-wrap text-[15px] leading-[1.4] text-foreground/95">
+              {profile?.bio || (isMe ? "Add a bio to tell people what you're building." : "")}
             </p>
 
-            <div className="mt-5 flex items-baseline gap-7">
-              {[[stats.posts, "Posts"], [stats.followers, "Followers"], [stats.following, "Following"]].map(([n, l]) => (
-                <div key={l as string}>
-                  <p className="text-[20px] font-bold tabular-nums text-foreground">{n}</p>
-                  <p className="text-[12px] text-muted-foreground">{l}</p>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-5 flex items-center gap-2">
-              {isMe ? (
-                <Link to="/settings/profile" className="tap flex-1 rounded-full bg-foreground py-[11px] text-center text-[14px] font-bold text-background">
-                  Edit profile
-                </Link>
-              ) : (
-                <button
-                  onClick={toggleFollow}
-                  disabled={followBusy || !profile}
-                  className={cn(
-                    "tap flex-1 rounded-full py-[11px] text-[14px] font-bold disabled:opacity-60",
-                    following
-                      ? "border border-border bg-background text-foreground"
-                      : "bg-primary text-primary-foreground",
-                  )}
-                >
-                  {following ? "Following" : "Follow"}
-                </button>
-              )}
-              <button className="tap rounded-full border border-border bg-background px-4 py-[11px] text-[14px] font-bold text-foreground">
-                Share
-              </button>
+            <div className="mt-3 flex items-center gap-5 text-[14px]">
+              <span><span className="font-bold text-foreground tabular-nums">{stats.following}</span> <span className="text-muted-foreground">Following</span></span>
+              <span><span className="font-bold text-foreground tabular-nums">{stats.followers}</span> <span className="text-muted-foreground">Followers</span></span>
             </div>
           </section>
 
-          <nav className="sticky top-[56px] z-20 hairline-b bg-background/90 backdrop-blur-xl">
-            <ul className="flex gap-6 px-5">
+          <nav className="sticky top-[52px] z-20 hairline-b bg-background/85 backdrop-blur-xl">
+            <ul className="grid grid-cols-4">
               {tabs.map((t) => (
-                <li key={t}>
+                <li key={t} className="flex justify-center">
                   <button
                     onClick={() => setTab(t)}
-                    className={cn("tap relative py-3 text-[14px] font-bold", tab === t ? "text-foreground" : "text-muted-foreground")}
+                    className={cn("tap relative py-3.5 text-[14px] font-semibold", tab === t ? "text-foreground" : "text-muted-foreground")}
                   >
-                    {t}
-                    {tab === t && <span className="absolute inset-x-0 -bottom-px h-[2px] bg-foreground" />}
+                    <span className="relative inline-block">
+                      {t}
+                      {tab === t && <span className="absolute -bottom-[13px] left-0 right-0 h-[3px] rounded-full bg-primary" />}
+                    </span>
                   </button>
                 </li>
               ))}
             </ul>
           </nav>
+
 
           {tab === "Posts" && posts.length > 0 ? (
             posts.map((p) => <FeedCard key={p.id} post={p} onChanged={load} />)
