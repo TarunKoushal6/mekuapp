@@ -1,9 +1,10 @@
 import { AppShell } from "@/components/meku/AppShell";
-import { TopBar, IconButton } from "@/components/meku/TopBar";
 import { EmptyState } from "@/components/meku/EmptyState";
-import { IconBack, IconBell } from "@/components/meku/MekuIcon";
-import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { IconBack, IconSettings } from "@/components/meku/MekuIcon";
+import { Logo } from "@/components/meku/Logo";
+import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { fetchNotifications, markAllRead, type NotificationWithActor } from "@/lib/notifications";
 import { supabase } from "@/integrations/supabase/client";
