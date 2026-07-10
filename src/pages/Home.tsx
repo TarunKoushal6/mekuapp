@@ -1,16 +1,16 @@
 import { AppShell } from "@/components/meku/AppShell";
 import { FeedCard } from "@/components/meku/FeedCard";
 import { EmptyState } from "@/components/meku/EmptyState";
-import { Menu } from "lucide-react";
-import { IconBell, IconPlus } from "@/components/meku/MekuIcon";
+import { IconSettings, IconPlus } from "@/components/meku/MekuIcon";
 import { Logo } from "@/components/meku/Logo";
+import { Avatar } from "@/components/meku/Avatar";
 import { SideMenu } from "@/components/meku/SideMenu";
 import { Link } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { useUnreadNotifications } from "@/hooks/useNotifications";
-import { fetchPosts, fetchPost, type Post } from "@/lib/social";
+import { fetchPosts, fetchPost, getProfile, type Post, type Profile } from "@/lib/social";
 import { supabase } from "@/integrations/supabase/client";
 import { PostListSkeleton } from "@/components/meku/Skeletons";
 
