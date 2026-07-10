@@ -131,6 +131,11 @@
     transition: transform var(--d2) var(--ease), opacity var(--d2) var(--ease), background-color var(--d2) var(--ease), color var(--d2) var(--ease);
   }
   .tap:active { transform: scale(0.975); opacity: 0.9; }
+  .tap:focus-visible, button:focus-visible, a:focus-visible {
+    outline: 2px solid hsl(var(--ring) / 0.6);
+    outline-offset: 2px;
+    border-radius: 12px;
+  }
 
   .fade-in { animation: m-fade var(--d4) var(--ease) both; }
   @keyframes m-fade {
