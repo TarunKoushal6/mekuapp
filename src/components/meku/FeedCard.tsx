@@ -213,7 +213,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
           return action ? <InlineActionCard action={action} postId={post.id} /> : null;
         })()}
 
-        <div className="-ml-2 mt-2 flex max-w-[425px] items-center justify-between text-muted-foreground">
+        <div className="-ml-2 mt-2 flex items-center justify-between pr-1 text-muted-foreground">
           <button
             onClick={(e) => { e.stopPropagation(); navigate(`/p/${post.id}`); }}
             className="tap inline-flex items-center gap-1.5 transition-colors hover:text-foreground"
