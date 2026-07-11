@@ -115,7 +115,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
   return (
     <article
       onClick={() => navigate(`/p/${post.id}`)}
-      className="hairline-b animate-fade-in cursor-pointer px-4 py-4 transition-colors duration-200 hover:bg-surface/40 active:bg-surface/60"
+      className="hairline-b animate-fade-in cursor-pointer px-4 py-3 transition-colors duration-200 hover:bg-surface/40 active:bg-surface/60"
     >
       <header className="flex items-start gap-3">
         <Link to={`/u/${handle}`} onClick={(e) => e.stopPropagation()} className="shrink-0">
@@ -135,9 +135,9 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
               size={15}
               className="shrink-0"
             />
-            <span className="text-[14px] text-muted-foreground">@{handle}</span>
-            <span className="text-[14px] text-muted-foreground">·</span>
-            <span className="whitespace-nowrap text-[14px] text-muted-foreground tabular-nums">
+            <span className="text-[15px] text-muted-foreground">@{handle}</span>
+            <span className="text-[15px] text-muted-foreground">·</span>
+            <span className="whitespace-nowrap text-[15px] text-muted-foreground tabular-nums">
               {timeAgo(post.created_at)}
             </span>
           </div>
