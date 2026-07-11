@@ -16,7 +16,7 @@ interface ThreadRow extends DmThread {
 const Inbox = () => {
   const { user } = useAuth();
   const [me, setMe] = useState<Profile | null>(null);
-  const [threads, setThreads] = useState<ThreadRow[]>([]);
+  const [threads, setThreads] = useState<ThreadRow[] | null>(null);
   const [q, setQ] = useState("");
 
   useEffect(() => {
@@ -53,7 +53,10 @@ const Inbox = () => {
     return () => { supabase.removeChannel(channel); };
   }, [user?.id]);
 
-  const filtered = q
+  const loading = threads === null;
+  const filtered = !threads
+    ? []
+    : q
     ? threads.filter((t) => {
         const s = (t.other?.display_name || "") + " " + (t.other?.username || "") + " " + t.last.body;
         return s.toLowerCase().includes(q.toLowerCase());
@@ -85,18 +88,36 @@ const Inbox = () => {
         </label>
       </section>
 
-      {filtered.length === 0 ? (
+      {loading ? (
+        <ul className="animate-fade-in">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <li key={i} className="hairline-b flex items-start gap-3 px-4 py-3.5">
+              <div className="h-12 w-12 shrink-0 rounded-full bg-surface-2 animate-pulse" />
+              <div className="min-w-0 flex-1 space-y-2 pt-1">
+                <div className="h-3.5 w-32 rounded bg-surface-2 animate-pulse" />
+                <div className="h-3 w-[80%] rounded bg-surface-2 animate-pulse" />
+              </div>
+            </li>
+          ))}
+        </ul>
+      ) : filtered.length === 0 ? (
         <EmptyState
           pose="caughtup"
-          title="No messages yet"
-          description="Start a conversation with someone you follow."
+          title={q ? "No matches" : "Welcome to your inbox!"}
+          description={
+            q
+              ? "Try a different name or handle."
+              : "Drop a line, share posts and more with private conversations between you and others on Meku."
+          }
           action={
-            <Link
-              to="/explore"
-              className="tap inline-flex h-[44px] items-center rounded-full bg-primary px-5 text-[14px] font-bold text-primary-foreground"
-            >
-              Find people
-            </Link>
+            !q && (
+              <Link
+                to="/explore"
+                className="tap inline-flex h-[44px] items-center rounded-full bg-primary px-5 text-[14px] font-bold text-primary-foreground"
+              >
+                Write a message
+              </Link>
+            )
           }
         />
       ) : (

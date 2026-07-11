@@ -3,18 +3,18 @@ import { cn } from "@/lib/utils";
 import { haptic } from "@/lib/haptics";
 import {
   IconHome,
-  IconCommunity,
+  IconSearch,
   IconPlus,
   IconWallet,
-  IconProfile,
+  IconMessages,
 } from "./MekuIcon";
 
 const items = [
   { to: "/home", label: "Home", icon: IconHome },
-  { to: "/explore", label: "Friends", icon: IconCommunity },
+  { to: "/explore", label: "Search", icon: IconSearch },
   { to: "/create", label: "Create", icon: IconPlus, primary: true },
   { to: "/wallet", label: "Wallet", icon: IconWallet },
-  { to: "/profile", label: "Profile", icon: IconProfile },
+  { to: "/inbox", label: "Messages", icon: IconMessages },
 ];
 
 export const BottomNav = () => {
