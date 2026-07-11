@@ -27,6 +27,7 @@ const Explore = () => {
   const [focused, setFocused] = useState(false);
   const [results, setResults] = useState<Profile[]>([]);
   const [suggested, setSuggested] = useState<Profile[]>([]);
+  const [trends, setTrends] = useState<Trend[]>([]);
   const [loading, setLoading] = useState(false);
   const [recent, setRecent] = useState<string[]>(() => readRecent());
   const inputRef = useRef<HTMLInputElement>(null);
