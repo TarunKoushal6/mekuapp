@@ -47,6 +47,10 @@ export interface FetchPostsOptions {
   followingOnly?: boolean;
   /** Optional explicit author filter (e.g. profile page). */
   authorId?: string;
+  /** Cursor: return posts strictly older than this ISO timestamp. */
+  before?: string;
+  /** Page size (default 20). */
+  limit?: number;
 }
 
 export async function fetchPosts(
