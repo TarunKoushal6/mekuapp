@@ -126,25 +126,36 @@ const Chat = () => {
           messages.map((m, i) => {
             const mine = m.sender_id === user?.id;
             const prev = messages[i - 1];
-            const grouped = prev && prev.sender_id === m.sender_id;
+            const next = messages[i + 1];
+            const t = new Date(m.created_at).getTime();
+            const gapFromPrev = prev ? (t - new Date(prev.created_at).getTime()) / 60000 : Infinity;
+            const gapToNext = next ? (new Date(next.created_at).getTime() - t) / 60000 : Infinity;
+            const startsGroup = !prev || prev.sender_id !== m.sender_id || gapFromPrev > 5;
+            const endsGroup = !next || next.sender_id !== m.sender_id || gapToNext > 5;
+            const pos: "single" | "first" | "middle" | "last" =
+              startsGroup && endsGroup ? "single" : startsGroup ? "first" : endsGroup ? "last" : "middle";
+            const showTime = !prev || gapFromPrev > 30
+              ? new Date(m.created_at).toLocaleString([], { hour: "numeric", minute: "2-digit", month: "short", day: "numeric" })
+              : null;
+            const onDelete = async () => {
+              const { error } = await supabase.from("messages").delete().eq("id", m.id);
+              if (error) return toast.error(error.message);
+              setMessages((prev) => prev?.filter((x) => x.id !== m.id) ?? prev);
+            };
             return (
-              <div key={m.id} className={cn("flex", mine ? "justify-end" : "justify-start")}>
-                <div
-                  className={cn(
-                    "max-w-[78%] whitespace-pre-wrap break-words px-3.5 py-2 text-[15px] leading-[1.35]",
-                    mine ? "bg-primary text-primary-foreground" : "bg-surface-2 text-foreground",
-                    mine
-                      ? grouped ? "rounded-2xl rounded-br-md" : "rounded-2xl rounded-br-md"
-                      : grouped ? "rounded-2xl rounded-bl-md" : "rounded-2xl rounded-bl-md",
-                  )}
-                >
-                  {m.body}
-                </div>
-              </div>
+              <MessageBubble
+                key={m.id}
+                body={m.body}
+                mine={mine}
+                pos={pos}
+                showTime={showTime}
+                onDelete={mine ? onDelete : undefined}
+              />
             );
           })
         )}
       </div>
+
 
 
       <form
