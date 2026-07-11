@@ -10,6 +10,7 @@ import { getProfile, type Profile } from "@/lib/social";
 import { fetchThread, sendMessage, markThreadRead, type DirectMessage } from "@/lib/dm";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { MessageBubble } from "@/components/meku/MessageBubble";
 
 const Chat = () => {
   const navigate = useNavigate();
