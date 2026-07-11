@@ -122,11 +122,11 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
           <Avatar name={name} src={author?.avatar_url ?? undefined} size="md" />
         </Link>
         <div className="flex min-w-0 flex-1 flex-col leading-tight">
-          <div className="flex min-w-0 items-center gap-1">
+          <div className="flex min-w-0 flex-wrap items-center gap-x-1">
             <Link
               to={`/u/${handle}`}
               onClick={(e) => e.stopPropagation()}
-              className="truncate text-[15px] font-bold tracking-[-0.01em] text-foreground hover:underline"
+              className="break-words text-[15px] font-bold tracking-[-0.01em] text-foreground hover:underline"
             >
               {name}
             </Link>
@@ -136,7 +136,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
               className="shrink-0"
             />
           </div>
-          <span className="truncate text-[13px] text-muted-foreground">@{handle}</span>
+          <span className="break-all text-[13px] text-muted-foreground">@{handle}</span>
         </div>
         <div className="ml-2 flex shrink-0 items-start gap-1">
           <span className="mt-[2px] whitespace-nowrap text-[12.5px] text-muted-foreground tabular-nums">
