@@ -179,9 +179,9 @@ const Home = () => {
           opacity: ptrDist > 4 ? 1 : 0,
         }}
       >
-        <div className="mt-2 flex h-8 w-8 items-center justify-center rounded-full bg-background/90 shadow-md ring-1 ring-border">
+        <div className="mt-1 flex h-6 w-6 items-center justify-center rounded-full bg-background/90 shadow-sm ring-1 ring-border">
           <div
-            className={cn("h-4 w-4 rounded-full border-2 border-primary border-t-transparent", refreshing && "animate-spin")}
+            className={cn("h-3 w-3 rounded-full border-[1.5px] border-primary border-t-transparent", refreshing && "animate-spin")}
             style={{ transform: refreshing ? undefined : `rotate(${ptrProgress * 360}deg)` }}
           />
         </div>
