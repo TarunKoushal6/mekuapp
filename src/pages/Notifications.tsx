@@ -111,9 +111,7 @@ const Notifications = () => {
       </nav>
 
       {loading ? (
-        <div className="flex min-h-[40vh] items-center justify-center">
-          <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-        </div>
+        <EmptyState pose="searching" title="Loading notifications" description="Fetching the latest activity for you." />
       ) : filtered.length === 0 ? (
         <EmptyState pose="caughtup" title="You're all caught up" description="New replies, follows and mentions will appear here." />
       ) : (
