@@ -6,50 +6,50 @@
 
 @layer base {
   :root {
-    /* Base = dark (Midnight Indigo). .dark class also set for shadcn parity. */
-    --background: 240 60% 6%;         /* #0a0a1a */
-    --foreground: 220 30% 96%;
-    --surface:    236 44% 14%;        /* #141432 */
-    --surface-2:  236 40% 18%;
+    /* MEKU — Light theme with purple identity */
+    --background: 0 0% 100%;
+    --foreground: 236 40% 12%;
+    --surface:    240 30% 97%;
+    --surface-2:  240 24% 94%;
 
-    --muted: 236 30% 16%;
-    --muted-foreground: 230 14% 66%;
+    --muted: 240 20% 96%;
+    --muted-foreground: 236 12% 42%;
 
-    --card: 236 44% 12%;
-    --card-foreground: 220 30% 96%;
-    --popover: 236 48% 10%;
-    --popover-foreground: 220 30% 96%;
+    --card: 0 0% 100%;
+    --card-foreground: 236 40% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 236 40% 12%;
 
-    --primary: 243 76% 59%;           /* #4f46e5 electric indigo */
+    --primary: 243 76% 59%;
     --primary-foreground: 0 0% 100%;
-    --primary-soft: 240 55% 22%;
+    --primary-soft: 243 90% 96%;
     --primary-glow: 250 88% 72%;
 
-    --secondary: 236 40% 18%;
-    --secondary-foreground: 220 30% 96%;
+    --secondary: 240 24% 94%;
+    --secondary-foreground: 236 40% 12%;
     --accent: 243 76% 59%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 78% 62%;
+    --destructive: 0 78% 58%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 236 30% 22%;
-    --input: 236 30% 22%;
+    --border: 240 16% 88%;
+    --input: 240 16% 88%;
     --ring: 243 76% 59%;
 
     --radius: 18px;
 
     --gradient-purple: linear-gradient(135deg, hsl(243 90% 66%) 0%, hsl(258 80% 56%) 100%);
-    --gradient-card: linear-gradient(135deg, hsl(243 80% 34%) 0%, hsl(252 76% 22%) 100%);
-    --shadow-purple: 0 14px 44px -12px hsl(243 90% 50% / 0.55);
+    --gradient-card: linear-gradient(135deg, hsl(243 90% 66%) 0%, hsl(258 80% 56%) 100%);
+    --shadow-purple: 0 14px 44px -12px hsl(243 90% 50% / 0.35);
 
-    --sidebar-background: 236 48% 10%;
-    --sidebar-foreground: 220 30% 96%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 236 40% 12%;
     --sidebar-primary: 243 76% 59%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 236 40% 18%;
-    --sidebar-accent-foreground: 220 30% 96%;
-    --sidebar-border: 236 30% 22%;
+    --sidebar-accent: 240 24% 94%;
+    --sidebar-accent-foreground: 236 40% 12%;
+    --sidebar-border: 240 16% 88%;
     --sidebar-ring: 243 76% 59%;
 
     --ease: cubic-bezier(0.32, 0.72, 0, 1);
@@ -57,27 +57,27 @@
   }
 
   .dark {
-    --background: 240 60% 6%;
-    --foreground: 220 30% 96%;
-    --surface:    236 44% 14%;
-    --surface-2:  236 40% 18%;
-    --muted: 236 30% 16%;
-    --muted-foreground: 230 14% 66%;
-    --card: 236 44% 12%;
-    --card-foreground: 220 30% 96%;
-    --popover: 236 48% 10%;
-    --popover-foreground: 220 30% 96%;
-    --primary: 243 76% 62%;
+    --background: 0 0% 100%;
+    --foreground: 236 40% 12%;
+    --surface:    240 30% 97%;
+    --surface-2:  240 24% 94%;
+    --muted: 240 20% 96%;
+    --muted-foreground: 236 12% 42%;
+    --card: 0 0% 100%;
+    --card-foreground: 236 40% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 236 40% 12%;
+    --primary: 243 76% 59%;
     --primary-foreground: 0 0% 100%;
-    --primary-soft: 240 55% 22%;
-    --secondary: 236 40% 18%;
-    --secondary-foreground: 220 30% 96%;
-    --accent: 243 76% 62%;
+    --primary-soft: 243 90% 96%;
+    --secondary: 240 24% 94%;
+    --secondary-foreground: 236 40% 12%;
+    --accent: 243 76% 59%;
     --accent-foreground: 0 0% 100%;
-    --border: 236 30% 22%;
-    --input: 236 30% 22%;
-    --ring: 243 76% 62%;
-    --gradient-card: linear-gradient(135deg, hsl(243 80% 34%) 0%, hsl(252 76% 22%) 100%);
+    --border: 240 16% 88%;
+    --input: 240 16% 88%;
+    --ring: 243 76% 59%;
+    --gradient-card: linear-gradient(135deg, hsl(243 90% 66%) 0%, hsl(258 80% 56%) 100%);
   }
 }
 
