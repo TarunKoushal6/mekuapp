@@ -69,7 +69,7 @@ export async function fetchPosts(
 
   let query = supabase
     .from("posts")
-    .select("id, user_id, title, body, image_url, created_at")
+    .select("id, user_id, title, body, image_url, created_at, view_count")
     .order("created_at", { ascending: false })
     .limit(opts.limit ?? 20);
   if (opts.authorId) query = query.eq("user_id", opts.authorId);
@@ -167,7 +167,7 @@ export async function getRepostCount(postId: string) {
 export async function fetchPost(id: string, viewerId?: string | null): Promise<Post | null> {
   const { data, error } = await supabase
     .from("posts")
-    .select("id, user_id, title, body, image_url, created_at")
+    .select("id, user_id, title, body, image_url, created_at, view_count")
     .eq("id", id)
     .maybeSingle();
   if (error) throw error;

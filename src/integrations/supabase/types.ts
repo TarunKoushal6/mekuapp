@@ -191,6 +191,7 @@ export type Database = {
           title: string | null
           token: string | null
           user_id: string
+          view_count: number
         }
         Insert: {
           amount_usdc?: number | null
@@ -203,6 +204,7 @@ export type Database = {
           title?: string | null
           token?: string | null
           user_id: string
+          view_count?: number
         }
         Update: {
           amount_usdc?: number | null
@@ -215,6 +217,7 @@ export type Database = {
           title?: string | null
           token?: string | null
           user_id?: string
+          view_count?: number
         }
         Relationships: [
           {
@@ -502,6 +505,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_post_view: { Args: { _post_id: string }; Returns: number }
       notify_mentions_in_text: {
         Args: {
           _actor_id: string

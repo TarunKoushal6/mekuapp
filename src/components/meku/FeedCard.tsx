@@ -1,4 +1,4 @@
-import { MessageCircle, Repeat2, Upload, Coins, MoreHorizontal, Trash2 } from "lucide-react";
+import { MessageCircle, Repeat2, Upload, Coins, MoreHorizontal, Trash2, BarChart2 } from "lucide-react";
 import { VerificationBadge } from "./VerificationBadge";
 import { Avatar } from "./Avatar";
 import { useEffect, useState } from "react";
@@ -30,6 +30,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
   const [reposted, setReposted] = useState(false);
   const [repostCount, setRepostCount] = useState(0);
   const [bookmarked, setBookmarked] = useState(() => readBookmarks(user?.id).has(post.id));
+  const [viewCount, setViewCount] = useState<number>((post as any).view_count ?? 0);
   const author = post.author;
   const name = author?.display_name || author?.username || "Anonymous";
   const handle = author?.username || "anon";
@@ -53,6 +54,26 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
     })();
     return () => { cancelled = true; };
   }, [post.id, user?.id]);
+
+  // Impressions: count once per session per post, subscribe to live updates.
+  useEffect(() => {
+    const key = `mv:${post.id}`;
+    if (!sessionStorage.getItem(key)) {
+      sessionStorage.setItem(key, "1");
+      supabase.rpc("increment_post_view", { _post_id: post.id }).then(({ data }) => {
+        if (typeof data === "number") setViewCount(data);
+      });
+    }
+    const ch = supabase
+      .channel(`post-views-${post.id}`)
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "posts", filter: `id=eq.${post.id}` },
+        (payload: any) => {
+          const v = payload.new?.view_count;
+          if (typeof v === "number") setViewCount(v);
+        })
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [post.id]);
 
   const handleRepost = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -115,9 +136,9 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
   return (
     <article
       onClick={() => navigate(`/p/${post.id}`)}
-      className="hairline-b animate-fade-in cursor-pointer px-4 py-3 transition-colors duration-200 hover:bg-surface/40 active:bg-surface/60"
+      className="hairline-b animate-fade-in cursor-pointer px-3 py-3 transition-colors duration-200 hover:bg-surface/40 active:bg-surface/60"
     >
-      <header className="flex items-start gap-3">
+      <header className="flex items-start gap-2.5">
         <Link to={`/u/${handle}`} onClick={(e) => e.stopPropagation()} className="shrink-0">
           <Avatar name={name} src={author?.avatar_url ?? undefined} size="md" />
         </Link>
@@ -173,7 +194,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
         </div>
       </header>
 
-      <div className="ml-[52px] mt-0.5">
+      <div className="ml-[50px] mt-0.5">
         {post.title && <h2 className="text-[15px] font-bold leading-[1.35] tracking-[-0.01em] text-foreground">{post.title}</h2>}
         {post.body && (
           <PostBody
@@ -217,20 +238,30 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
             />
             <span className={cn("text-[13px] tabular-nums", liked && "text-[#ff5b89]")}>{likeCount}</span>
           </div>
-          <BookmarkSave
-            checked={bookmarked}
-            onChange={(e) => {
-              e.stopPropagation();
-              const next = !bookmarked;
-              setBookmarked(next);
-              toggleBookmark(user?.id, post.id, next);
-            }}
-            size={18}
-            aria-label="Save"
-          />
-          <button onClick={handleShare} className="tap transition-colors hover:text-foreground" aria-label="Share">
-            <Upload className="h-[18px] w-[18px]" strokeWidth={1.6} />
+          <button
+            onClick={(e) => { e.stopPropagation(); navigate(`/p/${post.id}`); }}
+            className="tap inline-flex items-center gap-1.5 transition-colors hover:text-foreground"
+            aria-label="Views"
+          >
+            <BarChart2 className="h-[18px] w-[18px]" strokeWidth={1.6} />
+            <span className="text-[13px] tabular-nums">{viewCount}</span>
           </button>
+          <div className="inline-flex items-center gap-1">
+            <BookmarkSave
+              checked={bookmarked}
+              onChange={(e) => {
+                e.stopPropagation();
+                const next = !bookmarked;
+                setBookmarked(next);
+                toggleBookmark(user?.id, post.id, next);
+              }}
+              size={18}
+              aria-label="Save"
+            />
+            <button onClick={handleShare} className="tap transition-colors hover:text-foreground" aria-label="Share">
+              <Upload className="h-[18px] w-[18px]" strokeWidth={1.6} />
+            </button>
+          </div>
         </div>
       </div>
       {tipOpen && (
