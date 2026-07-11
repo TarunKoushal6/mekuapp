@@ -217,7 +217,7 @@ const Explore = () => {
       {/* Discover — trends + suggested */}
       {showDiscover && (
         <>
-          {trends.length > 0 && (
+          {trends.length > 0 ? (
             <section className="pt-3">
               <h2 className="px-4 pb-1 text-[18px] font-bold tracking-[-0.01em] text-foreground">Trends for you</h2>
               <ul>
@@ -235,8 +235,15 @@ const Explore = () => {
                 ))}
               </ul>
             </section>
+          ) : (
+            recent.length === 0 && (
+              <EmptyState
+                pose="searching"
+                title="Search MEKU"
+                description="Find people, posts, and trending hashtags across the network."
+              />
+            )
           )}
-
         </>
       )}
     </AppShell>

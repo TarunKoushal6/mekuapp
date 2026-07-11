@@ -173,12 +173,12 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
         </div>
       </header>
 
-      <div className="ml-[52px] mt-1.5">
-        {post.title && <h2 className="text-[17px] font-bold leading-[1.3] tracking-[-0.01em] text-foreground">{post.title}</h2>}
+      <div className="ml-[52px] mt-0.5">
+        {post.title && <h2 className="text-[15px] font-bold leading-[1.35] tracking-[-0.01em] text-foreground">{post.title}</h2>}
         {post.body && (
           <PostBody
             text={post.body}
-            className={(post.title ? "mt-1 " : "") + "whitespace-pre-wrap text-[15px] leading-[1.45] tracking-[-0.003em] text-foreground/95"}
+            className={(post.title ? "mt-0.5 " : "") + "whitespace-pre-wrap text-[15px] leading-[20px] tracking-[-0.003em] text-foreground"}
           />
         )}
         {post.image_url && (
@@ -191,7 +191,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
           return action ? <InlineActionCard action={action} postId={post.id} /> : null;
         })()}
 
-        <div className="mt-3 flex items-center justify-between pr-1 text-muted-foreground">
+        <div className="-ml-2 mt-2 flex max-w-[425px] items-center justify-between text-muted-foreground">
           <button
             onClick={(e) => { e.stopPropagation(); navigate(`/p/${post.id}`); }}
             className="tap inline-flex items-center gap-1.5 transition-colors hover:text-foreground"
