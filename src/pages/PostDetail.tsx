@@ -1,5 +1,5 @@
 import { AppShell } from "@/components/meku/AppShell";
-import { ChevronLeft, MoreHorizontal, MessageCircle, Repeat2, Upload, Loader2, Coins, Trash2 } from "lucide-react";
+import { ChevronLeft, MoreHorizontal, MessageCircle, Repeat2, Upload, Loader2, Coins, Trash2, BarChart2 } from "lucide-react";
 import { VerificationBadge } from "@/components/meku/VerificationBadge";
 import { HeartLike } from "@/components/meku/HeartLike";
 import { BookmarkSave } from "@/components/meku/BookmarkSave";
