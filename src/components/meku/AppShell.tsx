@@ -16,9 +16,9 @@ interface AppShellProps {
 export const AppShell = ({ children, hideNav, hideCompose }: AppShellProps) => {
   const [composerOpen, setComposerOpen] = useState(false);
   const { pathname } = useLocation();
-  // Hide FAB on create/auth flows automatically.
-  const autoHide = pathname.startsWith("/create") || pathname.startsWith("/auth");
-  const showFab = !hideNav && !hideCompose && !autoHide;
+  // Compose FAB is a home-only affordance.
+  const isHome = pathname === "/" || pathname === "/home";
+  const showFab = !hideNav && !hideCompose && isHome;
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-background">

@@ -20,7 +20,7 @@ const items = [
   { to: "/profile", label: "Profile", icon: IconProfile },
   { to: "/wallet", label: "Wallet", icon: IconWallet },
   { to: "/explore", label: "Friends", icon: IconCommunity },
-  { to: "/bookmarks", label: "Bookmarks", icon: (p: any) => <Bookmark size={p.size ?? 26} strokeWidth={1.8} /> },
+  { to: "/bookmarks", label: "Bookmarks", icon: (p: any) => <Bookmark size={p.size ?? 20} strokeWidth={1.8} /> },
   { to: "/notifications", label: "Notifications", icon: IconBell },
   { to: "/home", label: "Home", icon: IconHome },
 ];
@@ -40,67 +40,74 @@ export const SideMenu = ({ open, onOpenChange }: Props) => {
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="left" className="w-[320px] max-w-[85vw] border-border bg-background p-0">
+      <SheetContent side="left" className="w-[300px] max-w-[85vw] border-border bg-background p-0">
         <div className="flex h-full flex-col">
-          <div className="px-5 pb-4 pt-6">
-            <Link to="/profile" onClick={() => onOpenChange(false)} className="block">
-              <Avatar name={name} src={me?.avatar_url ?? undefined} size="lg" />
-              <div className="mt-3 flex items-center gap-1.5">
-                <span className="truncate text-[19px] font-bold tracking-[-0.01em] text-foreground">{name}</span>
-                <VerificationBadge
-                  kind={(me?.verification_kind ?? (me?.verified ? "verified" : "none")) as any}
-                  size={18}
-                />
+          {/* Profile card */}
+          <Link
+            to="/profile"
+            onClick={() => onOpenChange(false)}
+            className="tap block rounded-2xl border border-border bg-surface/60 px-4 py-3.5 mx-3 mt-4"
+          >
+            <div className="flex items-center gap-3">
+              <Avatar name={name} src={me?.avatar_url ?? undefined} size="md" />
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1">
+                  <span className="truncate text-[15px] font-bold tracking-[-0.01em] text-foreground">{name}</span>
+                  <VerificationBadge
+                    kind={(me?.verification_kind ?? (me?.verified ? "verified" : "none")) as any}
+                    size={14}
+                  />
+                </div>
+                {me?.username && <div className="truncate text-[12.5px] text-muted-foreground">@{me.username}</div>}
               </div>
-              {me?.username && <div className="text-[14px] text-muted-foreground">@{me.username}</div>}
-              <div className="mt-3 flex items-center gap-5 text-[14px]">
-                <span><span className="font-bold text-foreground">{counts.following}</span> <span className="text-muted-foreground">Following</span></span>
-                <span><span className="font-bold text-foreground">{counts.followers}</span> <span className="text-muted-foreground">Followers</span></span>
-              </div>
-            </Link>
-          </div>
+            </div>
+            <div className="mt-2.5 flex items-center gap-4 text-[12.5px]">
+              <span><span className="font-bold text-foreground">{counts.following}</span> <span className="text-muted-foreground">Following</span></span>
+              <span><span className="font-bold text-foreground">{counts.followers}</span> <span className="text-muted-foreground">Followers</span></span>
+            </div>
+          </Link>
 
-          <nav className="flex-1 overflow-y-auto px-1">
+          <nav className="mt-2 flex-1 overflow-y-auto px-2">
             <ul className="flex flex-col">
               {items.map(({ to, label, icon: Icon }) => (
                 <li key={to}>
                   <Link
                     to={to}
                     onClick={() => onOpenChange(false)}
-                    className="tap flex items-center gap-5 rounded-xl px-4 py-3 text-[19px] font-bold tracking-[-0.01em] text-foreground hover:bg-surface-2"
+                    className="tap flex items-center gap-3.5 rounded-lg px-3 py-2 text-[15px] font-semibold tracking-[-0.005em] text-foreground hover:bg-surface-2"
                   >
-                    <Icon size={26} strokeWidth={1.8} />
+                    <Icon size={20} strokeWidth={1.8} />
                     <span>{label}</span>
                   </Link>
                 </li>
               ))}
             </ul>
 
-            <div className="mx-4 my-3 h-px bg-border" />
+            <div className="mx-3 my-2 h-px bg-border" />
 
             <Link
               to="/settings"
               onClick={() => onOpenChange(false)}
-              className="tap flex items-center gap-4 rounded-xl px-4 py-3 text-[15px] font-medium text-foreground hover:bg-surface-2"
+              className="tap flex items-center gap-3.5 rounded-lg px-3 py-2 text-[14px] font-medium text-foreground hover:bg-surface-2"
             >
-              <IconSettings size={20} strokeWidth={1.7} />
+              <IconSettings size={18} strokeWidth={1.7} />
               <span>Settings and privacy</span>
             </Link>
             <a
               href="https://faucet.circle.com"
               target="_blank"
               rel="noreferrer"
-              className="tap flex items-center justify-between rounded-xl px-4 py-3 text-[15px] font-medium text-muted-foreground hover:bg-surface-2"
+              className="tap flex items-center justify-between rounded-lg px-3 py-2 text-[14px] font-medium text-muted-foreground hover:bg-surface-2"
             >
               <span>Get testnet USDC</span>
-              <IconExternal size={16} />
+              <IconExternal size={14} />
             </a>
             {user && (
               <button
                 onClick={async () => { await signOut(); onOpenChange(false); }}
-                className="tap flex w-full items-center gap-4 rounded-xl px-4 py-3 text-left text-[15px] font-medium text-foreground hover:bg-surface-2"
+                className="tap flex w-full items-center gap-3.5 rounded-lg px-3 py-2 text-left text-[14px] font-medium text-foreground hover:bg-surface-2"
               >
-                <IconLogout size={20} strokeWidth={1.7} />
+                <IconLogout size={18} strokeWidth={1.7} />
                 <span>Log out</span>
               </button>
             )}

@@ -19,18 +19,15 @@ const writeRecent = (items: string[]) => {
   try { localStorage.setItem(RECENT_KEY, JSON.stringify(items.slice(0, 8))); } catch {}
 };
 
-const TRENDING = [
-  { topic: "Trending in tech", tag: "#Bitcoin", meta: "128K posts" },
-  { topic: "Trending in crypto", tag: "#USDC", meta: "42.1K posts" },
-  { topic: "Only on MEKU", tag: "#Onchain", meta: "8,204 posts" },
-  { topic: "Trending", tag: "#SendItLikeMeku", meta: "3,912 posts" },
-];
+interface Trend { tag: string; count: number }
+const HASHTAG_RE = /#([A-Za-z0-9_]{2,32})/g;
 
 const Explore = () => {
   const [q, setQ] = useState("");
   const [focused, setFocused] = useState(false);
   const [results, setResults] = useState<Profile[]>([]);
   const [suggested, setSuggested] = useState<Profile[]>([]);
+  const [trends, setTrends] = useState<Trend[]>([]);
   const [loading, setLoading] = useState(false);
   const [recent, setRecent] = useState<string[]>(() => readRecent());
   const inputRef = useRef<HTMLInputElement>(null);
@@ -44,6 +41,34 @@ const Explore = () => {
         .order("created_at", { ascending: false })
         .limit(10);
       setSuggested((data ?? []) as Profile[]);
+    })();
+  }, []);
+
+  // Real trending hashtags — extracted from recent posts (last 7 days).
+  useEffect(() => {
+    (async () => {
+      const since = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString();
+      const { data } = await supabase
+        .from("posts")
+        .select("title,body")
+        .gte("created_at", since)
+        .limit(500);
+      const counts = new Map<string, { display: string; count: number }>();
+      (data ?? []).forEach((p: any) => {
+        const text = `${p.title ?? ""} ${p.body ?? ""}`;
+        const matches = text.matchAll(HASHTAG_RE);
+        for (const m of matches) {
+          const key = m[1].toLowerCase();
+          const cur = counts.get(key);
+          if (cur) cur.count += 1;
+          else counts.set(key, { display: `#${m[1]}`, count: 1 });
+        }
+      });
+      const top = Array.from(counts.values())
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 6)
+        .map((t) => ({ tag: t.display, count: t.count }));
+      setTrends(top);
     })();
   }, []);
 
@@ -192,23 +217,25 @@ const Explore = () => {
       {/* Discover — trends + suggested */}
       {showDiscover && (
         <>
-          <section className="pt-3">
-            <h2 className="px-4 pb-1 text-[18px] font-bold tracking-[-0.01em] text-foreground">Trends for you</h2>
-            <ul>
-              {TRENDING.map((t) => (
-                <li key={t.tag} className="hairline-b">
-                  <button
-                    onClick={() => { setQ(t.tag); commitRecent(t.tag); inputRef.current?.focus(); }}
-                    className="tap flex w-full flex-col items-start gap-0.5 px-4 py-3 text-left hover:bg-surface/40"
-                  >
-                    <span className="text-[12px] text-muted-foreground">{t.topic}</span>
-                    <span className="text-[15px] font-bold tracking-[-0.01em] text-foreground">{t.tag}</span>
-                    <span className="text-[12px] text-muted-foreground tabular-nums">{t.meta}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </section>
+          {trends.length > 0 && (
+            <section className="pt-3">
+              <h2 className="px-4 pb-1 text-[18px] font-bold tracking-[-0.01em] text-foreground">Trends for you</h2>
+              <ul>
+                {trends.map((t) => (
+                  <li key={t.tag} className="hairline-b">
+                    <button
+                      onClick={() => { setQ(t.tag); commitRecent(t.tag); inputRef.current?.focus(); }}
+                      className="tap flex w-full flex-col items-start gap-0.5 px-4 py-3 text-left hover:bg-surface/40"
+                    >
+                      <span className="text-[12px] text-muted-foreground">Trending on MEKU</span>
+                      <span className="text-[15px] font-bold tracking-[-0.01em] text-foreground">{t.tag}</span>
+                      <span className="text-[12px] text-muted-foreground tabular-nums">{t.count} {t.count === 1 ? "post" : "posts"}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
 
           <section className="pt-5">
             <h2 className="px-4 pb-1 text-[18px] font-bold tracking-[-0.01em] text-foreground">Who to follow</h2>
