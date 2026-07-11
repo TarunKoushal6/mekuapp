@@ -53,7 +53,10 @@ const Inbox = () => {
     return () => { supabase.removeChannel(channel); };
   }, [user?.id]);
 
-  const filtered = q
+  const loading = threads === null;
+  const filtered = !threads
+    ? []
+    : q
     ? threads.filter((t) => {
         const s = (t.other?.display_name || "") + " " + (t.other?.username || "") + " " + t.last.body;
         return s.toLowerCase().includes(q.toLowerCase());
