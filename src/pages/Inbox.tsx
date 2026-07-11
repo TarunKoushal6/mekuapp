@@ -67,7 +67,7 @@ const Inbox = () => {
     <AppShell>
       <header className="sticky top-0 z-30 grid h-[52px] grid-cols-[1fr_auto_1fr] items-center bg-background/85 px-4 backdrop-blur-xl">
         <button aria-label="Open menu" className="tap inline-flex items-center justify-self-start rounded-full">
-          <Avatar name={me?.display_name || "You"} src={me?.avatar_url ?? undefined} size="sm" />
+          <Avatar name={me?.display_name || "You"} src={me?.avatar_url ?? undefined} size="xs" />
         </button>
         <div className="text-[17px] font-bold tracking-[-0.01em]">Messages</div>
         <Link to="/settings" aria-label="Settings" className="tap inline-flex h-10 w-10 items-center justify-center justify-self-end rounded-full">
