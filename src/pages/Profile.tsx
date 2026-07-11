@@ -273,10 +273,23 @@ const Profile = () => {
           </nav>
 
 
-          {tab === "Posts" && posts.length > 0 ? (
-            posts.map((p) => <FeedCard key={p.id} post={p} onChanged={load} />)
+          {visible.length > 0 ? (
+            visible.map((p) => <FeedCard key={p.id} post={p} onChanged={load} />)
           ) : (
-            <EmptyState pose="sitting" title={`No ${tab.toLowerCase()} yet`} description="When there's something to show, it shows up here." />
+            <EmptyState
+              pose="sitting"
+              title={
+                tab === "Replies" ? "No replies yet"
+                : tab === "Media" ? "No media yet"
+                : tab === "Likes" ? "No likes yet"
+                : "No posts yet"
+              }
+              description={
+                tab === "Media" ? "Posts with photos show up here."
+                : tab === "Likes" ? "Tap the heart on any post to save it here."
+                : "When there's something to show, it shows up here."
+              }
+            />
           )}
         </div>
       )}
