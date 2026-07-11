@@ -136,18 +136,18 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
   return (
     <article
       onClick={() => navigate(`/p/${post.id}`)}
-      className="hairline-b animate-fade-in cursor-pointer px-3 py-3 transition-colors duration-200 hover:bg-surface/40 active:bg-surface/60"
+      className="hairline-b animate-fade-in cursor-pointer px-2 py-3 transition-colors duration-200 hover:bg-surface/40 active:bg-surface/60"
     >
-      <header className="flex items-start gap-2.5">
+      <header className="flex items-start gap-2">
         <Link to={`/u/${handle}`} onClick={(e) => e.stopPropagation()} className="shrink-0">
           <Avatar name={name} src={author?.avatar_url ?? undefined} size="md" />
         </Link>
-        <div className="flex min-w-0 flex-1 items-start justify-between gap-2">
-          <div className="flex min-w-0 flex-wrap items-center gap-x-1 leading-tight">
+        <div className="flex min-w-0 flex-1 items-start justify-between gap-1">
+          <div className="flex min-w-0 flex-1 items-center gap-x-1 leading-tight">
             <Link
               to={`/u/${handle}`}
               onClick={(e) => e.stopPropagation()}
-              className="text-[15px] font-bold tracking-[-0.01em] text-foreground hover:underline"
+              className="truncate text-[15px] font-bold tracking-[-0.01em] text-foreground hover:underline"
             >
               {name}
             </Link>
@@ -156,9 +156,9 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
               size={15}
               className="shrink-0"
             />
-            <span className="text-[15px] text-muted-foreground">@{handle}</span>
-            <span className="text-[15px] text-muted-foreground">·</span>
-            <span className="whitespace-nowrap text-[15px] text-muted-foreground tabular-nums">
+            <span className="min-w-0 truncate text-[15px] text-muted-foreground">@{handle}</span>
+            <span className="shrink-0 text-[15px] text-muted-foreground">·</span>
+            <span className="shrink-0 whitespace-nowrap text-[15px] text-muted-foreground tabular-nums">
               {timeAgo(post.created_at)}
             </span>
           </div>
@@ -193,6 +193,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
           </div>
         </div>
       </header>
+
 
       <div className="ml-[50px] mt-0.5">
         {post.title && <h2 className="text-[15px] font-bold leading-[1.35] tracking-[-0.01em] text-foreground">{post.title}</h2>}
