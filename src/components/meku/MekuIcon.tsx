@@ -1,11 +1,12 @@
-// MEKU custom stroke icons — refined to match the official iconography sheet.
-// 24x24 grid, 1.6 stroke, round caps/joins. Single visual language.
+// MEKU icons — X (Twitter)-style stroke geometry: 24x24 grid, 2px stroke,
+// round caps/joins, filled-forward silhouettes. Single visual language.
 import { SVGProps } from "react";
 
 type IconProps = SVGProps<SVGSVGElement> & { size?: number; strokeWidth?: number };
 
+
 const wrap = (children: React.ReactNode) =>
-  (({ size = 22, strokeWidth = 1.6, ...rest }: IconProps) => (
+  (({ size = 24, strokeWidth = 2, ...rest }: IconProps) => (
     <svg
       viewBox="0 0 24 24"
       width={size}
@@ -20,6 +21,7 @@ const wrap = (children: React.ReactNode) =>
       {children}
     </svg>
   )) as (p: IconProps) => JSX.Element;
+
 
 // ── Brand / Action icons ────────────────────────────────────────────────────
 
@@ -84,23 +86,26 @@ export const IconDroplet = wrap(
 
 // ── Navigation icons ───────────────────────────────────────────────────────
 
+// House — X-style pitched roof, floating base.
 export const IconHome = wrap(
   <>
-    <path d="M3.5 11.5 12 4l8.5 7.5" />
-    <path d="M5 10.5V20h4v-5h6v5h4v-9.5" />
+    <path d="M3 11 12 3l9 8" />
+    <path d="M5 9.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.5" />
   </>,
 );
 
+// Explore — X uses a rotated square (magnifier tilted) with an inner tick.
 export const IconExplore = wrap(
   <>
-    <circle cx="12" cy="12" r="9" />
-    <path d="m15.5 8.5-2 5.4-5.4 2 2-5.4 5.4-2Z" />
+    <rect x="4" y="4" width="16" height="16" rx="2" transform="rotate(45 12 12)" />
+    <path d="M9 15 12 9l3 6-3-1.5Z" />
   </>,
 );
 
+// Bell — X's rounded-shoulder bell, straight base, small clapper.
 export const IconBell = wrap(
   <>
-    <path d="M6 16.5V11a6 6 0 1 1 12 0v5.5l1.4 1.9a.5.5 0 0 1-.4.8H5a.5.5 0 0 1-.4-.8L6 16.5Z" />
+    <path d="M5.5 17h13l-1.6-2V11a5 5 0 1 0-9.8 0v4L5.5 17Z" />
     <path d="M10 20a2 2 0 0 0 4 0" />
   </>,
 );
@@ -122,26 +127,30 @@ export const IconActivity = wrap(
 
 export const IconPlus = wrap(<><path d="M12 5v14M5 12h14" /></>);
 
+// Person — X's head + narrow shoulder curve.
 export const IconProfile = wrap(
   <>
-    <circle cx="12" cy="8.5" r="3.7" />
-    <path d="M4.5 20c1.5-3.7 4.4-5.6 7.5-5.6S18 16.3 19.5 20" />
+    <circle cx="12" cy="8" r="4" />
+    <path d="M4 21c1.5-4.2 4.6-6.5 8-6.5s6.5 2.3 8 6.5" />
   </>,
 );
 
+// Search — X uses a slightly offset lens with straight handle.
 export const IconSearch = wrap(
   <>
-    <circle cx="11" cy="11" r="6.5" />
-    <path d="m20 20-4.2-4.2" />
+    <circle cx="10.5" cy="10.5" r="6.5" />
+    <path d="m20 20-4.6-4.6" />
   </>,
 );
 
+// Compose — X's feather-in-square: pencil emerging from rounded square.
 export const IconCompose = wrap(
   <>
-    <path d="M4 20h4l10-10-4-4L4 16Z" />
-    <path d="m14 6 4 4" />
+    <path d="M19 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h6" />
+    <path d="M15.5 4.5 20 9l-8.5 8.5H7v-4.5L15.5 4.5Z" />
   </>,
 );
+
 
 // Settings — clean 8-tooth gear, symmetric.
 export const IconSettings = wrap(
