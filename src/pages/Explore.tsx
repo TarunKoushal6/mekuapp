@@ -19,12 +19,8 @@ const writeRecent = (items: string[]) => {
   try { localStorage.setItem(RECENT_KEY, JSON.stringify(items.slice(0, 8))); } catch {}
 };
 
-const TRENDING = [
-  { topic: "Trending in tech", tag: "#Bitcoin", meta: "128K posts" },
-  { topic: "Trending in crypto", tag: "#USDC", meta: "42.1K posts" },
-  { topic: "Only on MEKU", tag: "#Onchain", meta: "8,204 posts" },
-  { topic: "Trending", tag: "#SendItLikeMeku", meta: "3,912 posts" },
-];
+interface Trend { tag: string; count: number }
+const HASHTAG_RE = /#([A-Za-z0-9_]{2,32})/g;
 
 const Explore = () => {
   const [q, setQ] = useState("");
