@@ -136,9 +136,9 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
   return (
     <article
       onClick={() => navigate(`/p/${post.id}`)}
-      className="hairline-b animate-fade-in cursor-pointer px-4 py-3 transition-colors duration-200 hover:bg-surface/40 active:bg-surface/60"
+      className="hairline-b animate-fade-in cursor-pointer px-3 py-3 transition-colors duration-200 hover:bg-surface/40 active:bg-surface/60"
     >
-      <header className="flex items-start gap-3">
+      <header className="flex items-start gap-2.5">
         <Link to={`/u/${handle}`} onClick={(e) => e.stopPropagation()} className="shrink-0">
           <Avatar name={name} src={author?.avatar_url ?? undefined} size="md" />
         </Link>
