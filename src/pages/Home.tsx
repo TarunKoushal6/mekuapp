@@ -1,7 +1,8 @@
 import { AppShell } from "@/components/meku/AppShell";
 import { FeedCard } from "@/components/meku/FeedCard";
 import { EmptyState } from "@/components/meku/EmptyState";
-import { IconSettings, IconPlus } from "@/components/meku/MekuIcon";
+import { IconPlus } from "@/components/meku/MekuIcon";
+import { Bell } from "lucide-react";
 import { Logo } from "@/components/meku/Logo";
 import { Avatar } from "@/components/meku/Avatar";
 import { SideMenu } from "@/components/meku/SideMenu";
