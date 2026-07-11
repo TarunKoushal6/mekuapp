@@ -9,7 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { fetchNotifications, markAllRead, type NotificationWithActor } from "@/lib/notifications";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar } from "@/components/meku/Avatar";
-import { Heart, MessageCircle, Repeat2, AtSign, Coins, UserPlus, Loader2 } from "lucide-react";
+import { Heart, MessageCircle, Repeat2, AtSign, Coins, UserPlus } from "lucide-react";
 import { timeAgo } from "@/lib/social";
 
 const ICON = {
