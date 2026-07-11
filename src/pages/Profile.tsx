@@ -2,7 +2,7 @@ import { AppShell } from "@/components/meku/AppShell";
 import { VerificationBadge } from "@/components/meku/VerificationBadge";
 import { IconBack, IconMore, IconSettings, IconCopy, IconExternal } from "@/components/meku/MekuIcon";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/meku/Avatar";
 import { EmptyState } from "@/components/meku/EmptyState";
