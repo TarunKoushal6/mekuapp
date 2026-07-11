@@ -289,6 +289,7 @@ const PostDetail = () => {
         </p>
 
         <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1 border-y border-border py-3 text-[13px] text-muted-foreground">
+          <span className="inline-flex items-center gap-1"><BarChart2 className="h-[14px] w-[14px]" strokeWidth={1.8} /><strong className="text-foreground">{formatCount(viewCount)}</strong> Impressions</span>
           <span><strong className="text-foreground">{formatCount(post.comment_count)}</strong> Replies</span>
           <span><strong className="text-foreground">{formatCount(post.like_count)}</strong> Likes</span>
         </div>
