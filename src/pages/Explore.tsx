@@ -44,6 +44,34 @@ const Explore = () => {
     })();
   }, []);
 
+  // Real trending hashtags — extracted from recent posts (last 7 days).
+  useEffect(() => {
+    (async () => {
+      const since = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString();
+      const { data } = await supabase
+        .from("posts")
+        .select("title,body")
+        .gte("created_at", since)
+        .limit(500);
+      const counts = new Map<string, { display: string; count: number }>();
+      (data ?? []).forEach((p: any) => {
+        const text = `${p.title ?? ""} ${p.body ?? ""}`;
+        const matches = text.matchAll(HASHTAG_RE);
+        for (const m of matches) {
+          const key = m[1].toLowerCase();
+          const cur = counts.get(key);
+          if (cur) cur.count += 1;
+          else counts.set(key, { display: `#${m[1]}`, count: 1 });
+        }
+      });
+      const top = Array.from(counts.values())
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 6)
+        .map((t) => ({ tag: t.display, count: t.count }));
+      setTrends(top);
+    })();
+  }, []);
+
   // Debounced search.
   useEffect(() => {
     const term = q.trim();
