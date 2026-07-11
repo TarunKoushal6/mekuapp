@@ -12,6 +12,7 @@ import Profile from "./pages/Profile.tsx";
 import Notifications from "./pages/Notifications.tsx";
 import Onchain from "./pages/Onchain.tsx";
 import Chat from "./pages/Chat.tsx";
+import NewMessage from "./pages/NewMessage.tsx";
 import Auth from "./pages/Auth.tsx";
 import Settings from "./pages/Settings.tsx";
 import EditProfile from "./pages/EditProfile.tsx";
@@ -48,6 +49,7 @@ const App = () => (
           <Route path="/u/:handle" element={<Profile />} />
           <Route path="/create" element={<RequireAuth><Create /></RequireAuth>} />
           <Route path="/inbox" element={<RequireAuth><Inbox /></RequireAuth>} />
+          <Route path="/inbox/new" element={<RequireAuth><NewMessage /></RequireAuth>} />
           <Route path="/inbox/:id" element={<RequireAuth><Chat /></RequireAuth>} />
           <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
           <Route path="/notifications" element={<RequireAuth><Notifications /></RequireAuth>} />

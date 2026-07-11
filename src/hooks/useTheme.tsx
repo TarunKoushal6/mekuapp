@@ -1,23 +1,23 @@
 import { createContext, useContext, useEffect, ReactNode } from "react";
 
-type Theme = "dark";
+type Theme = "light";
 const ThemeCtx = createContext<{ theme: Theme; setTheme: (t: Theme) => void; toggle: () => void }>({
-  theme: "dark",
+  theme: "light",
   setTheme: () => {},
   toggle: () => {},
 });
 
-// MEKU — Midnight Indigo. Dark by product decision.
+// MEKU — Light theme.
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const root = document.documentElement;
-    root.classList.remove("light");
-    root.classList.add("dark");
-    try { localStorage.setItem("meku-theme", "dark"); } catch {}
+    root.classList.remove("dark");
+    root.classList.add("light");
+    try { localStorage.setItem("meku-theme", "light"); } catch {}
   }, []);
 
   return (
-    <ThemeCtx.Provider value={{ theme: "dark", setTheme: () => {}, toggle: () => {} }}>
+    <ThemeCtx.Provider value={{ theme: "light", setTheme: () => {}, toggle: () => {} }}>
       {children}
     </ThemeCtx.Provider>
   );
