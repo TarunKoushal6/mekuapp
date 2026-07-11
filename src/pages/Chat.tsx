@@ -69,7 +69,7 @@ const Chat = () => {
     setDraft("");
     try {
       const m = await sendMessage(user.id, otherId, body);
-      if (m) setMessages((prev) => (prev.find((x) => x.id === m.id) ? prev : [...prev, m]));
+      if (m) setMessages((prev) => (prev?.find((x) => x.id === m.id) ? prev : [...(prev ?? []), m]));
     } catch (err: any) {
       setDraft(body);
       toast.error(err.message ?? "Could not send");
