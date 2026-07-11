@@ -38,7 +38,12 @@ const Home = () => {
 
   useLayoutEffect(() => {
     const el = tabRefs.current[tab];
-    if (el) setIndicator({ left: el.offsetLeft, width: el.offsetWidth });
+    if (!el) return;
+    // X-style: short centered underline sized to the label, not the full tab
+    const label = el.querySelector<HTMLSpanElement>("[data-tab-label]");
+    const w = label?.offsetWidth ?? el.offsetWidth;
+    const left = el.offsetLeft + (el.offsetWidth - w) / 2;
+    setIndicator({ left, width: w });
   }, [tab]);
 
   // Pull-to-refresh
