@@ -76,15 +76,15 @@ const Home = () => {
             aria-label="Open menu"
             className="tap relative inline-flex items-center justify-center rounded-full"
           >
-            <Avatar name={me?.display_name || me?.username || "You"} src={me?.avatar_url ?? undefined} size="sm" />
-            {hasUnread && <span className="absolute -right-0.5 -top-0.5 h-[9px] w-[9px] rounded-full bg-primary ring-2 ring-background" />}
+            <Avatar name={me?.display_name || me?.username || "You"} src={me?.avatar_url ?? undefined} size="xs" />
+            {hasUnread && <span className="absolute -right-0.5 -top-0.5 h-[8px] w-[8px] rounded-full bg-primary ring-2 ring-background" />}
           </button>
         </div>
         <div className="flex items-center justify-center">
-          <Logo size={22} wordmark={false} />
+          <Logo size={26} wordmark />
         </div>
         <div className="flex items-center justify-end">
-          <Link to="/settings" aria-label="Settings" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground">
+          <Link to="/settings" aria-label="Settings" className="tap inline-flex h-9 w-9 items-center justify-center rounded-full text-foreground">
             <IconSettings size={20} />
           </Link>
         </div>
