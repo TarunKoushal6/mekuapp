@@ -81,7 +81,7 @@ const Home = () => {
           </button>
         </div>
         <div className="flex items-center justify-center">
-          <Logo size={26} wordmark />
+          <Logo size={32} wordmark />
         </div>
         <div className="flex items-center justify-end">
           <Link to="/settings" aria-label="Settings" className="tap inline-flex h-9 w-9 items-center justify-center rounded-full text-foreground">
