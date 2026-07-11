@@ -2,7 +2,7 @@ import { AppShell } from "@/components/meku/AppShell";
 import { VerificationBadge } from "@/components/meku/VerificationBadge";
 import { IconBack, IconMore, IconSettings, IconCopy, IconExternal } from "@/components/meku/MekuIcon";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/meku/Avatar";
 import { EmptyState } from "@/components/meku/EmptyState";
@@ -27,10 +27,19 @@ const Profile = () => {
   const [tab, setTab] = useState<Tab>("Posts");
   const [profile, setProfile] = useState<ProfileT | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
+  const [likedPosts, setLikedPosts] = useState<Post[]>([]);
+  const [likedLoaded, setLikedLoaded] = useState(false);
   const [loading, setLoading] = useState(true);
   const [counts, setCounts] = useState({ followers: 0, following: 0 });
   const [following, setFollowing] = useState(false);
   const [followBusy, setFollowBusy] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 120);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const load = useCallback(async () => {
     if (authLoading) return;
@@ -49,6 +58,8 @@ const Profile = () => {
         p = await getProfile(user.id);
       }
       setProfile(p);
+      setLikedLoaded(false);
+      setLikedPosts([]);
       if (p) {
         const [all, c, follows] = await Promise.all([
           fetchPosts(user?.id, { authorId: p.id }),
@@ -63,6 +74,38 @@ const Profile = () => {
   }, [authLoading, handle, user]);
 
   useEffect(() => { load(); }, [load]);
+
+  // Lazy-load liked posts when the Likes tab opens.
+  useEffect(() => {
+    if (tab !== "Likes" || !profile || likedLoaded) return;
+    (async () => {
+      const { data: likes } = await supabase
+        .from("post_likes")
+        .select("post_id, created_at")
+        .eq("user_id", profile.id)
+        .order("created_at", { ascending: false })
+        .limit(50);
+      const ids = (likes ?? []).map((l: any) => l.post_id);
+      if (ids.length === 0) { setLikedLoaded(true); return; }
+      const { data: rows } = await supabase
+        .from("posts")
+        .select("id, user_id, title, body, image_url, created_at")
+        .in("id", ids);
+      const orderIndex = new Map(ids.map((id, i) => [id, i]));
+      const sorted = (rows ?? []).slice().sort(
+        (a: any, b: any) => (orderIndex.get(a.id)! - orderIndex.get(b.id)!),
+      );
+      // enrich with author + counts using the same helper
+      const userIds = Array.from(new Set(sorted.map((r: any) => r.user_id)));
+      const { data: profiles } = await supabase.from("profiles").select("*").in("id", userIds);
+      const pMap = new Map((profiles ?? []).map((p: any) => [p.id, p]));
+      setLikedPosts(sorted.map((p: any) => ({
+        ...p, author: pMap.get(p.user_id) ?? null,
+        like_count: 0, comment_count: 0, liked_by_me: true,
+      })));
+      setLikedLoaded(true);
+    })();
+  }, [tab, profile, likedLoaded]);
 
   const toggleFollow = async () => {
     if (!user || !profile || followBusy) { if (!user) navigate("/auth"); return; }
@@ -85,21 +128,48 @@ const Profile = () => {
   const name = profile?.display_name || profile?.username || "Profile";
   const stats = { posts: posts.length, followers: counts.followers, following: counts.following };
 
+  const visible = useMemo<Post[]>(() => {
+    if (tab === "Posts") return posts;
+    if (tab === "Media") return posts.filter((p) => !!p.image_url);
+    if (tab === "Replies") return []; // replies live under comments; empty until dedicated view
+    if (tab === "Likes") return likedPosts;
+    return posts;
+  }, [tab, posts, likedPosts]);
+
   return (
     <AppShell>
-      <header className="sticky top-0 z-30 flex h-[52px] items-center justify-between bg-background/70 px-3 backdrop-blur-xl">
-        <button onClick={() => navigate(-1)} aria-label="Back" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full bg-background/60 text-foreground backdrop-blur">
-          <IconBack size={20} />
-        </button>
+      <header
+        className={cn(
+          "sticky top-0 z-30 flex h-[52px] items-center justify-between px-3 transition-colors",
+          scrolled ? "bg-background/85 backdrop-blur-xl hairline-b" : "bg-transparent",
+        )}
+      >
+        <div className="flex items-center gap-2 min-w-0">
+          <button onClick={() => navigate(-1)} aria-label="Back" className="tap inline-flex h-9 w-9 items-center justify-center rounded-full bg-background/50 text-foreground backdrop-blur">
+            <IconBack size={20} />
+          </button>
+          <div
+            className={cn(
+              "min-w-0 transition-all duration-200",
+              scrolled ? "opacity-100 translate-y-0" : "pointer-events-none opacity-0 -translate-y-1",
+            )}
+          >
+            <div className="flex items-center gap-1 truncate text-[16px] font-bold tracking-[-0.01em] text-foreground">
+              <span className="truncate">{name}</span>
+              <VerificationBadge kind={(profile?.verification_kind ?? (profile?.verified ? "verified" : "none")) as any} size={14} />
+            </div>
+            <div className="text-[12px] leading-none text-muted-foreground tabular-nums">{stats.posts} posts</div>
+          </div>
+        </div>
         <div className="flex items-center gap-1">
           {isMe && (
-            <Link to="/settings" aria-label="Settings" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full bg-background/60 text-foreground backdrop-blur">
+            <Link to="/settings" aria-label="Settings" className="tap inline-flex h-9 w-9 items-center justify-center rounded-full bg-background/50 text-foreground backdrop-blur">
               <IconSettings size={18} />
             </Link>
           )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button aria-label="More" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full bg-background/60 text-foreground backdrop-blur">
+              <button aria-label="More" className="tap inline-flex h-9 w-9 items-center justify-center rounded-full bg-background/50 text-foreground backdrop-blur">
                 <IconMore size={20} />
               </button>
             </DropdownMenuTrigger>
@@ -126,6 +196,7 @@ const Profile = () => {
           </DropdownMenu>
         </div>
       </header>
+
 
       {loading ? (
         <>
@@ -202,10 +273,23 @@ const Profile = () => {
           </nav>
 
 
-          {tab === "Posts" && posts.length > 0 ? (
-            posts.map((p) => <FeedCard key={p.id} post={p} onChanged={load} />)
+          {visible.length > 0 ? (
+            visible.map((p) => <FeedCard key={p.id} post={p} onChanged={load} />)
           ) : (
-            <EmptyState pose="sitting" title={`No ${tab.toLowerCase()} yet`} description="When there's something to show, it shows up here." />
+            <EmptyState
+              pose="sitting"
+              title={
+                tab === "Replies" ? "No replies yet"
+                : tab === "Media" ? "No media yet"
+                : tab === "Likes" ? "No likes yet"
+                : "No posts yet"
+              }
+              description={
+                tab === "Media" ? "Posts with photos show up here."
+                : tab === "Likes" ? "Tap the heart on any post to save it here."
+                : "When there's something to show, it shows up here."
+              }
+            />
           )}
         </div>
       )}

@@ -1,22 +1,56 @@
 import { AppShell } from "@/components/meku/AppShell";
-import { TopBar } from "@/components/meku/TopBar";
-import { Logo } from "@/components/meku/Logo";
 import { EmptyState } from "@/components/meku/EmptyState";
 import { IconSearch } from "@/components/meku/MekuIcon";
 import { Avatar } from "@/components/meku/Avatar";
-import { useEffect, useState } from "react";
+import { VerificationBadge } from "@/components/meku/VerificationBadge";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import type { Profile } from "@/lib/social";
+import { type Profile } from "@/lib/social";
 import { Link } from "react-router-dom";
+import { cn } from "@/lib/utils";
+import { X } from "lucide-react";
+
+const RECENT_KEY = "meku.search.recent.v1";
+
+const readRecent = (): string[] => {
+  try { return JSON.parse(localStorage.getItem(RECENT_KEY) || "[]"); } catch { return []; }
+};
+const writeRecent = (items: string[]) => {
+  try { localStorage.setItem(RECENT_KEY, JSON.stringify(items.slice(0, 8))); } catch {}
+};
+
+const TRENDING = [
+  { topic: "Trending in tech", tag: "#Bitcoin", meta: "128K posts" },
+  { topic: "Trending in crypto", tag: "#USDC", meta: "42.1K posts" },
+  { topic: "Only on MEKU", tag: "#Onchain", meta: "8,204 posts" },
+  { topic: "Trending", tag: "#SendItLikeMeku", meta: "3,912 posts" },
+];
 
 const Explore = () => {
   const [q, setQ] = useState("");
+  const [focused, setFocused] = useState(false);
   const [results, setResults] = useState<Profile[]>([]);
+  const [suggested, setSuggested] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(false);
+  const [recent, setRecent] = useState<string[]>(() => readRecent());
+  const inputRef = useRef<HTMLInputElement>(null);
 
+  // Suggested people (top ~10 profiles).
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(10);
+      setSuggested((data ?? []) as Profile[]);
+    })();
+  }, []);
+
+  // Debounced search.
   useEffect(() => {
     const term = q.trim();
-    if (!term) { setResults([]); return; }
+    if (!term) { setResults([]); setLoading(false); return; }
     setLoading(true);
     const t = setTimeout(async () => {
       const like = `%${term}%`;
@@ -31,70 +65,178 @@ const Explore = () => {
     return () => clearTimeout(t);
   }, [q]);
 
+  const commitRecent = (term: string) => {
+    const t = term.trim();
+    if (!t) return;
+    const next = [t, ...recent.filter((r) => r.toLowerCase() !== t.toLowerCase())].slice(0, 8);
+    setRecent(next);
+    writeRecent(next);
+  };
+  const clearRecent = () => { setRecent([]); writeRecent([]); };
+  const removeRecent = (r: string) => {
+    const next = recent.filter((x) => x !== r);
+    setRecent(next); writeRecent(next);
+  };
+
+  const showResults = q.trim().length > 0;
+  const showRecents = !showResults && recent.length > 0;
+  const showDiscover = !showResults;
+
+  const orderedSuggested = useMemo(() => suggested.slice(0, 6), [suggested]);
+
   return (
     <AppShell>
-      <TopBar left={<div className="pl-3"><Logo size={20} /></div>} />
-
-      <section className="px-4 pb-4 pt-4">
-        <h1 className="t-h2 text-foreground">Explore</h1>
-      </section>
-
-      <div className="px-4">
-        <label className="flex h-[48px] items-center gap-3 rounded-full bg-surface-2 px-4">
-          <IconSearch size={18} />
+      {/* Sticky search header */}
+      <header className="sticky top-0 z-30 bg-background/85 px-4 pt-3 pb-3 backdrop-blur-xl">
+        <form
+          onSubmit={(e) => { e.preventDefault(); commitRecent(q); inputRef.current?.blur(); }}
+          className={cn(
+            "flex h-[42px] items-center gap-2 rounded-full border bg-surface-2 px-4 transition-colors",
+            focused ? "border-primary" : "border-transparent",
+          )}
+        >
+          <IconSearch size={18} className={cn(focused ? "text-primary" : "text-muted-foreground")} />
           <input
+            ref={inputRef}
             value={q}
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Search people by name or handle"
+            placeholder="Search MEKU"
             className="flex-1 bg-transparent text-[15px] text-foreground outline-none placeholder:text-muted-foreground"
           />
-        </label>
-      </div>
+          {q && (
+            <button
+              type="button"
+              onClick={() => { setQ(""); inputRef.current?.focus(); }}
+              className="tap inline-flex h-6 w-6 items-center justify-center rounded-full bg-foreground/80 text-background"
+              aria-label="Clear"
+            >
+              <X size={14} strokeWidth={3} />
+            </button>
+          )}
+        </form>
+      </header>
 
-      {q.trim().length === 0 ? (
-        <EmptyState
-          pose="searching"
-          title="Find your people"
-          description="Search by name or handle."
-        />
-      ) : loading ? (
-        <ul className="mt-3">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <li key={i} className="flex items-center gap-3 px-4 py-3">
-              <div className="h-12 w-12 rounded-full bg-surface-2 animate-pulse" />
-              <div className="flex-1 space-y-2">
-                <div className="h-3.5 w-32 rounded bg-surface-2 animate-pulse" />
-                <div className="h-3 w-20 rounded bg-surface-2 animate-pulse" />
-              </div>
-            </li>
-          ))}
-        </ul>
-      ) : results.length === 0 ? (
-        <EmptyState
-          pose="thinking"
-          title={`No results for "${q}"`}
-          description="Try a different name or handle."
-        />
-      ) : (
-        <ul className="mt-2">
-          {results.map((p) => (
-            <li key={p.id} className="hairline-b">
-              <Link
-                to={p.username ? `/u/${p.username}` : "#"}
-                className="tap flex items-center gap-3 px-4 py-3 hover:bg-surface/40"
-              >
-                <Avatar name={p.display_name || p.username || "User"} src={p.avatar_url ?? undefined} size="lg" />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-[15px] font-bold text-foreground">
-                    {p.display_name || p.username || "User"}
-                  </p>
-                  {p.username && <p className="truncate text-[13px] text-muted-foreground">@{p.username}</p>}
-                  {p.bio && <p className="mt-0.5 truncate text-[13px] text-foreground/80">{p.bio}</p>}
+      {/* Live search results */}
+      {showResults && (
+        loading ? (
+          <ul className="mt-1">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <li key={i} className="flex items-center gap-3 px-4 py-3">
+                <div className="h-12 w-12 rounded-full bg-surface-2 animate-pulse" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-3.5 w-32 rounded bg-surface-2 animate-pulse" />
+                  <div className="h-3 w-20 rounded bg-surface-2 animate-pulse" />
                 </div>
-              </Link>
-            </li>
-          ))}
-        </ul>
+              </li>
+            ))}
+          </ul>
+        ) : results.length === 0 ? (
+          <EmptyState pose="thinking" title={`No results for "${q}"`} description="Try a different name or handle." />
+        ) : (
+          <ul>
+            {results.map((p) => (
+              <li key={p.id} className="hairline-b">
+                <Link
+                  to={p.username ? `/u/${p.username}` : "#"}
+                  onClick={() => commitRecent(q)}
+                  className="tap flex items-center gap-3 px-4 py-3 hover:bg-surface/40"
+                >
+                  <Avatar name={p.display_name || p.username || "User"} src={p.avatar_url ?? undefined} size="lg" />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1 truncate">
+                      <span className="truncate text-[15px] font-bold text-foreground">{p.display_name || p.username || "User"}</span>
+                      <VerificationBadge kind={(p.verification_kind ?? (p.verified ? "verified" : "none")) as any} size={14} />
+                    </div>
+                    {p.username && <p className="truncate text-[13px] text-muted-foreground">@{p.username}</p>}
+                    {p.bio && <p className="mt-0.5 truncate text-[13px] text-foreground/80">{p.bio}</p>}
+                  </div>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )
+      )}
+
+      {/* Recents */}
+      {showRecents && (
+        <section className="pt-2">
+          <div className="flex items-center justify-between px-4 pb-1">
+            <h2 className="text-[15px] font-bold tracking-[-0.01em] text-foreground">Recent searches</h2>
+            <button onClick={clearRecent} className="tap text-[13px] font-semibold text-primary">Clear all</button>
+          </div>
+          <ul>
+            {recent.map((r) => (
+              <li key={r} className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface/40">
+                <button
+                  onClick={() => { setQ(r); inputRef.current?.focus(); }}
+                  className="tap flex flex-1 items-center gap-3 text-left"
+                >
+                  <IconSearch size={16} className="text-muted-foreground" />
+                  <span className="truncate text-[15px] text-foreground">{r}</span>
+                </button>
+                <button
+                  onClick={() => removeRecent(r)}
+                  aria-label={`Remove ${r}`}
+                  className="tap inline-flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground hover:bg-surface-2"
+                >
+                  <X size={14} />
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {/* Discover — trends + suggested */}
+      {showDiscover && (
+        <>
+          <section className="pt-3">
+            <h2 className="px-4 pb-1 text-[18px] font-bold tracking-[-0.01em] text-foreground">Trends for you</h2>
+            <ul>
+              {TRENDING.map((t) => (
+                <li key={t.tag} className="hairline-b">
+                  <button
+                    onClick={() => { setQ(t.tag); commitRecent(t.tag); inputRef.current?.focus(); }}
+                    className="tap flex w-full flex-col items-start gap-0.5 px-4 py-3 text-left hover:bg-surface/40"
+                  >
+                    <span className="text-[12px] text-muted-foreground">{t.topic}</span>
+                    <span className="text-[15px] font-bold tracking-[-0.01em] text-foreground">{t.tag}</span>
+                    <span className="text-[12px] text-muted-foreground tabular-nums">{t.meta}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <section className="pt-5">
+            <h2 className="px-4 pb-1 text-[18px] font-bold tracking-[-0.01em] text-foreground">Who to follow</h2>
+            {orderedSuggested.length === 0 ? (
+              <EmptyState pose="searching" title="Nobody yet" description="New accounts show up here as MEKU grows." />
+            ) : (
+              <ul>
+                {orderedSuggested.map((p) => (
+                  <li key={p.id} className="hairline-b">
+                    <Link
+                      to={p.username ? `/u/${p.username}` : "#"}
+                      className="tap flex items-center gap-3 px-4 py-3 hover:bg-surface/40"
+                    >
+                      <Avatar name={p.display_name || p.username || "User"} src={p.avatar_url ?? undefined} size="lg" />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1 truncate">
+                          <span className="truncate text-[15px] font-bold text-foreground">{p.display_name || p.username || "User"}</span>
+                          <VerificationBadge kind={(p.verification_kind ?? (p.verified ? "verified" : "none")) as any} size={14} />
+                        </div>
+                        {p.username && <p className="truncate text-[13px] text-muted-foreground">@{p.username}</p>}
+                      </div>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        </>
       )}
     </AppShell>
   );
