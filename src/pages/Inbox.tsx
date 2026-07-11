@@ -16,7 +16,7 @@ interface ThreadRow extends DmThread {
 const Inbox = () => {
   const { user } = useAuth();
   const [me, setMe] = useState<Profile | null>(null);
-  const [threads, setThreads] = useState<ThreadRow[]>([]);
+  const [threads, setThreads] = useState<ThreadRow[] | null>(null);
   const [q, setQ] = useState("");
 
   useEffect(() => {
