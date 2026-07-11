@@ -71,9 +71,10 @@ export async function fetchPosts(
     .from("posts")
     .select("id, user_id, title, body, image_url, created_at")
     .order("created_at", { ascending: false })
-    .limit(50);
+    .limit(opts.limit ?? 20);
   if (opts.authorId) query = query.eq("user_id", opts.authorId);
   if (followingIds) query = query.in("user_id", followingIds);
+  if (opts.before) query = query.lt("created_at", opts.before);
 
   const { data: posts, error } = await query;
   if (error) throw error;
