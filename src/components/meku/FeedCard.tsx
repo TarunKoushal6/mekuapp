@@ -238,20 +238,30 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
             />
             <span className={cn("text-[13px] tabular-nums", liked && "text-[#ff5b89]")}>{likeCount}</span>
           </div>
-          <BookmarkSave
-            checked={bookmarked}
-            onChange={(e) => {
-              e.stopPropagation();
-              const next = !bookmarked;
-              setBookmarked(next);
-              toggleBookmark(user?.id, post.id, next);
-            }}
-            size={18}
-            aria-label="Save"
-          />
-          <button onClick={handleShare} className="tap transition-colors hover:text-foreground" aria-label="Share">
-            <Upload className="h-[18px] w-[18px]" strokeWidth={1.6} />
+          <button
+            onClick={(e) => { e.stopPropagation(); navigate(`/p/${post.id}`); }}
+            className="tap inline-flex items-center gap-1.5 transition-colors hover:text-foreground"
+            aria-label="Views"
+          >
+            <BarChart2 className="h-[18px] w-[18px]" strokeWidth={1.6} />
+            <span className="text-[13px] tabular-nums">{viewCount}</span>
           </button>
+          <div className="inline-flex items-center gap-1">
+            <BookmarkSave
+              checked={bookmarked}
+              onChange={(e) => {
+                e.stopPropagation();
+                const next = !bookmarked;
+                setBookmarked(next);
+                toggleBookmark(user?.id, post.id, next);
+              }}
+              size={18}
+              aria-label="Save"
+            />
+            <button onClick={handleShare} className="tap transition-colors hover:text-foreground" aria-label="Share">
+              <Upload className="h-[18px] w-[18px]" strokeWidth={1.6} />
+            </button>
+          </div>
         </div>
       </div>
       {tipOpen && (
