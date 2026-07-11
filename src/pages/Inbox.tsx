@@ -89,17 +89,7 @@ const Inbox = () => {
       </section>
 
       {loading ? (
-        <ul className="animate-fade-in">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <li key={i} className="hairline-b flex items-start gap-3 px-4 py-3.5">
-              <div className="h-12 w-12 shrink-0 rounded-full bg-surface-2 animate-pulse" />
-              <div className="min-w-0 flex-1 space-y-2 pt-1">
-                <div className="h-3.5 w-32 rounded bg-surface-2 animate-pulse" />
-                <div className="h-3 w-[80%] rounded bg-surface-2 animate-pulse" />
-              </div>
-            </li>
-          ))}
-        </ul>
+        <EmptyState pose="sitting" title="Loading messages" description="Grabbing your latest conversations." />
       ) : filtered.length === 0 ? (
         <EmptyState
           pose="caughtup"
