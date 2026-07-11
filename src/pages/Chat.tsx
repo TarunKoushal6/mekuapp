@@ -100,32 +100,52 @@ const Chat = () => {
       </header>
 
       <div ref={scrollRef} className="flex-1 space-y-1.5 overflow-y-auto px-3 pb-[96px] pt-4">
-        {messages.length === 0 && (
-          <p className="mt-16 text-center text-[13px] text-muted-foreground">Say hello 👋</p>
-        )}
-        {messages.map((m, i) => {
-          const mine = m.sender_id === user?.id;
-          const prev = messages[i - 1];
-          const grouped = prev && prev.sender_id === m.sender_id;
-          return (
-            <div key={m.id} className={cn("flex", mine ? "justify-end" : "justify-start")}>
-              <div
-                className={cn(
-                  "max-w-[78%] whitespace-pre-wrap break-words px-3.5 py-2 text-[15px] leading-[1.35]",
-                  mine
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-surface-2 text-foreground",
-                  mine
-                    ? grouped ? "rounded-2xl rounded-br-md" : "rounded-2xl rounded-br-md"
-                    : grouped ? "rounded-2xl rounded-bl-md" : "rounded-2xl rounded-bl-md",
-                )}
-              >
-                {m.body}
+        {messages === null ? (
+          <div className="animate-fade-in space-y-2">
+            {[0, 1, 2, 3].map((i) => (
+              <div key={i} className={cn("flex", i % 2 ? "justify-end" : "justify-start")}>
+                <div
+                  className={cn(
+                    "h-8 animate-pulse rounded-2xl bg-surface-2",
+                    i % 2 ? "w-40" : "w-52",
+                  )}
+                />
               </div>
-            </div>
-          );
-        })}
+            ))}
+          </div>
+        ) : messages.length === 0 ? (
+          <div className="mt-16 flex flex-col items-center px-8 text-center">
+            <Avatar name={name} src={other?.avatar_url ?? undefined} size="xl" />
+            <p className="mt-4 text-[17px] font-bold text-foreground">{name}</p>
+            {handle && <p className="text-[13px] text-muted-foreground">@{handle}</p>}
+            <p className="mt-3 text-[13px] leading-relaxed text-muted-foreground">
+              This is the start of your conversation. Say hi 👋
+            </p>
+          </div>
+        ) : (
+          messages.map((m, i) => {
+            const mine = m.sender_id === user?.id;
+            const prev = messages[i - 1];
+            const grouped = prev && prev.sender_id === m.sender_id;
+            return (
+              <div key={m.id} className={cn("flex", mine ? "justify-end" : "justify-start")}>
+                <div
+                  className={cn(
+                    "max-w-[78%] whitespace-pre-wrap break-words px-3.5 py-2 text-[15px] leading-[1.35]",
+                    mine ? "bg-primary text-primary-foreground" : "bg-surface-2 text-foreground",
+                    mine
+                      ? grouped ? "rounded-2xl rounded-br-md" : "rounded-2xl rounded-br-md"
+                      : grouped ? "rounded-2xl rounded-bl-md" : "rounded-2xl rounded-bl-md",
+                  )}
+                >
+                  {m.body}
+                </div>
+              </div>
+            );
+          })
+        )}
       </div>
+
 
       <form
         onSubmit={onSend}
