@@ -134,6 +134,7 @@ const PostDetail = () => {
   const [tipOpen, setTipOpen] = useState(false);
 
   const [bookmarked, setBookmarked] = useState<boolean>(() => readBookmarks(user?.id).has(id));
+  const [viewCount, setViewCount] = useState<number>(0);
 
   useEffect(() => {
     setBookmarked(readBookmarks(user?.id).has(id));
@@ -143,10 +144,32 @@ const PostDetail = () => {
     const [p, c] = await Promise.all([fetchPost(id, user?.id), fetchComments(id)]);
     setPost(p);
     setComments(c);
+    if (p) setViewCount((p as any).view_count ?? 0);
     setLoading(false);
   }, [id, user?.id]);
 
   useEffect(() => { load(); }, [load]);
+
+  // Increment impression once per session for this post, and live-subscribe to updates
+  useEffect(() => {
+    if (!id) return;
+    const key = `meku:viewed:${id}`;
+    if (!sessionStorage.getItem(key)) {
+      sessionStorage.setItem(key, "1");
+      supabase.rpc("increment_post_view", { _post_id: id }).then(({ data }) => {
+        if (typeof data === "number") setViewCount(data);
+      });
+    }
+    const channel = supabase
+      .channel(`post-views-detail-${id}`)
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "posts", filter: `id=eq.${id}` }, (payload: any) => {
+        const v = payload.new?.view_count;
+        if (typeof v === "number") setViewCount(v);
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [id]);
+
 
   const handleLike = async () => {
     if (!user || !post) { navigate("/auth"); return; }
