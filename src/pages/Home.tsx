@@ -211,7 +211,7 @@ const Home = () => {
 
       {/* Sticky, horizontally scrollable tabs w/ animated indicator */}
       <nav className="sticky top-[52px] z-20 bg-background/85 backdrop-blur-xl hairline-b">
-        <div className="scrollbar-hide relative flex overflow-x-auto">
+        <div className="relative flex overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           <div className="relative flex min-w-full items-center">
             {tabs.map((t) => (
               <button
