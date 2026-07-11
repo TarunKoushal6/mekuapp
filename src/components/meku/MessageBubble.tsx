@@ -1,0 +1,114 @@
+import { useRef, useState } from "react";
+import { cn } from "@/lib/utils";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Copy, Reply, Trash2 } from "lucide-react";
+import { haptic } from "@/lib/haptics";
+import { toast } from "sonner";
+
+export type BubblePos = "single" | "first" | "middle" | "last";
+
+interface Props {
+  body: string;
+  mine: boolean;
+  pos: BubblePos;
+  showTime?: string | null;
+  onDelete?: () => void;
+  onReact?: (emoji: string) => void;
+}
+
+const REACTIONS = ["❤️", "😂", "👍", "😮", "😢", "🔥"];
+
+const cornerFor = (mine: boolean, pos: BubblePos) => {
+  const base = "rounded-2xl";
+  if (pos === "single") return base;
+  if (mine) {
+    if (pos === "first") return `${base} rounded-br-md`;
+    if (pos === "middle") return `${base} rounded-r-md`;
+    return `${base} rounded-tr-md`;
+  }
+  if (pos === "first") return `${base} rounded-bl-md`;
+  if (pos === "middle") return `${base} rounded-l-md`;
+  return `${base} rounded-tl-md`;
+};
+
+export const MessageBubble = ({ body, mine, pos, showTime, onDelete, onReact }: Props) => {
+  const [open, setOpen] = useState(false);
+  const timer = useRef<number | null>(null);
+
+  const startPress = () => {
+    timer.current = window.setTimeout(() => {
+      haptic("medium");
+      setOpen(true);
+    }, 380);
+  };
+  const cancelPress = () => {
+    if (timer.current) { clearTimeout(timer.current); timer.current = null; }
+  };
+
+  return (
+    <>
+      {showTime && (
+        <div className="my-3 text-center text-[11.5px] font-medium text-muted-foreground">{showTime}</div>
+      )}
+      <div className={cn("flex", mine ? "justify-end" : "justify-start")}>
+        <div
+          onPointerDown={startPress}
+          onPointerUp={cancelPress}
+          onPointerLeave={cancelPress}
+          onPointerCancel={cancelPress}
+          onContextMenu={(e) => { e.preventDefault(); haptic("medium"); setOpen(true); }}
+          className={cn(
+            "max-w-[78%] cursor-pointer whitespace-pre-wrap break-words px-3.5 py-2 text-[15px] leading-[1.35] transition-transform active:scale-[0.98]",
+            mine ? "bg-primary text-primary-foreground" : "bg-surface-2 text-foreground",
+            cornerFor(mine, pos),
+          )}
+        >
+          {body}
+        </div>
+      </div>
+
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetContent
+          side="bottom"
+          className="rounded-t-3xl border-border bg-background/90 p-0 backdrop-blur-2xl"
+        >
+          <div className="mx-auto mt-2 h-1 w-10 rounded-full bg-muted" />
+          <div className="flex justify-around px-4 py-4">
+            {REACTIONS.map((e) => (
+              <button
+                key={e}
+                onClick={() => { onReact?.(e); haptic("light"); setOpen(false); toast(`Reacted ${e}`); }}
+                className="tap flex h-11 w-11 items-center justify-center rounded-full text-[22px] transition-transform hover:scale-110 active:scale-95"
+              >
+                {e}
+              </button>
+            ))}
+          </div>
+          <div className="hairline-t">
+            <button
+              onClick={() => { navigator.clipboard?.writeText(body); toast.success("Copied"); setOpen(false); }}
+              className="tap flex w-full items-center gap-3 px-5 py-3.5 text-left text-[15px] text-foreground hover:bg-surface/40"
+            >
+              <Copy size={18} /> Copy
+            </button>
+            <button
+              onClick={() => setOpen(false)}
+              className="tap flex w-full items-center gap-3 px-5 py-3.5 text-left text-[15px] text-foreground hover:bg-surface/40"
+            >
+              <Reply size={18} /> Reply
+            </button>
+            {mine && onDelete && (
+              <button
+                onClick={() => { onDelete(); setOpen(false); }}
+                className="tap flex w-full items-center gap-3 px-5 py-3.5 text-left text-[15px] text-destructive hover:bg-surface/40"
+              >
+                <Trash2 size={18} /> Delete
+              </button>
+            )}
+          </div>
+          <div style={{ paddingBottom: "max(env(safe-area-inset-bottom), 12px)" }} />
+        </SheetContent>
+      </Sheet>
+    </>
+  );
+};
