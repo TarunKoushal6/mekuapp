@@ -30,6 +30,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
   const [reposted, setReposted] = useState(false);
   const [repostCount, setRepostCount] = useState(0);
   const [bookmarked, setBookmarked] = useState(() => readBookmarks(user?.id).has(post.id));
+  const [viewCount, setViewCount] = useState<number>((post as any).view_count ?? 0);
   const author = post.author;
   const name = author?.display_name || author?.username || "Anonymous";
   const handle = author?.username || "anon";
