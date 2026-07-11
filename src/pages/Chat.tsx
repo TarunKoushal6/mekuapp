@@ -49,7 +49,7 @@ const Chat = () => {
             (m.sender_id === user.id && m.recipient_id === otherId) ||
             (m.sender_id === otherId && m.recipient_id === user.id);
           if (!pair) return;
-          setMessages((prev) => (prev.find((x) => x.id === m.id) ? prev : [...prev, m]));
+          setMessages((prev) => (prev?.find((x) => x.id === m.id) ? prev : [...(prev ?? []), m]));
           if (m.recipient_id === user.id) markThreadRead(user.id, otherId).catch(() => {});
         },
       )
