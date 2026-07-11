@@ -16,7 +16,7 @@ const Chat = () => {
   const { id: otherId } = useParams<{ id: string }>();
   const { user } = useAuth();
   const [other, setOther] = useState<Profile | null>(null);
-  const [messages, setMessages] = useState<DirectMessage[]>([]);
+  const [messages, setMessages] = useState<DirectMessage[] | null>(null);
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
