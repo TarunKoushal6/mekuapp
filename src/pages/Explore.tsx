@@ -237,32 +237,6 @@ const Explore = () => {
             </section>
           )}
 
-          <section className="pt-5">
-            <h2 className="px-4 pb-1 text-[18px] font-bold tracking-[-0.01em] text-foreground">Who to follow</h2>
-            {orderedSuggested.length === 0 ? (
-              <EmptyState pose="searching" title="Nobody yet" description="New accounts show up here as MEKU grows." />
-            ) : (
-              <ul>
-                {orderedSuggested.map((p) => (
-                  <li key={p.id} className="hairline-b">
-                    <Link
-                      to={p.username ? `/u/${p.username}` : "#"}
-                      className="tap flex items-center gap-3 px-4 py-3 hover:bg-surface/40"
-                    >
-                      <Avatar name={p.display_name || p.username || "User"} src={p.avatar_url ?? undefined} size="lg" />
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-1 truncate">
-                          <span className="truncate text-[15px] font-bold text-foreground">{p.display_name || p.username || "User"}</span>
-                          <VerificationBadge kind={(p.verification_kind ?? (p.verified ? "verified" : "none")) as any} size={14} />
-                        </div>
-                        {p.username && <p className="truncate text-[13px] text-muted-foreground">@{p.username}</p>}
-                      </div>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
         </>
       )}
     </AppShell>
