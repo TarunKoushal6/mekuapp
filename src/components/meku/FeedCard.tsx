@@ -55,6 +55,26 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
     return () => { cancelled = true; };
   }, [post.id, user?.id]);
 
+  // Impressions: count once per session per post, subscribe to live updates.
+  useEffect(() => {
+    const key = `mv:${post.id}`;
+    if (!sessionStorage.getItem(key)) {
+      sessionStorage.setItem(key, "1");
+      supabase.rpc("increment_post_view", { _post_id: post.id }).then(({ data }) => {
+        if (typeof data === "number") setViewCount(data);
+      });
+    }
+    const ch = supabase
+      .channel(`post-views-${post.id}`)
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "posts", filter: `id=eq.${post.id}` },
+        (payload: any) => {
+          const v = payload.new?.view_count;
+          if (typeof v === "number") setViewCount(v);
+        })
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [post.id]);
+
   const handleRepost = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!user) { navigate("/auth"); return; }
