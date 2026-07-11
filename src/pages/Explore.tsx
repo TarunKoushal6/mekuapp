@@ -217,23 +217,25 @@ const Explore = () => {
       {/* Discover — trends + suggested */}
       {showDiscover && (
         <>
-          <section className="pt-3">
-            <h2 className="px-4 pb-1 text-[18px] font-bold tracking-[-0.01em] text-foreground">Trends for you</h2>
-            <ul>
-              {TRENDING.map((t) => (
-                <li key={t.tag} className="hairline-b">
-                  <button
-                    onClick={() => { setQ(t.tag); commitRecent(t.tag); inputRef.current?.focus(); }}
-                    className="tap flex w-full flex-col items-start gap-0.5 px-4 py-3 text-left hover:bg-surface/40"
-                  >
-                    <span className="text-[12px] text-muted-foreground">{t.topic}</span>
-                    <span className="text-[15px] font-bold tracking-[-0.01em] text-foreground">{t.tag}</span>
-                    <span className="text-[12px] text-muted-foreground tabular-nums">{t.meta}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </section>
+          {trends.length > 0 && (
+            <section className="pt-3">
+              <h2 className="px-4 pb-1 text-[18px] font-bold tracking-[-0.01em] text-foreground">Trends for you</h2>
+              <ul>
+                {trends.map((t) => (
+                  <li key={t.tag} className="hairline-b">
+                    <button
+                      onClick={() => { setQ(t.tag); commitRecent(t.tag); inputRef.current?.focus(); }}
+                      className="tap flex w-full flex-col items-start gap-0.5 px-4 py-3 text-left hover:bg-surface/40"
+                    >
+                      <span className="text-[12px] text-muted-foreground">Trending on MEKU</span>
+                      <span className="text-[15px] font-bold tracking-[-0.01em] text-foreground">{t.tag}</span>
+                      <span className="text-[12px] text-muted-foreground tabular-nums">{t.count} {t.count === 1 ? "post" : "posts"}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
 
           <section className="pt-5">
             <h2 className="px-4 pb-1 text-[18px] font-bold tracking-[-0.01em] text-foreground">Who to follow</h2>
