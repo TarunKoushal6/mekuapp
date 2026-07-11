@@ -19,6 +19,7 @@ import EditProfile from "./pages/EditProfile.tsx";
 import Privacy from "./pages/Privacy.tsx";
 import Wallet from "./pages/Wallet.tsx";
 import PostDetail from "./pages/PostDetail.tsx";
+import Browser from "./pages/Browser.tsx";
 import Bookmarks from "./pages/Bookmarks.tsx";
 import AdminOverview from "./pages/admin/AdminOverview.tsx";
 import AdminUsers from "./pages/admin/AdminUsers.tsx";
@@ -56,6 +57,7 @@ const App = () => (
           
           <Route path="/settings/privacy" element={<RequireAuth><Privacy /></RequireAuth>} />
           <Route path="/wallet" element={<RequireAuth><Wallet /></RequireAuth>} />
+          <Route path="/browser" element={<Browser />} />
           <Route path="/bookmarks" element={<RequireAuth><Bookmarks /></RequireAuth>} />
           <Route path="/admin" element={<RequireAuth><AdminOverview /></RequireAuth>} />
           <Route path="/admin/users" element={<RequireAuth><AdminUsers /></RequireAuth>} />
