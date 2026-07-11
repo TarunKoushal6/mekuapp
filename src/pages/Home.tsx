@@ -230,12 +230,12 @@ const Home = () => {
                   tab === t ? "text-foreground" : "text-muted-foreground",
                 )}
               >
-                {t}
+                <span data-tab-label>{t}</span>
               </button>
             ))}
             <span
               aria-hidden
-              className="pointer-events-none absolute -bottom-px h-[3px] rounded-full bg-primary"
+              className="pointer-events-none absolute bottom-0 h-[3.5px] rounded-full bg-primary"
               style={{
                 left: indicator.left,
                 width: indicator.width,
