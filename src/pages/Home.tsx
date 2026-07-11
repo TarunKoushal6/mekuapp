@@ -202,8 +202,9 @@ const Home = () => {
           <Logo size={32} wordmark />
         </div>
         <div className="flex items-center justify-end">
-          <Link to="/settings" aria-label="Settings" className="tap inline-flex h-9 w-9 items-center justify-center rounded-full text-foreground">
-            <IconSettings size={20} />
+          <Link to="/notifications" aria-label="Notifications" className="tap relative inline-flex h-9 w-9 items-center justify-center rounded-full text-foreground">
+            <Bell size={20} strokeWidth={1.75} />
+            {hasUnread && <span className="absolute right-1.5 top-1.5 h-[8px] w-[8px] rounded-full bg-primary ring-2 ring-background" />}
           </Link>
         </div>
       </header>
