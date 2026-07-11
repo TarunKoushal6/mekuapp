@@ -259,16 +259,20 @@ const PostDetail = () => {
         <PostBody text={post.body} className="mt-2 whitespace-pre-wrap break-words text-[16px] leading-[1.55] text-foreground/90" />
         {post.image_url && <div className="mt-3 overflow-hidden rounded-[14px] border border-border"><img src={post.image_url} alt="" className="w-full" /></div>}
 
-        <p className="mt-3 text-[12px] text-muted-foreground">{new Date(post.created_at).toLocaleString()}</p>
+        <p className="mt-3 text-[12px] text-muted-foreground">
+          {new Date(post.created_at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
+          {" · "}
+          {new Date(post.created_at).toLocaleDateString([], { month: "short", day: "numeric", year: "numeric" })}
+        </p>
 
-        <div className="mt-3 flex items-center gap-6 border-y border-border py-2 text-[13px] text-muted-foreground">
-          <span><strong className="text-foreground">{post.comment_count}</strong> Comments</span>
-          <span><strong className="text-foreground">{post.like_count}</strong> Likes</span>
+        <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1 border-y border-border py-3 text-[13px] text-muted-foreground">
+          <span><strong className="text-foreground">{formatCount(post.comment_count)}</strong> Replies</span>
+          <span><strong className="text-foreground">{formatCount(post.like_count)}</strong> Likes</span>
         </div>
 
-        <div className="mt-2 flex items-center justify-around pt-1 text-muted-foreground">
-          <button className="tap inline-flex items-center gap-1.5"><MessageCircle className="h-[20px] w-[20px]" strokeWidth={1.6} /></button>
-          <button className="tap inline-flex items-center gap-1.5"><Repeat2 className="h-[20px] w-[20px]" strokeWidth={1.6} /></button>
+        <div className="mt-1 flex items-center justify-between px-1 pt-2 text-muted-foreground">
+          <button className="tap" aria-label="Reply"><MessageCircle className="h-[22px] w-[22px]" strokeWidth={1.6} /></button>
+          <button className="tap" aria-label="Repost"><Repeat2 className="h-[22px] w-[22px]" strokeWidth={1.6} /></button>
           <HeartLike checked={!!post.liked_by_me} onChange={() => handleLike()} size={22} aria-label="Like" />
           <BookmarkSave
             checked={bookmarked}
@@ -277,18 +281,17 @@ const PostDetail = () => {
               setBookmarked(next);
               toggleBookmark(user?.id, post.id, next);
             }}
-            size={20}
+            size={22}
             aria-label="Save"
           />
-          <button className="tap"><Upload className="h-[20px] w-[20px]" strokeWidth={1.6} /></button>
+          <button className="tap" aria-label="Share"><Upload className="h-[22px] w-[22px]" strokeWidth={1.6} /></button>
         </div>
       </article>
 
 
       <section className="px-4 pb-[120px]">
-        <h2 className="mb-1 text-[13px] font-bold uppercase tracking-wider text-muted-foreground">Comments</h2>
         {tree.length === 0 ? (
-          <p className="py-6 text-center text-[13px] text-muted-foreground">Be the first to comment.</p>
+          <p className="py-6 text-center text-[13px] text-muted-foreground">Be the first to reply.</p>
         ) : (
           tree.map((c) => <CommentNode key={c.id} node={c} postId={post.id} onReplied={load} />)
         )}
@@ -296,14 +299,15 @@ const PostDetail = () => {
 
       <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[440px] hairline-t bg-background/95 px-3 py-2 backdrop-blur-xl" style={{ paddingBottom: "max(env(safe-area-inset-bottom), 8px)" }}>
         <div className="flex min-w-0 items-center gap-2">
+          <Avatar name={user?.email ?? "You"} size="sm" />
           <input
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && send()}
-            placeholder="Add a comment…"
-            className="h-[44px] min-w-0 flex-1 rounded-full border border-border bg-surface px-4 text-[14px] outline-none focus:border-primary"
+            placeholder={`Reply to @${post.author?.username ?? "anon"}…`}
+            className="h-[42px] min-w-0 flex-1 rounded-full border border-border bg-surface px-4 text-[14px] outline-none focus:border-primary"
           />
-          <button onClick={send} disabled={sending || !draft.trim()} className="tap shrink-0 rounded-full bg-primary px-4 py-2.5 text-[13px] font-bold text-primary-foreground disabled:opacity-40">
+          <button onClick={send} disabled={sending || !draft.trim()} className="tap shrink-0 rounded-full bg-primary px-4 py-2 text-[13px] font-bold text-primary-foreground disabled:opacity-40">
             {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Reply"}
           </button>
         </div>
