@@ -64,15 +64,24 @@ const CommentNode = ({ node, postId, onReplied, depth = 0 }: { node: TreeNode; p
 
   const name = node.author?.display_name || node.author?.username || "Anonymous";
 
+  const hasChildren = node.children.length > 0;
+
   return (
-    <div className={cn("py-3", depth > 0 && "border-l border-border pl-3")}>
-      <div className="flex min-w-0 gap-3">
-        <Avatar name={name} src={node.author?.avatar_url ?? undefined} size="sm" />
-        <div className="min-w-0 flex-1">
+    <div className="relative">
+      <div className="flex min-w-0 gap-3 pt-3">
+        {/* Avatar column with X-style vertical connector */}
+        <div className="relative flex shrink-0 flex-col items-center">
+          <Avatar name={name} src={node.author?.avatar_url ?? undefined} size="sm" />
+          {hasChildren && <div className="mt-1 w-px flex-1 bg-border" aria-hidden />}
+        </div>
+        <div className="min-w-0 flex-1 pb-2">
           <div className="flex items-center gap-1.5 text-[13px]">
-            <span className="font-semibold text-foreground">{name}</span>
-            <span className="text-muted-foreground">@{node.author?.username ?? "anon"}</span>
-            <span className="text-muted-foreground">· {timeAgo(node.created_at)}</span>
+            <span className="truncate font-semibold text-foreground">{name}</span>
+            {node.author?.verification_kind && node.author.verification_kind !== "none" && (
+              <VerificationBadge kind={node.author.verification_kind as any} size={12} />
+            )}
+            <span className="truncate text-muted-foreground">@{node.author?.username ?? "anon"}</span>
+            <span className="shrink-0 text-muted-foreground">· {timeAgo(node.created_at)}</span>
           </div>
           <PostBody text={node.body} className="mt-0.5 whitespace-pre-wrap break-words text-[14px] leading-[1.45] text-foreground/90" />
           <button onClick={() => setShowReply((v) => !v)} className="tap mt-1 text-[12px] font-medium text-muted-foreground hover:text-foreground">
@@ -95,13 +104,22 @@ const CommentNode = ({ node, postId, onReplied, depth = 0 }: { node: TreeNode; p
           )}
         </div>
       </div>
-      {node.children.length > 0 && (
-        <div className="ml-3 mt-1">
-          {node.children.map((c) => <CommentNode key={c.id} node={c} postId={postId} onReplied={onReplied} depth={Math.min(depth + 1, 3)} />)}
+      {hasChildren && (
+        <div className="pl-[calc(2rem+0.75rem)]">
+          {node.children.map((c) => (
+            <CommentNode key={c.id} node={c} postId={postId} onReplied={onReplied} depth={Math.min(depth + 1, 3)} />
+          ))}
         </div>
       )}
     </div>
   );
+};
+
+const formatCount = (n: number) => {
+  if (n < 1000) return String(n);
+  if (n < 10000) return (n / 1000).toFixed(1).replace(/\.0$/, "") + "K";
+  if (n < 1000000) return Math.floor(n / 1000) + "K";
+  return (n / 1000000).toFixed(1).replace(/\.0$/, "") + "M";
 };
 
 const PostDetail = () => {
