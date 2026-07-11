@@ -141,14 +141,16 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
               {timeAgo(post.created_at)}
             </span>
           </div>
-          <div className="flex shrink-0 items-start gap-1">
-            <button
-              aria-label="Tip USDC"
-              onClick={(e) => { e.stopPropagation(); if (!user) return navigate("/auth"); setTipOpen(true); }}
-              className="tap -mt-1 inline-flex h-8 w-8 items-center justify-center rounded-full text-amber-500 transition-colors hover:bg-amber-500/10"
-            >
-              <Coins size={16} strokeWidth={1.8} />
-            </button>
+          <div className="flex shrink-0 items-start gap-0.5">
+            {!isOwn && (
+              <button
+                aria-label="Tip USDC"
+                onClick={(e) => { e.stopPropagation(); if (!user) return navigate("/auth"); setTipOpen(true); }}
+                className="tap -mt-1 inline-flex h-8 w-8 items-center justify-center rounded-full text-amber-500 transition-colors hover:bg-amber-500/10"
+              >
+                <Coins size={16} strokeWidth={1.8} />
+              </button>
+            )}
             {isOwn && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
