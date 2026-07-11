@@ -195,7 +195,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
       </header>
 
 
-      <div className="ml-[50px] mt-0.5">
+      <div className="ml-[48px] mt-0.5">
         {post.title && <h2 className="text-[15px] font-bold leading-[1.35] tracking-[-0.01em] text-foreground">{post.title}</h2>}
         {post.body && (
           <PostBody
