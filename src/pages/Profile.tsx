@@ -27,10 +27,19 @@ const Profile = () => {
   const [tab, setTab] = useState<Tab>("Posts");
   const [profile, setProfile] = useState<ProfileT | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
+  const [likedPosts, setLikedPosts] = useState<Post[]>([]);
+  const [likedLoaded, setLikedLoaded] = useState(false);
   const [loading, setLoading] = useState(true);
   const [counts, setCounts] = useState({ followers: 0, following: 0 });
   const [following, setFollowing] = useState(false);
   const [followBusy, setFollowBusy] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 120);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const load = useCallback(async () => {
     if (authLoading) return;
@@ -49,6 +58,8 @@ const Profile = () => {
         p = await getProfile(user.id);
       }
       setProfile(p);
+      setLikedLoaded(false);
+      setLikedPosts([]);
       if (p) {
         const [all, c, follows] = await Promise.all([
           fetchPosts(user?.id, { authorId: p.id }),
@@ -63,6 +74,38 @@ const Profile = () => {
   }, [authLoading, handle, user]);
 
   useEffect(() => { load(); }, [load]);
+
+  // Lazy-load liked posts when the Likes tab opens.
+  useEffect(() => {
+    if (tab !== "Likes" || !profile || likedLoaded) return;
+    (async () => {
+      const { data: likes } = await supabase
+        .from("post_likes")
+        .select("post_id, created_at")
+        .eq("user_id", profile.id)
+        .order("created_at", { ascending: false })
+        .limit(50);
+      const ids = (likes ?? []).map((l: any) => l.post_id);
+      if (ids.length === 0) { setLikedLoaded(true); return; }
+      const { data: rows } = await supabase
+        .from("posts")
+        .select("id, user_id, title, body, image_url, created_at")
+        .in("id", ids);
+      const orderIndex = new Map(ids.map((id, i) => [id, i]));
+      const sorted = (rows ?? []).slice().sort(
+        (a: any, b: any) => (orderIndex.get(a.id)! - orderIndex.get(b.id)!),
+      );
+      // enrich with author + counts using the same helper
+      const userIds = Array.from(new Set(sorted.map((r: any) => r.user_id)));
+      const { data: profiles } = await supabase.from("profiles").select("*").in("id", userIds);
+      const pMap = new Map((profiles ?? []).map((p: any) => [p.id, p]));
+      setLikedPosts(sorted.map((p: any) => ({
+        ...p, author: pMap.get(p.user_id) ?? null,
+        like_count: 0, comment_count: 0, liked_by_me: true,
+      })));
+      setLikedLoaded(true);
+    })();
+  }, [tab, profile, likedLoaded]);
 
   const toggleFollow = async () => {
     if (!user || !profile || followBusy) { if (!user) navigate("/auth"); return; }
@@ -84,6 +127,14 @@ const Profile = () => {
   const isMe = !!user && !!profile && user.id === profile.id;
   const name = profile?.display_name || profile?.username || "Profile";
   const stats = { posts: posts.length, followers: counts.followers, following: counts.following };
+
+  const visible = useMemo<Post[]>(() => {
+    if (tab === "Posts") return posts;
+    if (tab === "Media") return posts.filter((p) => !!p.image_url);
+    if (tab === "Replies") return []; // replies live under comments; empty until dedicated view
+    if (tab === "Likes") return likedPosts;
+    return posts;
+  }, [tab, posts, likedPosts]);
 
   return (
     <AppShell>
