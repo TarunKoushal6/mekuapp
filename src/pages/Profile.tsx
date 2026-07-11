@@ -138,19 +138,38 @@ const Profile = () => {
 
   return (
     <AppShell>
-      <header className="sticky top-0 z-30 flex h-[52px] items-center justify-between bg-background/70 px-3 backdrop-blur-xl">
-        <button onClick={() => navigate(-1)} aria-label="Back" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full bg-background/60 text-foreground backdrop-blur">
-          <IconBack size={20} />
-        </button>
+      <header
+        className={cn(
+          "sticky top-0 z-30 flex h-[52px] items-center justify-between px-3 transition-colors",
+          scrolled ? "bg-background/85 backdrop-blur-xl hairline-b" : "bg-transparent",
+        )}
+      >
+        <div className="flex items-center gap-2 min-w-0">
+          <button onClick={() => navigate(-1)} aria-label="Back" className="tap inline-flex h-9 w-9 items-center justify-center rounded-full bg-background/50 text-foreground backdrop-blur">
+            <IconBack size={20} />
+          </button>
+          <div
+            className={cn(
+              "min-w-0 transition-all duration-200",
+              scrolled ? "opacity-100 translate-y-0" : "pointer-events-none opacity-0 -translate-y-1",
+            )}
+          >
+            <div className="flex items-center gap-1 truncate text-[16px] font-bold tracking-[-0.01em] text-foreground">
+              <span className="truncate">{name}</span>
+              <VerificationBadge kind={(profile?.verification_kind ?? (profile?.verified ? "verified" : "none")) as any} size={14} />
+            </div>
+            <div className="text-[12px] leading-none text-muted-foreground tabular-nums">{stats.posts} posts</div>
+          </div>
+        </div>
         <div className="flex items-center gap-1">
           {isMe && (
-            <Link to="/settings" aria-label="Settings" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full bg-background/60 text-foreground backdrop-blur">
+            <Link to="/settings" aria-label="Settings" className="tap inline-flex h-9 w-9 items-center justify-center rounded-full bg-background/50 text-foreground backdrop-blur">
               <IconSettings size={18} />
             </Link>
           )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button aria-label="More" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full bg-background/60 text-foreground backdrop-blur">
+              <button aria-label="More" className="tap inline-flex h-9 w-9 items-center justify-center rounded-full bg-background/50 text-foreground backdrop-blur">
                 <IconMore size={20} />
               </button>
             </DropdownMenuTrigger>
@@ -177,6 +196,7 @@ const Profile = () => {
           </DropdownMenu>
         </div>
       </header>
+
 
       {loading ? (
         <>
