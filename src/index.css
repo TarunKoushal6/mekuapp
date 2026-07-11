@@ -209,8 +209,8 @@
     -webkit-user-select: none;
   }
 
-  .wordmark-img { filter: none; }
-  .dark .wordmark-img { filter: invert(1); }
+ .wordmark-img { filter: brightness(0) invert(1); }
+ .dark .wordmark-img { filter: brightness(0) invert(1); }
 }
 
 /* ============ HeartLike (Uiverse / catraco) ============ */

@@ -9,8 +9,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { getProfile, type Profile } from "@/lib/social";
 import { fetchThread, sendMessage, markThreadRead, type DirectMessage } from "@/lib/dm";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
+
 import { MessageBubble } from "@/components/meku/MessageBubble";
+import { EmptyState } from "@/components/meku/EmptyState";
 
 const Chat = () => {
   const navigate = useNavigate();
@@ -102,27 +103,13 @@ const Chat = () => {
 
       <div ref={scrollRef} className="flex-1 space-y-1.5 overflow-y-auto px-3 pb-[96px] pt-4">
         {messages === null ? (
-          <div className="animate-fade-in space-y-2">
-            {[0, 1, 2, 3].map((i) => (
-              <div key={i} className={cn("flex", i % 2 ? "justify-end" : "justify-start")}>
-                <div
-                  className={cn(
-                    "h-8 animate-pulse rounded-2xl bg-surface-2",
-                    i % 2 ? "w-40" : "w-52",
-                  )}
-                />
-              </div>
-            ))}
-          </div>
+          <EmptyState pose="searching" title="Loading messages" description="Hang tight while we fetch your chat." />
         ) : messages.length === 0 ? (
-          <div className="mt-16 flex flex-col items-center px-8 text-center">
-            <Avatar name={name} src={other?.avatar_url ?? undefined} size="xl" />
-            <p className="mt-4 text-[17px] font-bold text-foreground">{name}</p>
-            {handle && <p className="text-[13px] text-muted-foreground">@{handle}</p>}
-            <p className="mt-3 text-[13px] leading-relaxed text-muted-foreground">
-              This is the start of your conversation. Say hi 👋
-            </p>
-          </div>
+          <EmptyState
+            pose="waving"
+            title={`Say hi to ${name}`}
+            description="This is the start of your conversation."
+          />
         ) : (
           messages.map((m, i) => {
             const mine = m.sender_id === user?.id;
