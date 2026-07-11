@@ -59,7 +59,7 @@ const Chat = () => {
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
-  }, [messages.length]);
+  }, [messages?.length]);
 
   const onSend = async (e: React.FormEvent) => {
     e.preventDefault();
