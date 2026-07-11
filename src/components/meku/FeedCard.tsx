@@ -121,12 +121,12 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
         <Link to={`/u/${handle}`} onClick={(e) => e.stopPropagation()} className="shrink-0">
           <Avatar name={name} src={author?.avatar_url ?? undefined} size="md" />
         </Link>
-        <div className="flex min-w-0 flex-1 flex-col leading-tight">
-          <div className="flex min-w-0 flex-wrap items-center gap-x-1">
+        <div className="flex min-w-0 flex-1 items-start justify-between gap-2">
+          <div className="flex min-w-0 flex-wrap items-center gap-x-1 leading-tight">
             <Link
               to={`/u/${handle}`}
               onClick={(e) => e.stopPropagation()}
-              className="break-words text-[15px] font-bold tracking-[-0.01em] text-foreground hover:underline"
+              className="text-[15px] font-bold tracking-[-0.01em] text-foreground hover:underline"
             >
               {name}
             </Link>
@@ -135,38 +135,39 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
               size={15}
               className="shrink-0"
             />
+            <span className="text-[14px] text-muted-foreground">@{handle}</span>
+            <span className="text-[14px] text-muted-foreground">·</span>
+            <span className="whitespace-nowrap text-[14px] text-muted-foreground tabular-nums">
+              {timeAgo(post.created_at)}
+            </span>
           </div>
-          <span className="break-all text-[13px] text-muted-foreground">@{handle}</span>
-        </div>
-        <div className="ml-2 flex shrink-0 items-start gap-1">
-          <span className="mt-[2px] whitespace-nowrap text-[12.5px] text-muted-foreground tabular-nums">
-            {timeAgo(post.created_at)}
-          </span>
-          <button
-            aria-label="Tip USDC"
-            onClick={(e) => { e.stopPropagation(); if (!user) return navigate("/auth"); setTipOpen(true); }}
-            className="tap -mt-1 inline-flex h-8 w-8 items-center justify-center rounded-full text-amber-500 transition-colors hover:bg-amber-500/10"
-          >
-            <Coins size={16} strokeWidth={1.8} />
-          </button>
-          {isOwn && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button
-                  aria-label="More"
-                  onClick={(e) => e.stopPropagation()}
-                  className="tap -mt-1 inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-surface-2"
-                >
-                  <MoreHorizontal size={18} />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()} className="rounded-2xl">
-                <DropdownMenuItem onClick={(e) => handleDelete(e as any)} className="text-destructive focus:text-destructive">
-                  <Trash2 size={16} className="mr-2" /> Delete post
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+          <div className="flex shrink-0 items-start gap-1">
+            <button
+              aria-label="Tip USDC"
+              onClick={(e) => { e.stopPropagation(); if (!user) return navigate("/auth"); setTipOpen(true); }}
+              className="tap -mt-1 inline-flex h-8 w-8 items-center justify-center rounded-full text-amber-500 transition-colors hover:bg-amber-500/10"
+            >
+              <Coins size={16} strokeWidth={1.8} />
+            </button>
+            {isOwn && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    aria-label="More"
+                    onClick={(e) => e.stopPropagation()}
+                    className="tap -mt-1 inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-surface-2"
+                  >
+                    <MoreHorizontal size={18} />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()} className="rounded-2xl">
+                  <DropdownMenuItem onClick={(e) => handleDelete(e as any)} className="text-destructive focus:text-destructive">
+                    <Trash2 size={16} className="mr-2" /> Delete post
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
         </div>
       </header>
 
