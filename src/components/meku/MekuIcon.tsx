@@ -1,8 +1,9 @@
-// MEKU custom stroke icons — refined to match the official iconography sheet.
-// 24x24 grid, 1.6 stroke, round caps/joins. Single visual language.
+// MEKU icons — X (Twitter)-style stroke geometry: 24x24 grid, 2px stroke,
+// round caps/joins, filled-forward silhouettes. Single visual language.
 import { SVGProps } from "react";
 
 type IconProps = SVGProps<SVGSVGElement> & { size?: number; strokeWidth?: number };
+
 
 const wrap = (children: React.ReactNode) =>
   (({ size = 22, strokeWidth = 1.6, ...rest }: IconProps) => (
