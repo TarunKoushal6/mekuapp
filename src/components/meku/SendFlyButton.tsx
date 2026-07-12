@@ -108,15 +108,18 @@ export const SendFlyButton = ({
           transform-origin: center center;
           transition: transform 0.3s cubic-bezier(.22,.61,.36,1);
         }
-        /* Hover preview */
-        .meku-send-btn:not([data-active="true"]):not(:disabled):hover .svg-wrapper {
-          animation: meku-fly-1 0.6s ease-in-out infinite alternate;
-        }
-        .meku-send-btn:not([data-active="true"]):not(:disabled):hover svg {
-          transform: translateX(1.2em) rotate(45deg) scale(1.1);
-        }
-        .meku-send-btn:not([data-active="true"]):not(:disabled):hover span {
-          transform: translateX(5em);
+        /* Hover preview — only on real hover-capable pointers to avoid sticky
+           hover states on touch after a tap. */
+        @media (hover: hover) and (pointer: fine) {
+          .meku-send-btn:not([data-active="true"]):not(:disabled):hover .svg-wrapper {
+            animation: meku-fly-1 0.6s ease-in-out infinite alternate;
+          }
+          .meku-send-btn:not([data-active="true"]):not(:disabled):hover svg {
+            transform: translateX(1.2em) rotate(45deg) scale(1.1);
+          }
+          .meku-send-btn:not([data-active="true"]):not(:disabled):hover span {
+            transform: translateX(5em);
+          }
         }
         /* Active state — plane flies off, label slides out */
         .meku-send-btn[data-active="true"][data-success="false"] .svg-wrapper {
@@ -133,6 +136,14 @@ export const SendFlyButton = ({
         @keyframes meku-fly-1 {
           from { transform: translateY(0.1em); }
           to { transform: translateY(-0.1em); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .meku-send-btn,
+          .meku-send-btn span,
+          .meku-send-btn svg,
+          .meku-send-btn .svg-wrapper { transition: none !important; animation: none !important; }
+          .meku-send-btn[data-active="true"][data-success="false"] svg { transform: none; }
+          .meku-send-btn[data-active="true"][data-success="false"] span { transform: none; opacity: 1; }
         }
       `}</style>
     </button>

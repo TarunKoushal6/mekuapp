@@ -329,7 +329,9 @@
   border: var(--icon-circle-border);
   opacity: 0;
 }
-.ui-bookmark:hover .bookmark { fill: var(--icon-hover-color); }
+@media (hover: hover) and (pointer: fine) {
+  .ui-bookmark:hover .bookmark { fill: var(--icon-hover-color); }
+}
 .ui-bookmark input:checked + .bookmark::after {
   animation: bookmark-circles var(--icon-anmt-duration) cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   animation-delay: var(--icon-anmt-duration);
@@ -356,4 +358,17 @@
   from { transform: scale(0); }
   40%  { opacity: 1; }
   to   { transform: scale(0.8); opacity: 0; }
+}
+
+/* ============ Reduced motion — neutralize decorative bursts ============ */
+@media (prefers-reduced-motion: reduce) {
+  .heart-container .svg-filled,
+  .heart-container .svg-celebrate,
+  .ui-bookmark input:checked + .bookmark,
+  .ui-bookmark input:checked + .bookmark::before,
+  .ui-bookmark input:checked + .bookmark::after {
+    animation: none !important;
+  }
+  .heart-container,
+  .ui-bookmark .bookmark { transition: none !important; }
 }
