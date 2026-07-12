@@ -1,4 +1,5 @@
 import { NavLink, useLocation } from "react-router-dom";
+import { motion, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { haptic } from "@/lib/haptics";
 import {
@@ -19,6 +20,8 @@ const items = [
 
 export const BottomNav = () => {
   const { pathname } = useLocation();
+  const reduce = useReducedMotion();
+
   return (
     <nav
       aria-label="Primary"
@@ -37,14 +40,35 @@ export const BottomNav = () => {
                   aria-label={label}
                   onClick={() => haptic("selection")}
                   className={cn(
-                    "spring-press relative inline-flex h-[44px] w-[44px] items-center justify-center rounded-full",
+                    "relative inline-flex h-[44px] w-[44px] items-center justify-center rounded-full outline-none",
+                    "transition-colors duration-200 ease-[cubic-bezier(0.23,1,0.32,1)]",
                     active ? "text-primary" : "text-muted-foreground",
                   )}
+                  style={{ WebkitTapHighlightColor: "transparent" }}
                 >
-                  <Icon size={22} strokeWidth={active ? 2.2 : 1.7} />
-                  {active && (
-                    <span className="pointer-events-none absolute -bottom-0.5 h-1 w-1 rounded-full bg-primary animate-scale-in" />
-                  )}
+                  {({ isActive }) => {
+                    const isOn = isActive || active;
+                    return (
+                      <motion.span
+                        className="relative inline-flex items-center justify-center"
+                        whileTap={reduce ? undefined : { scale: 0.88 }}
+                        transition={{ type: "spring", stiffness: 500, damping: 28, mass: 0.6 }}
+                      >
+                        <Icon size={22} strokeWidth={isOn ? 2.2 : 1.7} />
+                        {isOn && (
+                          <motion.span
+                            layoutId="bottomnav-dot"
+                            className="pointer-events-none absolute -bottom-1.5 h-1 w-1 rounded-full bg-primary"
+                            transition={
+                              reduce
+                                ? { duration: 0.15 }
+                                : { type: "spring", stiffness: 520, damping: 34, mass: 0.7 }
+                            }
+                          />
+                        )}
+                      </motion.span>
+                    );
+                  }}
                 </NavLink>
               </li>
             );
