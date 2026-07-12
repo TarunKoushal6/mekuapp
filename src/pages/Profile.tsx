@@ -10,7 +10,7 @@ import { FeedCard } from "@/components/meku/FeedCard";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  fetchPosts, getProfile, type Post, type Profile as ProfileT,
+  fetchProfileFeed, getProfile, type Post, type Profile as ProfileT,
   getFollowCounts, isFollowing, followUser, unfollowUser,
 } from "@/lib/social";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
