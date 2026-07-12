@@ -252,3 +252,11 @@ export const IconRotate = wrap(
 );
 
 export const IconCheck = wrap(<><path d="m5 12 4 4 10-10" /></>);
+
+// Compass / Browser — Safari-style tilted needle inside a circle.
+export const IconCompass = wrap(
+  <>
+    <circle cx="12" cy="12" r="9" />
+    <path d="m15.5 8.5-5 2-2 5 5-2 2-5Z" />
+  </>,
+);
