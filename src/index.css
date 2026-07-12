@@ -155,7 +155,17 @@
     transition: transform 140ms var(--ease-out-strong), opacity 160ms var(--ease-out-strong);
     -webkit-tap-highlight-color: transparent;
   }
-  .spring-press:active { transform: scale(0.94); }
+  .spring-press:active { transform: scale(0.96); }
+
+  /* Global press feedback on all real buttons/links — instant, GPU-only. Gated to fine pointers. */
+  @media (hover: hover) and (pointer: fine) {
+    button, a, [role="button"] {
+      transition: transform 140ms var(--ease-out-strong);
+    }
+    button:active, a:active, [role="button"]:active {
+      transform: scale(0.97);
+    }
+  }
 
   /* Floating glass surface used by nav / sticky headers */
   .glass-floating {
