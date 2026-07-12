@@ -62,7 +62,7 @@ const Profile = () => {
       setLikedPosts([]);
       if (p) {
         const [all, c, follows] = await Promise.all([
-          fetchPosts(user?.id, { authorId: p.id }),
+          fetchProfileFeed(p.id, user?.id),
           getFollowCounts(p.id),
           user && user.id !== p.id ? isFollowing(user.id, p.id) : Promise.resolve(false),
         ]);
