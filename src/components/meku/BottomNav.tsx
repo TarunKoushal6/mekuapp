@@ -7,14 +7,14 @@ import {
   IconSearch,
   IconWallet,
   IconMessages,
-  IconExternal,
+  IconCompass,
 } from "./MekuIcon";
 
 const items = [
   { to: "/home", label: "Home", icon: IconHome },
   { to: "/explore", label: "Search", icon: IconSearch },
   { to: "/wallet", label: "Wallet", icon: IconWallet },
-  { to: "/browser", label: "Browser", icon: IconExternal },
+  { to: "/browser", label: "Browser", icon: IconCompass },
   { to: "/inbox", label: "Chat", icon: IconMessages },
 ];
 
