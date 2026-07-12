@@ -21,6 +21,9 @@ export interface Post {
   like_count: number;
   comment_count: number;
   liked_by_me: boolean;
+  /** When present, this post is being surfaced because `reposted_by` reposted it. */
+  reposted_by?: Profile | null;
+  reposted_at?: string;
 }
 
 export interface CommentRow {
