@@ -75,32 +75,7 @@ const App = () => (
       <BrowserRouter>
         <ScrollToTop />
         <NotificationsListener />
-        <Routes>
-          <Route path="/" element={<Intro />} />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="/explore" element={<Explore />} />
-          <Route path="/p/:id" element={<PostDetail />} />
-          <Route path="/u/:handle" element={<Profile />} />
-          <Route path="/create" element={<RequireAuth><Create /></RequireAuth>} />
-          <Route path="/inbox" element={<RequireAuth><Inbox /></RequireAuth>} />
-          <Route path="/inbox/new" element={<RequireAuth><NewMessage /></RequireAuth>} />
-          <Route path="/inbox/:id" element={<RequireAuth><Chat /></RequireAuth>} />
-          <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
-          <Route path="/notifications" element={<RequireAuth><Notifications /></RequireAuth>} />
-          <Route path="/onchain" element={<RequireAuth><Onchain /></RequireAuth>} />
-          <Route path="/settings" element={<RequireAuth><Settings /></RequireAuth>} />
-          <Route path="/settings/profile" element={<RequireAuth><EditProfile /></RequireAuth>} />
-          
-          <Route path="/settings/privacy" element={<RequireAuth><Privacy /></RequireAuth>} />
-          <Route path="/wallet" element={<RequireAuth><Wallet /></RequireAuth>} />
-          <Route path="/browser" element={<Browser />} />
-          <Route path="/bookmarks" element={<RequireAuth><Bookmarks /></RequireAuth>} />
-          <Route path="/admin" element={<RequireAuth><AdminOverview /></RequireAuth>} />
-          <Route path="/admin/users" element={<RequireAuth><AdminUsers /></RequireAuth>} />
-          <Route path="/admin/verification" element={<RequireAuth><AdminVerification /></RequireAuth>} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AnimatedRoutes />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
