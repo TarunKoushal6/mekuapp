@@ -359,3 +359,16 @@
   40%  { opacity: 1; }
   to   { transform: scale(0.8); opacity: 0; }
 }
+
+/* ============ Reduced motion — neutralize decorative bursts ============ */
+@media (prefers-reduced-motion: reduce) {
+  .heart-container .svg-filled,
+  .heart-container .svg-celebrate,
+  .ui-bookmark input:checked + .bookmark,
+  .ui-bookmark input:checked + .bookmark::before,
+  .ui-bookmark input:checked + .bookmark::after {
+    animation: none !important;
+  }
+  .heart-container,
+  .ui-bookmark .bookmark { transition: none !important; }
+}
