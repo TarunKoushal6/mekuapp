@@ -206,15 +206,15 @@ const Profile = () => {
       ) : (
         <div className="meku-page-in">
           {/* Banner — indigo gradient stand-in until banners exist */}
-          <div className="-mt-[52px] h-[120px] w-full gradient-purple" />
+          <div className="-mt-[52px] h-[150px] w-full gradient-purple" />
 
           <section className="px-4 pb-4">
-            <div className="-mt-[34px] flex items-end justify-between">
+            <div className="-mt-[64px] flex items-end justify-between">
               <Avatar
                 name={name}
                 src={profile?.avatar_url ?? undefined}
                 size="xl"
-                className="h-[68px] w-[68px] ring-4 ring-background"
+                className="h-[128px] w-[128px] ring-4 ring-background"
               />
               <div className="mb-1">
                 {isMe ? (

@@ -35,9 +35,9 @@ export const PostListSkeleton = ({ count = 4 }: { count?: number }) => (
 
 export const ProfileHeaderSkeleton = () => (
   <section className="px-4 pb-4 pt-2">
-    <Skeleton className="h-[120px] w-full rounded-none" />
-    <div className="-mt-[34px] flex items-end justify-between">
-      <Skeleton className="h-[68px] w-[68px] rounded-full ring-4 ring-background" />
+    <Skeleton className="h-[150px] w-full rounded-none" />
+    <div className="-mt-[64px] flex items-end justify-between">
+      <Skeleton className="h-[128px] w-[128px] rounded-full ring-4 ring-background" />
       <Skeleton className="mb-1 h-9 w-24 rounded-full" />
     </div>
     <Skeleton className="mt-3 h-6 w-40" />
