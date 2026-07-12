@@ -34,18 +34,20 @@ export const PostListSkeleton = ({ count = 4 }: { count?: number }) => (
 );
 
 export const ProfileHeaderSkeleton = () => (
-  <section className="px-5 pb-5 pt-2">
-    <Skeleton className="h-[96px] w-[96px] rounded-full" />
-    <Skeleton className="mt-5 h-7 w-44" />
-    <Skeleton className="mt-2 h-4 w-28" />
-    <Skeleton className="mt-4 h-4 w-[90%]" />
-    <Skeleton className="mt-1 h-4 w-[60%]" />
-    <div className="mt-5 flex gap-7">
-      <Skeleton className="h-10 w-12" />
-      <Skeleton className="h-10 w-16" />
-      <Skeleton className="h-10 w-16" />
+  <section className="px-4 pb-4 pt-2">
+    <Skeleton className="h-[120px] w-full rounded-none" />
+    <div className="-mt-[34px] flex items-end justify-between">
+      <Skeleton className="h-[68px] w-[68px] rounded-full ring-4 ring-background" />
+      <Skeleton className="mb-1 h-9 w-24 rounded-full" />
     </div>
-    <Skeleton className="mt-5 h-11 w-full rounded-full" />
+    <Skeleton className="mt-3 h-6 w-40" />
+    <Skeleton className="mt-2 h-3.5 w-24" />
+    <Skeleton className="mt-3 h-3.5 w-[85%]" />
+    <Skeleton className="mt-1 h-3.5 w-[55%]" />
+    <div className="mt-4 flex gap-5">
+      <Skeleton className="h-3.5 w-20" />
+      <Skeleton className="h-3.5 w-20" />
+    </div>
   </section>
 );
 
