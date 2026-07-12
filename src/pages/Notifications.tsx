@@ -137,7 +137,7 @@ const Notifications = () => {
                     <Icon className="h-[26px] w-[26px]" strokeWidth={2} fill={n.kind === "like" ? "currentColor" : "none"} />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <Avatar name={name} src={n.actor?.avatar_url ?? undefined} size="sm" />
+                    <Avatar name={name} src={n.actor?.avatar_url ?? undefined} size="xs" />
                     <p className="mt-2 text-[15px] leading-[1.35] text-foreground">
                       <span className="font-bold">{name}</span> {verb}
                     </p>
