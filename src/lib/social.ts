@@ -21,6 +21,9 @@ export interface Post {
   like_count: number;
   comment_count: number;
   liked_by_me: boolean;
+  /** When present, this post is being surfaced because `reposted_by` reposted it. */
+  reposted_by?: Profile | null;
+  reposted_at?: string;
 }
 
 export interface CommentRow {
@@ -106,6 +109,76 @@ export async function fetchPosts(
     comment_count: cmtCount.get(p.id) ?? 0,
     liked_by_me: liked.has(p.id),
   }));
+}
+
+/**
+ * Profile feed: authored posts + reposts by that profile, interleaved by time.
+ * Reposts carry `reposted_by` (the profile) and `reposted_at`.
+ */
+export async function fetchProfileFeed(
+  profileId: string,
+  viewerId?: string | null,
+): Promise<Post[]> {
+  const [authored, { data: repostRows }] = await Promise.all([
+    fetchPosts(viewerId, { authorId: profileId, limit: 40 }),
+    supabase
+      .from("reposts")
+      .select("post_id, created_at")
+      .eq("user_id", profileId)
+      .order("created_at", { ascending: false })
+      .limit(40),
+  ]);
+
+  const repostIds = (repostRows ?? []).map((r: any) => r.post_id);
+  let reposts: Post[] = [];
+  if (repostIds.length > 0) {
+    // Reuse the enrichment path — fetchPosts filters by authorId, so query directly.
+    const { data: rawPosts } = await supabase
+      .from("posts")
+      .select("id, user_id, title, body, image_url, created_at, view_count")
+      .in("id", repostIds);
+    const userIds = Array.from(new Set((rawPosts ?? []).map((p: any) => p.user_id).concat([profileId])));
+    const [{ data: profiles }, { data: likes }, { data: comments }, { data: myLikes }] = await Promise.all([
+      supabase.from("profiles").select("*").in("id", userIds),
+      supabase.from("post_likes").select("post_id").in("post_id", repostIds),
+      supabase.from("comments").select("post_id").in("post_id", repostIds),
+      viewerId
+        ? supabase.from("post_likes").select("post_id").eq("user_id", viewerId).in("post_id", repostIds)
+        : Promise.resolve({ data: [] as { post_id: string }[] }),
+    ]);
+    const pMap = new Map((profiles ?? []).map((p: any) => [p.id, p as Profile]));
+    const likeCount = new Map<string, number>();
+    (likes ?? []).forEach((l: any) => likeCount.set(l.post_id, (likeCount.get(l.post_id) ?? 0) + 1));
+    const cmtCount = new Map<string, number>();
+    (comments ?? []).forEach((c: any) => cmtCount.set(c.post_id, (cmtCount.get(c.post_id) ?? 0) + 1));
+    const likedSet = new Set((myLikes ?? []).map((l: any) => l.post_id));
+    const repostedByProfile = pMap.get(profileId) ?? null;
+    const repostAtMap = new Map((repostRows ?? []).map((r: any) => [r.post_id, r.created_at]));
+
+    reposts = (rawPosts ?? [])
+      // Don't double-count: skip if the profile is also the author (already in `authored`).
+      .filter((p: any) => p.user_id !== profileId)
+      .map((p: any) => ({
+        ...p,
+        author: pMap.get(p.user_id) ?? null,
+        like_count: likeCount.get(p.id) ?? 0,
+        comment_count: cmtCount.get(p.id) ?? 0,
+        liked_by_me: likedSet.has(p.id),
+        reposted_by: repostedByProfile,
+        reposted_at: repostAtMap.get(p.id) as string | undefined,
+      }));
+  }
+
+  // Merge & sort by repost time when present, otherwise by post creation.
+  const merged = [...authored, ...reposts];
+  merged.sort((a, b) => {
+    const ta = new Date(a.reposted_at ?? a.created_at).getTime();
+    const tb = new Date(b.reposted_at ?? b.created_at).getTime();
+    return tb - ta;
+  });
+  // Dedupe by id (keep first occurrence — most recent surface).
+  const seen = new Set<string>();
+  return merged.filter((p) => (seen.has(p.id) ? false : (seen.add(p.id), true)));
 }
 
 // ============ Follows ============

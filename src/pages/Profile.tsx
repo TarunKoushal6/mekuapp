@@ -10,7 +10,7 @@ import { FeedCard } from "@/components/meku/FeedCard";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  fetchPosts, getProfile, type Post, type Profile as ProfileT,
+  fetchProfileFeed, getProfile, type Post, type Profile as ProfileT,
   getFollowCounts, isFollowing, followUser, unfollowUser,
 } from "@/lib/social";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -62,7 +62,7 @@ const Profile = () => {
       setLikedPosts([]);
       if (p) {
         const [all, c, follows] = await Promise.all([
-          fetchPosts(user?.id, { authorId: p.id }),
+          fetchProfileFeed(p.id, user?.id),
           getFollowCounts(p.id),
           user && user.id !== p.id ? isFollowing(user.id, p.id) : Promise.resolve(false),
         ]);
@@ -206,15 +206,15 @@ const Profile = () => {
       ) : (
         <div className="meku-page-in">
           {/* Banner — indigo gradient stand-in until banners exist */}
-          <div className="-mt-[52px] h-[140px] w-full gradient-purple" />
+          <div className="-mt-[52px] h-[120px] w-full gradient-purple" />
 
           <section className="px-4 pb-4">
-            <div className="-mt-[46px] flex items-end justify-between">
+            <div className="-mt-[34px] flex items-end justify-between">
               <Avatar
                 name={name}
                 src={profile?.avatar_url ?? undefined}
                 size="xl"
-                className="h-[88px] w-[88px] ring-4 ring-background"
+                className="h-[68px] w-[68px] ring-4 ring-background"
               />
               <div className="mb-1">
                 {isMe ? (

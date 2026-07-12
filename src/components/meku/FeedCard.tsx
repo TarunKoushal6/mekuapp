@@ -139,6 +139,18 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
       onClick={() => navigate(`/p/${post.id}`)}
       className="hairline-b animate-fade-in cursor-pointer px-2 py-3 transition-colors duration-200 hover:bg-surface/40 active:bg-surface/60"
     >
+      {post.reposted_by && (
+        <Link
+          to={`/u/${post.reposted_by.username ?? ""}`}
+          onClick={(e) => e.stopPropagation()}
+          className="mb-1 ml-[36px] flex items-center gap-1.5 text-[12px] font-semibold text-muted-foreground hover:underline"
+        >
+          <Repeat2 className="h-3.5 w-3.5" strokeWidth={1.8} />
+          <span>
+            {post.reposted_by.display_name || post.reposted_by.username || "Someone"} reposted
+          </span>
+        </Link>
+      )}
       <header className="flex items-start gap-2">
         <Link to={`/u/${handle}`} onClick={(e) => e.stopPropagation()} className="shrink-0">
           <Avatar name={name} src={author?.avatar_url ?? undefined} size="md" />
