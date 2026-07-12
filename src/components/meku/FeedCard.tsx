@@ -10,6 +10,7 @@ import { toggleLike, toggleRepost, isReposted, getRepostCount, type Post, timeAg
 import { SendSheet } from "./SendSheet";
 import { InlineActionCard, parseInlineAction } from "./InlineActionCard";
 import { PostBody } from "./PostBody";
+import { AnimatedCount } from "./AnimatedCount";
 import { HeartLike } from "./HeartLike";
 import { BookmarkSave } from "./BookmarkSave";
 import { readBookmarks, toggleBookmark } from "@/lib/bookmarks";
