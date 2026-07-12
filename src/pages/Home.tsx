@@ -13,7 +13,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { useUnreadNotifications } from "@/hooks/useNotifications";
 import { fetchPosts, fetchPost, getProfile, type Post, type Profile } from "@/lib/social";
 import { supabase } from "@/integrations/supabase/client";
-import { PostListSkeleton, PostCardSkeleton } from "@/components/meku/Skeletons";
+import { PostListSkeleton, PostCardSkeleton, SkeletonCrossfade } from "@/components/meku/Skeletons";
+import { StaggerList } from "@/components/meku/StaggerList";
 import { haptic } from "@/lib/haptics";
 
 const tabs = ["For You", "Following"] as const;
@@ -248,31 +249,36 @@ const Home = () => {
       </nav>
 
       <section className="pb-6">
-        {loading ? (
-          <PostListSkeleton count={5} />
-        ) : posts.length === 0 ? (
-          <EmptyState
-            pose="sitting"
-            title="Your feed is quiet"
-            description="Share your first post to bring it to life."
-            action={
-              <Link to="/create" className="tap inline-flex h-[44px] items-center gap-2 rounded-full gradient-purple px-5 text-[14px] font-semibold text-primary-foreground">
-                <IconPlus size={16} />
-                New post
-              </Link>
-            }
-          />
-        ) : (
-          <div className="animate-fade-in">
-            {posts.map((p) => <FeedCard key={p.id} post={p} onChanged={load} />)}
-            {/* Sentinel + footer */}
-            <div ref={sentinelRef} />
-            {loadingMore && <PostCardSkeleton />}
-            {reachedEnd && posts.length > 0 && (
-              <div className="py-8 text-center text-[13px] text-muted-foreground">You're all caught up</div>
-            )}
-          </div>
-        )}
+        <SkeletonCrossfade
+          loading={loading}
+          skeleton={<PostListSkeleton count={5} />}
+        >
+          {posts.length === 0 ? (
+            <EmptyState
+              pose="sitting"
+              title="Your feed is quiet"
+              description="Share your first post to bring it to life."
+              action={
+                <Link to="/create" className="tap inline-flex h-[44px] items-center gap-2 rounded-full gradient-purple px-5 text-[14px] font-semibold text-primary-foreground">
+                  <IconPlus size={16} />
+                  New post
+                </Link>
+              }
+            />
+          ) : (
+            <div>
+              <StaggerList>
+                {posts.map((p) => <FeedCard key={p.id} post={p} onChanged={load} />)}
+              </StaggerList>
+              {/* Sentinel + footer */}
+              <div ref={sentinelRef} />
+              {loadingMore && <PostCardSkeleton />}
+              {reachedEnd && posts.length > 0 && (
+                <div className="py-8 text-center text-[13px] text-muted-foreground">You're all caught up</div>
+              )}
+            </div>
+          )}
+        </SkeletonCrossfade>
       </section>
     </AppShell>
   );
