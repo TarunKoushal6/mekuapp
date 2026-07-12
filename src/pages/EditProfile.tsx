@@ -102,7 +102,7 @@ const EditProfile = () => {
             name={p.display_name || p.username || "U"}
             src={p.avatar_url ?? undefined}
             size="xl"
-            className="relative h-[104px] w-[104px]"
+            className="relative h-[128px] w-[128px]"
           />
           <button
             onClick={onPick}
