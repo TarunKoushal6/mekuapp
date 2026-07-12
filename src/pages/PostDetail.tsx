@@ -229,7 +229,8 @@ const PostDetail = () => {
 
   return (
     <AppShell hideNav>
-      <div className="meku-page-in">
+      <>
+
       <header className="sticky top-0 z-30 flex h-[56px] items-center justify-between bg-background/90 px-3 backdrop-blur-xl">
         <button onClick={() => navigate(-1)} aria-label="Back" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full">
           <ChevronLeft className="h-[22px] w-[22px]" strokeWidth={1.6} />
@@ -336,7 +337,8 @@ const PostDetail = () => {
           </button>
         </div>
       </div>
-      </div>
+      </>
+
       {tipOpen && post && (
         <SendSheet
           open={tipOpen}
