@@ -193,8 +193,17 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .meku-page-in, .shimmer::after { animation: none; }
-    .spring-press { transition: none; }
+    .shimmer::after { animation: none; }
+    .spring-press, .tap { transition: opacity 160ms var(--ease-out-strong); }
+    button, a, [role="button"] { transition: none; }
+    * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; }
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .glass-floating {
+      background: hsl(var(--background));
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
   }
 
   .gradient-purple { background: var(--gradient-purple); }
