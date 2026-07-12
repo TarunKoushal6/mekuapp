@@ -10,11 +10,11 @@ interface AvatarProps {
 }
 
 const sizeMap = {
-  xs: "h-6 w-6",
-  sm: "h-8 w-8",
-  md: "h-9 w-9",
-  lg: "h-11 w-11",
-  xl: "h-16 w-16",
+  xs: "h-5 w-5",
+  sm: "h-7 w-7",
+  md: "h-8 w-8",
+  lg: "h-10 w-10",
+  xl: "h-14 w-14",
 };
 
 export const Avatar = ({ name, src, size = "md", className }: AvatarProps) => {
