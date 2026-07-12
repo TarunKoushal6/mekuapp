@@ -10,6 +10,7 @@ import { toggleLike, toggleRepost, isReposted, getRepostCount, type Post, timeAg
 import { SendSheet } from "./SendSheet";
 import { InlineActionCard, parseInlineAction } from "./InlineActionCard";
 import { PostBody } from "./PostBody";
+import { AnimatedCount } from "./AnimatedCount";
 import { HeartLike } from "./HeartLike";
 import { BookmarkSave } from "./BookmarkSave";
 import { readBookmarks, toggleBookmark } from "@/lib/bookmarks";
@@ -220,7 +221,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
             aria-label="Comment"
           >
             <MessageCircle className="h-[18px] w-[18px]" strokeWidth={1.6} />
-            <span className="text-[13px] tabular-nums">{post.comment_count}</span>
+            <AnimatedCount value={post.comment_count} className="text-[13px]" />
           </button>
           <button
             onClick={handleRepost}
@@ -228,7 +229,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
             aria-label="Repost"
           >
             <Repeat2 className="h-[18px] w-[18px]" strokeWidth={1.6} />
-            {repostCount > 0 && <span className="text-[13px] tabular-nums">{repostCount}</span>}
+            {repostCount > 0 && <AnimatedCount value={repostCount} className="text-[13px]" />}
           </button>
           <div className="inline-flex items-center gap-1.5">
             <HeartLike
@@ -237,7 +238,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
               size={20}
               aria-label="Like"
             />
-            <span className={cn("text-[13px] tabular-nums", liked && "text-[#ff5b89]")}>{likeCount}</span>
+            <AnimatedCount value={likeCount} className={cn("text-[13px]", liked && "text-[#ff5b89]")} />
           </div>
           <button
             onClick={(e) => { e.stopPropagation(); navigate(`/p/${post.id}`); }}
@@ -245,7 +246,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
             aria-label="Views"
           >
             <BarChart2 className="h-[18px] w-[18px]" strokeWidth={1.6} />
-            <span className="text-[13px] tabular-nums">{viewCount}</span>
+            <AnimatedCount value={viewCount} className="text-[13px]" />
           </button>
           <div className="inline-flex items-center gap-1">
             <BookmarkSave

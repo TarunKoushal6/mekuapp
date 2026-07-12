@@ -19,6 +19,7 @@ import {
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { PostBody } from "@/components/meku/PostBody";
+import { AnimatedCount } from "@/components/meku/AnimatedCount";
 import { readBookmarks, toggleBookmark } from "@/lib/bookmarks";
 import { PostCardSkeleton } from "@/components/meku/Skeletons";
 import { SendSheet } from "@/components/meku/SendSheet";
@@ -229,7 +230,8 @@ const PostDetail = () => {
 
   return (
     <AppShell hideNav>
-      <div className="meku-page-in">
+      <>
+
       <header className="sticky top-0 z-30 flex h-[56px] items-center justify-between bg-background/90 px-3 backdrop-blur-xl">
         <button onClick={() => navigate(-1)} aria-label="Back" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full">
           <ChevronLeft className="h-[22px] w-[22px]" strokeWidth={1.6} />
@@ -289,9 +291,9 @@ const PostDetail = () => {
         </p>
 
         <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1 border-y border-border py-3 text-[13px] text-muted-foreground">
-          <span className="inline-flex items-center gap-1"><BarChart2 className="h-[14px] w-[14px]" strokeWidth={1.8} /><strong className="text-foreground">{formatCount(viewCount)}</strong> Impressions</span>
-          <span><strong className="text-foreground">{formatCount(post.comment_count)}</strong> Replies</span>
-          <span><strong className="text-foreground">{formatCount(post.like_count)}</strong> Likes</span>
+          <span className="inline-flex items-center gap-1"><BarChart2 className="h-[14px] w-[14px]" strokeWidth={1.8} /><AnimatedCount value={formatCount(viewCount)} className="font-bold text-foreground" /> Impressions</span>
+          <span className="inline-flex items-center gap-1"><AnimatedCount value={formatCount(post.comment_count)} className="font-bold text-foreground" /> Replies</span>
+          <span className="inline-flex items-center gap-1"><AnimatedCount value={formatCount(post.like_count)} className="font-bold text-foreground" /> Likes</span>
         </div>
 
         <div className="mt-1 flex items-center justify-between px-1 pt-2 text-muted-foreground">
@@ -336,7 +338,8 @@ const PostDetail = () => {
           </button>
         </div>
       </div>
-      </div>
+      </>
+
       {tipOpen && post && (
         <SendSheet
           open={tipOpen}
