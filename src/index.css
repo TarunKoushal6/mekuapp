@@ -53,7 +53,12 @@
     --sidebar-ring: 243 76% 59%;
 
     --ease: cubic-bezier(0.32, 0.72, 0, 1);
-    --d1: 120ms; --d2: 180ms; --d3: 240ms; --d4: 320ms;
+    /* Emil / Apple curves — stronger than built-ins */
+    --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+    --ease-in-out-strong: cubic-bezier(0.77, 0, 0.175, 1);
+    --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+    /* Duration scale — UI stays sub-300ms */
+    --d1: 120ms; --d2: 160ms; --d3: 220ms; --d4: 280ms; --d5: 380ms;
   }
 
   .dark {
@@ -128,33 +133,39 @@
 
   .tap {
     -webkit-tap-highlight-color: transparent;
-    transition: transform var(--d2) var(--ease), opacity var(--d2) var(--ease), background-color var(--d2) var(--ease), color var(--d2) var(--ease);
+    transition:
+      transform var(--d1) var(--ease-out-strong),
+      opacity var(--d2) var(--ease-out-strong),
+      background-color var(--d2) var(--ease-out-strong),
+      color var(--d2) var(--ease-out-strong);
   }
-  .tap:active { transform: scale(0.975); opacity: 0.9; }
+  .tap:active { transform: scale(0.97); opacity: 0.92; }
 
-  .fade-in { animation: m-fade var(--d4) var(--ease) both; }
+  .fade-in { animation: m-fade var(--d3) var(--ease-out-strong) both; }
   @keyframes m-fade {
     from { opacity: 0; transform: translateY(4px); }
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  /* iOS-style page push: spring-eased slide + fade */
-  .meku-page-in {
-    animation: meku-page-in 380ms cubic-bezier(.22,1,.36,1) both;
-    transform-origin: center top;
-    will-change: transform, opacity;
-  }
-  @keyframes meku-page-in {
-    from { opacity: 0; transform: translateY(10px) scale(0.985); }
-    to   { opacity: 1; transform: translateY(0)    scale(1); }
-  }
+  /* Route transitions are handled by <PageTransition /> (framer-motion, interruptible). */
+  .meku-page-in { /* deprecated no-op — kept for legacy class refs */ }
 
-  /* Spring press for interactive elements */
+  /* Press feedback — fast in, springy release. Kept short per Emil UI-timing table. */
   .spring-press {
-    transition: transform 260ms cubic-bezier(.22,1,.36,1), opacity 200ms var(--ease);
+    transition: transform 140ms var(--ease-out-strong), opacity 160ms var(--ease-out-strong);
     -webkit-tap-highlight-color: transparent;
   }
-  .spring-press:active { transform: scale(0.94); }
+  .spring-press:active { transform: scale(0.96); }
+
+  /* Global press feedback on all real buttons/links — instant, GPU-only. Gated to fine pointers. */
+  @media (hover: hover) and (pointer: fine) {
+    button, a, [role="button"] {
+      transition: transform 140ms var(--ease-out-strong);
+    }
+    button:active, a:active, [role="button"]:active {
+      transform: scale(0.97);
+    }
+  }
 
   /* Floating glass surface used by nav / sticky headers */
   .glass-floating {
@@ -182,8 +193,17 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .meku-page-in, .shimmer::after { animation: none; }
-    .spring-press { transition: none; }
+    .shimmer::after { animation: none; }
+    .spring-press, .tap { transition: opacity 160ms var(--ease-out-strong); }
+    button, a, [role="button"] { transition: none; }
+    * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; }
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .glass-floating {
+      background: hsl(var(--background));
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
   }
 
   .gradient-purple { background: var(--gradient-purple); }
