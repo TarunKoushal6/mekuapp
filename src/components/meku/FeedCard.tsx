@@ -182,9 +182,9 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
               <button
                 aria-label="Tip USDC"
                 onClick={(e) => { e.stopPropagation(); if (!user) return navigate("/auth"); setTipOpen(true); }}
-                className="tap -mt-1 inline-flex h-10 w-10 items-center justify-center rounded-full text-amber-500 transition-colors hover:bg-amber-500/10"
+                className="tap -mt-1 inline-flex h-9 w-9 items-center justify-center rounded-full text-amber-500 transition-colors hover:bg-amber-500/10"
               >
-                <Coins size={16} strokeWidth={1.8} />
+                <Coins size={17} strokeWidth={1.75} />
               </button>
             )}
             {isOwn && (
@@ -193,9 +193,9 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
                   <button
                     aria-label="More"
                     onClick={(e) => e.stopPropagation()}
-                    className="tap -mt-1 inline-flex h-10 w-10 items-center justify-center rounded-full text-muted-foreground hover:bg-surface-2"
+                    className="tap -mt-1 inline-flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground hover:bg-surface-2"
                   >
-                    <MoreHorizontal size={18} />
+                    <MoreHorizontal size={18} strokeWidth={1.75} />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()} className="rounded-2xl">
