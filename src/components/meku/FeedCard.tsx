@@ -153,7 +153,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
           </span>
         </Link>
       )}
-      <header className="flex items-start gap-3">
+      <header className="flex items-start gap-[12px]">
         <Link to={`/u/${handle}`} onClick={(e) => e.stopPropagation()} className="shrink-0">
           <Avatar name={name} src={author?.avatar_url ?? undefined} size="lg" />
         </Link>
