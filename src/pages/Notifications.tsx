@@ -31,7 +31,7 @@ const TINT: Record<string, string> = {
   follow: "text-primary",
 };
 
-const TABS = ["All", "Mentions"] as const;
+const TABS = ["All", "Mentions", "Replies", "Likes"] as const;
 type Tab = (typeof TABS)[number];
 
 const Notifications = () => {
