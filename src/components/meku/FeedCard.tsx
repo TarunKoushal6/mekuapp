@@ -286,8 +286,10 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
             <Upload className="h-5 w-5" strokeWidth={1.7} />
           </button>
         </div>
+      </div>
 
       {tipOpen && (
+
         <SendSheet
           open={tipOpen}
           onOpenChange={setTipOpen}
