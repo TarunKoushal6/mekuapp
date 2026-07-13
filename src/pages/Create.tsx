@@ -6,6 +6,12 @@ import { TopBar, IconButton } from "@/components/meku/TopBar";
 import { useAuth } from "@/hooks/useAuth";
 import { createPost } from "@/lib/social";
 import { MentionAutocomplete } from "@/components/meku/MentionAutocomplete";
+import {
+  ComposerSkeleton,
+  ComposerToolbarSkeleton,
+  MediaPlaceholderSkeleton,
+  SkeletonCrossfade,
+} from "@/components/meku/Skeletons";
 import { toast } from "sonner";
 
 const Create = () => {
