@@ -86,35 +86,37 @@ const Wallet = () => {
 
   return (
     <AppShell>
-      <header className="sticky top-0 z-30 flex h-[56px] items-center justify-between bg-background/80 px-3 backdrop-blur-xl">
+      <header className="sticky top-0 z-30 grid h-[52px] grid-cols-[1fr_auto_1fr] items-center bg-background/85 px-3 backdrop-blur-xl">
         <button onClick={() => navigate(-1)} aria-label="Back" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground">
           <IconBack size={22} />
         </button>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button aria-label="More" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground">
-              <IconMore size={20} />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56 rounded-2xl">
-            <DropdownMenuItem onClick={copy} disabled={!wallet?.address}>
-              <IconCopy size={16} className="mr-2" /> Copy address
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={openExplorer} disabled={!wallet?.address}>
-              <IconExternal size={16} className="mr-2" /> View on explorer
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={openFaucet}>
-              <IconDroplet size={16} className="mr-2" /> Get testnet USDC
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => refresh()}>
-              <IconRefresh size={16} className="mr-2" /> Refresh balance
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="text-[17px] font-bold tracking-[-0.01em]">Wallet</div>
+        <div className="flex items-center justify-end">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button aria-label="More" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground">
+                <IconMore size={20} />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56 rounded-2xl">
+              <DropdownMenuItem onClick={copy} disabled={!wallet?.address}>
+                <IconCopy size={16} className="mr-2" /> Copy address
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={openExplorer} disabled={!wallet?.address}>
+                <IconExternal size={16} className="mr-2" /> View on explorer
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={openFaucet}>
+                <IconDroplet size={16} className="mr-2" /> Get testnet USDC
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => refresh()}>
+                <IconRefresh size={16} className="mr-2" /> Refresh balance
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </header>
 
-      <h1 className="px-5 pt-2 text-[28px] font-bold tracking-[-0.02em] text-foreground">Wallet</h1>
 
       <div className="px-5 pt-4">
         <div className="relative overflow-hidden rounded-[24px] p-5 gradient-card shadow-purple">
