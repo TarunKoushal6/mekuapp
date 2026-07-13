@@ -31,7 +31,7 @@ const TINT: Record<string, string> = {
   follow: "text-primary",
 };
 
-const TABS = ["All", "Mentions"] as const;
+const TABS = ["All", "Mentions", "Replies", "Likes"] as const;
 type Tab = (typeof TABS)[number];
 
 const Notifications = () => {
@@ -68,9 +68,14 @@ const Notifications = () => {
   }, [user?.id]);
 
   const filtered = useMemo(
-    () => tab === "Mentions" ? items.filter((n) => n.kind === "mention") : items,
+    () => tab === "All" ? items
+      : tab === "Mentions" ? items.filter((n) => n.kind === "mention")
+      : tab === "Replies" ? items.filter((n) => n.kind === "comment")
+      : items.filter((n) => n.kind === "like"),
     [items, tab],
   );
+
+
 
   const openTarget = (n: NotificationWithActor) => {
     if (n.post_id) navigate(`/p/${n.post_id}`);
