@@ -2,10 +2,10 @@ import { AppShell } from "@/components/meku/AppShell";
 import { ScreenHeader } from "@/components/meku/ScreenHeader";
 import { FeedCard } from "@/components/meku/FeedCard";
 import { EmptyState } from "@/components/meku/EmptyState";
+import { PostListSkeleton } from "@/components/meku/Skeletons";
 import { useEffect, useState } from "react";
 import { fetchPost, type Post } from "@/lib/social";
 import { useAuth } from "@/hooks/useAuth";
-import { Loader2 } from "lucide-react";
 import { readBookmarks } from "@/lib/bookmarks";
 
 const Bookmarks = () => {
@@ -27,9 +27,7 @@ const Bookmarks = () => {
     <AppShell>
       <ScreenHeader title="Bookmarks" />
       {loading ? (
-        <div className="flex min-h-[40vh] items-center justify-center">
-          <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-        </div>
+        <PostListSkeleton count={4} />
       ) : posts.length === 0 ? (
         <EmptyState
           title="No bookmarks yet"

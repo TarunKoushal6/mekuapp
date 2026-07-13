@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import type { Profile } from "@/lib/social";
+import { UserListSkeleton } from "@/components/meku/Skeletons";
 
 const NewMessage = () => {
   const navigate = useNavigate();
@@ -57,14 +58,7 @@ const NewMessage = () => {
       </div>
 
       {loading ? (
-        <ul>
-          {Array.from({ length: 5 }).map((_, i) => (
-            <li key={i} className="flex items-center gap-3 px-4 py-3">
-              <div className="h-12 w-12 rounded-full bg-surface-2 animate-pulse" />
-              <div className="h-3.5 w-40 rounded bg-surface-2 animate-pulse" />
-            </li>
-          ))}
-        </ul>
+        <UserListSkeleton count={6} />
       ) : q.trim() && results.length === 0 ? (
         <p className="mt-10 px-6 text-center text-[14px] text-muted-foreground">
           No people found for "{q}".

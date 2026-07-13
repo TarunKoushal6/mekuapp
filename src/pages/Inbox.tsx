@@ -1,5 +1,6 @@
 import { AppShell } from "@/components/meku/AppShell";
 import { EmptyState } from "@/components/meku/EmptyState";
+import { InboxListSkeleton } from "@/components/meku/Skeletons";
 import { IconCompose, IconSearch, IconSettings } from "@/components/meku/MekuIcon";
 import { Avatar } from "@/components/meku/Avatar";
 import { Link } from "react-router-dom";
@@ -89,7 +90,7 @@ const Inbox = () => {
       </section>
 
       {loading ? (
-        <EmptyState pose="sitting" title="Loading messages" description="Grabbing your latest conversations." />
+        <InboxListSkeleton count={7} />
       ) : filtered.length === 0 ? (
         <EmptyState
           pose="caughtup"
