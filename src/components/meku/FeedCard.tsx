@@ -265,30 +265,28 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
             <BarChart2 className="h-5 w-5" strokeWidth={1.7} />
             <AnimatedCount value={viewCount} className="text-[13px]" />
           </button>
-          <div className="inline-flex items-center gap-0.5">
-            <div className="inline-flex h-9 w-9 items-center justify-center rounded-full">
-              <BookmarkSave
-                checked={bookmarked}
-                onChange={(e) => {
-                  e.stopPropagation();
-                  const next = !bookmarked;
-                  setBookmarked(next);
-                  toggleBookmark(user?.id, post.id, next);
-                }}
-                size={20}
-                aria-label="Save"
-              />
-            </div>
-            <button
-              onClick={handleShare}
-              className="tap inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-foreground/5 hover:text-foreground"
-              aria-label="Share"
-            >
-              <Upload className="h-5 w-5" strokeWidth={1.7} />
-            </button>
+          <div className="inline-flex h-9 min-w-9 items-center justify-center rounded-full px-2">
+            <BookmarkSave
+              checked={bookmarked}
+              onChange={(e) => {
+                e.stopPropagation();
+                const next = !bookmarked;
+                setBookmarked(next);
+                toggleBookmark(user?.id, post.id, next);
+              }}
+              size={20}
+              aria-label="Save"
+            />
           </div>
+          <button
+            onClick={handleShare}
+            className="tap inline-flex h-9 min-w-9 items-center justify-center rounded-full px-2 transition-colors hover:bg-foreground/5 hover:text-foreground"
+            aria-label="Share"
+          >
+            <Upload className="h-5 w-5" strokeWidth={1.7} />
+          </button>
         </div>
-      </div>
+
       {tipOpen && (
         <SendSheet
           open={tipOpen}
