@@ -228,44 +228,44 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
           return action ? <InlineActionCard action={action} postId={post.id} /> : null;
         })()}
 
-        <div className={cn("-ml-2 flex items-center justify-between pr-1 text-muted-foreground", post.image_url ? "mt-2.5" : "mt-3")}>
+        <div className={cn("-ml-2 flex items-center justify-between pr-1 text-muted-foreground", post.image_url ? "mt-3" : "mt-3.5")}>
           <button
             onClick={(e) => { e.stopPropagation(); navigate(`/p/${post.id}`); }}
-            className="tap inline-flex h-9 min-w-9 items-center gap-1 rounded-full px-2 transition-colors hover:bg-foreground/5 hover:text-foreground"
+            className="tap inline-flex h-9 min-w-9 items-center gap-1.5 rounded-full px-2.5 transition-colors hover:bg-foreground/[0.06] hover:text-foreground"
             aria-label="Comment"
           >
-            <MessageCircle className="h-5 w-5" strokeWidth={1.7} />
-            <AnimatedCount value={post.comment_count} className="text-[13px]" />
+            <MessageCircle className="h-[18px] w-[18px]" strokeWidth={1.75} />
+            <AnimatedCount value={post.comment_count} className="text-[13px] tabular-nums" />
           </button>
           <button
             onClick={handleRepost}
             className={cn(
-              "tap inline-flex h-9 min-w-9 items-center gap-1 rounded-full px-2 transition-colors",
-              reposted ? "text-emerald-500 hover:bg-emerald-500/10" : "hover:bg-foreground/5 hover:text-foreground",
+              "tap inline-flex h-9 min-w-9 items-center gap-1.5 rounded-full px-2.5 transition-colors",
+              reposted ? "text-emerald-500 hover:bg-emerald-500/10" : "hover:bg-foreground/[0.06] hover:text-foreground",
             )}
             aria-label="Repost"
           >
-            <Repeat2 className="h-5 w-5" strokeWidth={1.7} />
-            {repostCount > 0 && <AnimatedCount value={repostCount} className="text-[13px]" />}
+            <Repeat2 className="h-[18px] w-[18px]" strokeWidth={1.75} />
+            {repostCount > 0 && <AnimatedCount value={repostCount} className="text-[13px] tabular-nums" />}
           </button>
-          <div className="inline-flex h-9 min-w-9 items-center gap-1 rounded-full px-2">
+          <div className="inline-flex h-9 min-w-9 items-center gap-1.5 rounded-full px-2.5">
             <HeartLike
               checked={liked}
               onChange={(e) => handleLike(e)}
-              size={20}
+              size={18}
               aria-label="Like"
             />
-            <AnimatedCount value={likeCount} className={cn("text-[13px]", liked && "text-[#ff5b89]")} />
+            <AnimatedCount value={likeCount} className={cn("text-[13px] tabular-nums", liked && "text-[#ff5b89]")} />
           </div>
           <button
             onClick={(e) => { e.stopPropagation(); navigate(`/p/${post.id}`); }}
-            className="tap inline-flex h-9 min-w-9 items-center gap-1 rounded-full px-2 transition-colors hover:bg-foreground/5 hover:text-foreground"
+            className="tap inline-flex h-9 min-w-9 items-center gap-1.5 rounded-full px-2.5 transition-colors hover:bg-foreground/[0.06] hover:text-foreground"
             aria-label="Views"
           >
-            <BarChart2 className="h-5 w-5" strokeWidth={1.7} />
-            <AnimatedCount value={viewCount} className="text-[13px]" />
+            <BarChart2 className="h-[18px] w-[18px]" strokeWidth={1.75} />
+            <AnimatedCount value={viewCount} className="text-[13px] tabular-nums" />
           </button>
-          <div className="inline-flex h-9 min-w-9 items-center justify-center rounded-full px-2">
+          <div className="inline-flex h-9 min-w-9 items-center justify-center rounded-full px-2.5">
             <BookmarkSave
               checked={bookmarked}
               onChange={(e) => {
@@ -274,18 +274,19 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
                 setBookmarked(next);
                 toggleBookmark(user?.id, post.id, next);
               }}
-              size={20}
+              size={18}
               aria-label="Save"
             />
           </div>
           <button
             onClick={handleShare}
-            className="tap inline-flex h-9 min-w-9 items-center justify-center rounded-full px-2 transition-colors hover:bg-foreground/5 hover:text-foreground"
+            className="tap inline-flex h-9 min-w-9 items-center justify-center rounded-full px-2.5 transition-colors hover:bg-foreground/[0.06] hover:text-foreground"
             aria-label="Share"
           >
-            <Upload className="h-5 w-5" strokeWidth={1.7} />
+            <Upload className="h-[18px] w-[18px]" strokeWidth={1.75} />
           </button>
         </div>
+
       </div>
 
       {tipOpen && (
