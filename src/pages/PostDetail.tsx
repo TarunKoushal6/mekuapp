@@ -257,64 +257,65 @@ const PostDetail = () => {
         </DropdownMenu>
       </header>
 
-      <article className="px-4 pt-3 pb-4 hairline-b">
-        <div className="flex items-start gap-3">
-          <Link to={`/u/${post.author?.username ?? ""}`} className="shrink-0">
-            <Avatar name={name} src={post.author?.avatar_url ?? undefined} size="lg" />
-          </Link>
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-1.5">
-              <Link to={`/u/${post.author?.username ?? ""}`} className="truncate text-[16px] font-semibold tracking-[-0.01em] text-foreground hover:underline">
-                {name}
-              </Link>
-              <VerificationBadge kind={(post.author?.verification_kind ?? (post.author?.verified ? "verified" : "none")) as any} size={14} />
+      <article className="px-4 py-4">
+        <div className="flex items-start justify-between gap-3">
+          <Link to={`/u/${post.author?.username ?? ""}`} className="flex items-center gap-3">
+            <Avatar name={name} src={post.author?.avatar_url ?? undefined} size="md" />
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5">
+                <p className="truncate text-[15px] font-semibold text-foreground">{name}</p>
+                <VerificationBadge kind={(post.author?.verification_kind ?? (post.author?.verified ? "verified" : "none")) as any} size={14} />
+              </div>
+              <p className="truncate text-[12.5px] text-muted-foreground">@{post.author?.username ?? "anon"}</p>
             </div>
-            <p className="truncate text-[14px] text-muted-foreground">@{post.author?.username ?? "anon"}</p>
-          </div>
-          <span className="shrink-0 pt-0.5 text-[13px] text-muted-foreground tabular-nums">{timeAgo(post.created_at)}</span>
+          </Link>
+          {!isOwn && (
+            <button
+              aria-label="Tip"
+              onClick={() => { if (!user) return navigate("/auth"); setTipOpen(true); }}
+              className="tap inline-flex h-9 items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 text-[12.5px] font-semibold text-amber-500 hover:bg-amber-500/15"
+            >
+              <Coins size={14} /> Tip
+            </button>
+          )}
         </div>
 
-        {post.title && <h1 className="mt-3 text-[17px] font-semibold leading-[1.35] tracking-[-0.01em] text-foreground">{post.title}</h1>}
-        <PostBody text={post.body} className="mt-1.5 whitespace-pre-wrap break-words text-[16px] leading-[24px] text-foreground" />
-        {post.image_url && <div className="mt-3 overflow-hidden rounded-[16px] border border-border"><img src={post.image_url} alt="" className="w-full" /></div>}
+        {post.title && <h1 className="mt-4 text-[20px] font-bold leading-tight tracking-[-0.01em] text-foreground">{post.title}</h1>}
+        <PostBody text={post.body} className="mt-2 whitespace-pre-wrap break-words text-[16px] leading-[1.55] text-foreground/90" />
+        {post.image_url && <div className="mt-3 overflow-hidden rounded-[14px] border border-border"><img src={post.image_url} alt="" className="w-full" /></div>}
 
-        <div className="mt-4 flex items-center justify-between text-muted-foreground">
-          <button onClick={() => document.getElementById("reply-input")?.focus()} className="tap inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-[13px] hover:bg-foreground/5 hover:text-foreground" aria-label="Reply">
-            <MessageCircle className="h-5 w-5" strokeWidth={1.7} />
-            <AnimatedCount value={post.comment_count} />
-          </button>
-          <button className="tap inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-[13px] hover:bg-foreground/5 hover:text-foreground" aria-label="Repost">
-            <Repeat2 className="h-5 w-5" strokeWidth={1.7} />
-          </button>
-          <div className="inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-[13px]">
-            <HeartLike checked={!!post.liked_by_me} onChange={() => handleLike()} size={20} aria-label="Like" />
-            <AnimatedCount value={post.like_count} className={cn(post.liked_by_me && "text-[#ff5b89]")} />
-          </div>
-          <button className="tap inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-[13px] hover:bg-foreground/5 hover:text-foreground" aria-label="Views">
-            <BarChart2 className="h-5 w-5" strokeWidth={1.7} />
-            <AnimatedCount value={viewCount} />
-          </button>
-          <div className="inline-flex items-center gap-0.5">
-            <BookmarkSave
-              checked={bookmarked}
-              onChange={() => { const next = !bookmarked; setBookmarked(next); toggleBookmark(user?.id, post.id, next); }}
-              size={20}
-              aria-label="Save"
-            />
-            <button className="tap inline-flex h-9 w-9 items-center justify-center rounded-full hover:bg-foreground/5 hover:text-foreground" aria-label="Share">
-              <Upload className="h-5 w-5" strokeWidth={1.7} />
-            </button>
-          </div>
+        <p className="mt-3 text-[12px] text-muted-foreground">
+          {new Date(post.created_at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
+          {" · "}
+          {new Date(post.created_at).toLocaleDateString([], { month: "short", day: "numeric", year: "numeric" })}
+        </p>
+
+        <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1 border-y border-border py-3 text-[13px] text-muted-foreground">
+          <span className="inline-flex items-center gap-1"><BarChart2 className="h-[14px] w-[14px]" strokeWidth={1.8} /><AnimatedCount value={formatCount(viewCount)} className="font-bold text-foreground" /> Impressions</span>
+          <span className="inline-flex items-center gap-1"><AnimatedCount value={formatCount(post.comment_count)} className="font-bold text-foreground" /> Replies</span>
+          <span className="inline-flex items-center gap-1"><AnimatedCount value={formatCount(post.like_count)} className="font-bold text-foreground" /> Likes</span>
+        </div>
+
+        <div className="mt-1 flex items-center justify-between px-1 pt-2 text-muted-foreground">
+          <button className="tap" aria-label="Reply"><MessageCircle className="h-[22px] w-[22px]" strokeWidth={1.6} /></button>
+          <button className="tap" aria-label="Repost"><Repeat2 className="h-[22px] w-[22px]" strokeWidth={1.6} /></button>
+          <HeartLike checked={!!post.liked_by_me} onChange={() => handleLike()} size={22} aria-label="Like" />
+          <BookmarkSave
+            checked={bookmarked}
+            onChange={() => {
+              const next = !bookmarked;
+              setBookmarked(next);
+              toggleBookmark(user?.id, post.id, next);
+            }}
+            size={22}
+            aria-label="Save"
+          />
+          <button className="tap" aria-label="Share"><Upload className="h-[22px] w-[22px]" strokeWidth={1.6} /></button>
         </div>
       </article>
 
+
       <section className="px-4 pb-[120px]">
-        <div className="flex items-center justify-between py-3">
-          <h2 className="text-[15px] font-semibold text-foreground">Replies</h2>
-          <button className="tap inline-flex h-8 items-center rounded-full bg-surface-2 px-3 text-[12.5px] font-medium text-muted-foreground">
-            Most relevant
-          </button>
-        </div>
         {tree.length === 0 ? (
           <p className="py-6 text-center text-[13px] text-muted-foreground">Be the first to reply.</p>
         ) : (
@@ -325,28 +326,19 @@ const PostDetail = () => {
       <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[440px] hairline-t bg-background/95 px-3 py-2 backdrop-blur-xl" style={{ paddingBottom: "max(env(safe-area-inset-bottom), 8px)" }}>
         <div className="flex min-w-0 items-center gap-2">
           <Avatar name={user?.email ?? "You"} size="sm" />
-          <div className="relative min-w-0 flex-1">
-            <input
-              id="reply-input"
-              value={draft}
-              onChange={(e) => setDraft(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && send()}
-              placeholder="Post your reply..."
-              className="h-[42px] w-full rounded-full border border-border bg-surface pl-4 pr-12 text-[14px] outline-none focus:border-primary"
-            />
-            <button
-              onClick={send}
-              disabled={sending || !draft.trim()}
-              aria-label="Send reply"
-              className="tap absolute right-1 top-1/2 inline-flex h-[34px] w-[34px] -translate-y-1/2 items-center justify-center rounded-full bg-primary text-primary-foreground disabled:opacity-40"
-            >
-              {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4 rotate-90" strokeWidth={2} />}
-            </button>
-          </div>
+          <input
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && send()}
+            placeholder={`Reply to @${post.author?.username ?? "anon"}…`}
+            className="h-[42px] min-w-0 flex-1 rounded-full border border-border bg-surface px-4 text-[14px] outline-none focus:border-primary"
+          />
+          <button onClick={send} disabled={sending || !draft.trim()} className="tap shrink-0 rounded-full bg-primary px-4 py-2 text-[13px] font-bold text-primary-foreground disabled:opacity-40">
+            {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Reply"}
+          </button>
         </div>
       </div>
       </>
-
 
       {tipOpen && post && (
         <SendSheet

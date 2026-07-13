@@ -25,56 +25,62 @@ export const BottomNav = () => {
   return (
     <nav
       aria-label="Primary"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/92 backdrop-blur-xl"
-      style={{ paddingBottom: "max(env(safe-area-inset-bottom), 4px)" }}
+      className="fixed inset-x-0 bottom-0 z-40"
+      style={{ paddingBottom: "max(env(safe-area-inset-bottom), 6px)" }}
     >
-      <ul className="mx-auto flex h-[56px] max-w-[440px] items-center justify-between px-2">
-        {items.map(({ to, label, icon: Icon }) => {
-          const active =
-            pathname === to || (to !== "/home" && pathname.startsWith(to));
-          return (
-            <li key={to} className="flex flex-1 justify-center">
-              <NavLink
-                to={to}
-                aria-label={label}
-                onClick={() => haptic("selection")}
-                className="tap relative inline-flex h-11 w-11 items-center justify-center rounded-full outline-none"
-                style={{ WebkitTapHighlightColor: "transparent" }}
-              >
-                {({ isActive }) => {
-                  const isOn = isActive || active;
-                  return (
-                    <motion.span
-                      className="relative inline-flex h-11 w-11 items-center justify-center"
-                      animate={
-                        reduce
-                          ? undefined
-                          : { scale: isOn ? 1.08 : 1, y: isOn ? -1 : 0 }
-                      }
-                      transition={{
-                        type: "spring",
-                        stiffness: 520,
-                        damping: 28,
-                        mass: 0.6,
-                      }}
-                    >
-                      <Icon
-                        size={24}
-                        strokeWidth={isOn ? 2.4 : 1.75}
-                        className={cn(
-                          "transition-colors duration-200",
-                          isOn ? "text-primary" : "text-muted-foreground",
+      <div className="mx-auto max-w-[440px] px-3 pt-1.5">
+        <ul className="glass-floating flex h-[62px] items-center justify-between rounded-[22px] px-2 shadow-[0_10px_40px_-14px_hsl(252_95%_40%/0.28)]">
+          {items.map(({ to, label, icon: Icon }) => {
+            const active =
+              pathname === to || (to !== "/home" && pathname.startsWith(to));
+            return (
+              <li key={to} className="flex flex-1 justify-center">
+                <NavLink
+                  to={to}
+                  aria-label={label}
+                  onClick={() => haptic("selection")}
+                  className={cn(
+                    "relative inline-flex h-[44px] w-[44px] items-center justify-center rounded-full outline-none",
+                    "transition-colors duration-200 ease-[cubic-bezier(0.23,1,0.32,1)]",
+                    active ? "text-primary" : "text-muted-foreground",
+                  )}
+                  style={{ WebkitTapHighlightColor: "transparent" }}
+                >
+                  {({ isActive }) => {
+                    const isOn = isActive || active;
+                    return (
+                      <motion.span
+                        className="relative inline-flex h-11 w-11 items-center justify-center"
+                        whileTap={reduce ? undefined : { scale: 0.88 }}
+                        transition={{ type: "spring", stiffness: 520, damping: 26, mass: 0.6 }}
+                      >
+                        {isOn && (
+                          <motion.span
+                            layoutId="bottomnav-pill"
+                            className="absolute inset-0 rounded-full bg-primary/12"
+                            transition={
+                              reduce
+                                ? { duration: 0.15 }
+                                : { type: "spring", stiffness: 480, damping: 34, mass: 0.7 }
+                            }
+                          />
                         )}
-                        {...(isOn ? { fill: "currentColor" } : {})}
-                      />
-                    </motion.span>
-                  );
-                }}
-              </NavLink>
-            </li>
-          );
-        })}
-      </ul>
+                        <motion.span
+                          className="relative inline-flex"
+                          animate={reduce ? undefined : { y: isOn ? -1 : 0, scale: isOn ? 1.06 : 1 }}
+                          transition={{ type: "spring", stiffness: 500, damping: 28, mass: 0.6 }}
+                        >
+                          <Icon size={22} strokeWidth={isOn ? 2.2 : 1.7} />
+                        </motion.span>
+                      </motion.span>
+                    );
+                  }}
+                </NavLink>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
     </nav>
   );
 };
