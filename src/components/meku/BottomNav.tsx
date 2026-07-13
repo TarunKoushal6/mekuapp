@@ -50,22 +50,28 @@ export const BottomNav = () => {
                     const isOn = isActive || active;
                     return (
                       <motion.span
-                        className="relative inline-flex items-center justify-center"
+                        className="relative inline-flex h-11 w-11 items-center justify-center"
                         whileTap={reduce ? undefined : { scale: 0.88 }}
-                        transition={{ type: "spring", stiffness: 500, damping: 28, mass: 0.6 }}
+                        transition={{ type: "spring", stiffness: 520, damping: 26, mass: 0.6 }}
                       >
-                        <Icon size={22} strokeWidth={isOn ? 2.2 : 1.7} />
                         {isOn && (
                           <motion.span
-                            layoutId="bottomnav-dot"
-                            className="pointer-events-none absolute -bottom-1.5 h-1 w-1 rounded-full bg-primary"
+                            layoutId="bottomnav-pill"
+                            className="absolute inset-0 rounded-full bg-primary/12"
                             transition={
                               reduce
                                 ? { duration: 0.15 }
-                                : { type: "spring", stiffness: 520, damping: 34, mass: 0.7 }
+                                : { type: "spring", stiffness: 480, damping: 34, mass: 0.7 }
                             }
                           />
                         )}
+                        <motion.span
+                          className="relative inline-flex"
+                          animate={reduce ? undefined : { y: isOn ? -1 : 0, scale: isOn ? 1.06 : 1 }}
+                          transition={{ type: "spring", stiffness: 500, damping: 28, mass: 0.6 }}
+                        >
+                          <Icon size={22} strokeWidth={isOn ? 2.2 : 1.7} />
+                        </motion.span>
                       </motion.span>
                     );
                   }}

@@ -35,13 +35,9 @@ export const Avatar = ({ name, src, size = "md", className }: AvatarProps) => {
         draggable={false}
         onContextMenu={(e) => e.preventDefault()}
         onError={() => setErrored(true)}
-        // For the brand mascot avatar we zoom in slightly and lock to the upper
-        // third so the face stays centered in every size.
-        style={
-          usingDefault
-            ? { objectPosition: "50% 22%", transform: "scale(1.18)" }
-            : undefined
-        }
+        // Keep the mascot's face centered without scaling so the avatar renders
+        // at exactly the container size (no visual "pop" vs. real photos).
+        style={usingDefault ? { objectPosition: "50% 28%" } : undefined}
         className="no-save h-full w-full object-cover"
       />
     </div>

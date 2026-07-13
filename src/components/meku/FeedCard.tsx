@@ -231,51 +231,60 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
         <div className="-ml-2 mt-2 flex items-center justify-between pr-1 text-muted-foreground">
           <button
             onClick={(e) => { e.stopPropagation(); navigate(`/p/${post.id}`); }}
-            className="tap inline-flex items-center gap-1.5 transition-colors hover:text-foreground"
+            className="tap inline-flex h-9 min-w-9 items-center gap-1.5 rounded-full px-2 transition-colors hover:bg-foreground/5 hover:text-foreground"
             aria-label="Comment"
           >
-            <MessageCircle className="h-[18px] w-[18px]" strokeWidth={1.6} />
+            <MessageCircle className="h-[19px] w-[19px]" strokeWidth={1.7} />
             <AnimatedCount value={post.comment_count} className="text-[13px]" />
           </button>
           <button
             onClick={handleRepost}
-            className={cn("tap inline-flex items-center gap-1.5 transition-colors", reposted ? "text-emerald-500" : "hover:text-foreground")}
+            className={cn(
+              "tap inline-flex h-9 min-w-9 items-center gap-1.5 rounded-full px-2 transition-colors",
+              reposted ? "text-emerald-500 hover:bg-emerald-500/10" : "hover:bg-foreground/5 hover:text-foreground",
+            )}
             aria-label="Repost"
           >
-            <Repeat2 className="h-[18px] w-[18px]" strokeWidth={1.6} />
+            <Repeat2 className="h-[19px] w-[19px]" strokeWidth={1.7} />
             {repostCount > 0 && <AnimatedCount value={repostCount} className="text-[13px]" />}
           </button>
-          <div className="inline-flex items-center gap-1.5">
+          <div className="inline-flex h-9 min-w-9 items-center gap-1.5 rounded-full px-2">
             <HeartLike
               checked={liked}
               onChange={(e) => handleLike(e)}
-              size={20}
+              size={19}
               aria-label="Like"
             />
             <AnimatedCount value={likeCount} className={cn("text-[13px]", liked && "text-[#ff5b89]")} />
           </div>
           <button
             onClick={(e) => { e.stopPropagation(); navigate(`/p/${post.id}`); }}
-            className="tap inline-flex items-center gap-1.5 transition-colors hover:text-foreground"
+            className="tap inline-flex h-9 min-w-9 items-center gap-1.5 rounded-full px-2 transition-colors hover:bg-foreground/5 hover:text-foreground"
             aria-label="Views"
           >
-            <BarChart2 className="h-[18px] w-[18px]" strokeWidth={1.6} />
+            <BarChart2 className="h-[19px] w-[19px]" strokeWidth={1.7} />
             <AnimatedCount value={viewCount} className="text-[13px]" />
           </button>
-          <div className="inline-flex items-center gap-1">
-            <BookmarkSave
-              checked={bookmarked}
-              onChange={(e) => {
-                e.stopPropagation();
-                const next = !bookmarked;
-                setBookmarked(next);
-                toggleBookmark(user?.id, post.id, next);
-              }}
-              size={18}
-              aria-label="Save"
-            />
-            <button onClick={handleShare} className="tap transition-colors hover:text-foreground" aria-label="Share">
-              <Upload className="h-[18px] w-[18px]" strokeWidth={1.6} />
+          <div className="inline-flex items-center gap-0.5">
+            <div className="inline-flex h-9 w-9 items-center justify-center rounded-full">
+              <BookmarkSave
+                checked={bookmarked}
+                onChange={(e) => {
+                  e.stopPropagation();
+                  const next = !bookmarked;
+                  setBookmarked(next);
+                  toggleBookmark(user?.id, post.id, next);
+                }}
+                size={19}
+                aria-label="Save"
+              />
+            </div>
+            <button
+              onClick={handleShare}
+              className="tap inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-foreground/5 hover:text-foreground"
+              aria-label="Share"
+            >
+              <Upload className="h-[19px] w-[19px]" strokeWidth={1.7} />
             </button>
           </div>
         </div>
