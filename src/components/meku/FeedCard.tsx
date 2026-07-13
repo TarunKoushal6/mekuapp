@@ -147,7 +147,9 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
         >
           <Repeat2 className="h-3.5 w-3.5" strokeWidth={1.8} />
           <span>
-            {post.reposted_by.display_name || post.reposted_by.username || "Someone"} reposted
+            {user && post.reposted_by.id === user.id
+              ? "You reposted"
+              : `${post.reposted_by.display_name || post.reposted_by.username || "Someone"} reposted`}
           </span>
         </Link>
       )}
