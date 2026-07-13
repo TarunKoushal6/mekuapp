@@ -1,5 +1,6 @@
 import { AppShell } from "@/components/meku/AppShell";
 import { EmptyState } from "@/components/meku/EmptyState";
+import { UserListSkeleton } from "@/components/meku/Skeletons";
 import { IconSearch } from "@/components/meku/MekuIcon";
 import { Avatar } from "@/components/meku/Avatar";
 import { VerificationBadge } from "@/components/meku/VerificationBadge";

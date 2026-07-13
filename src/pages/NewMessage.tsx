@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import type { Profile } from "@/lib/social";
+import { UserListSkeleton } from "@/components/meku/Skeletons";
 
 const NewMessage = () => {
   const navigate = useNavigate();
