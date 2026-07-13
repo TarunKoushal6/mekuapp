@@ -219,7 +219,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
           />
         )}
         {post.image_url && (
-          <div className="mt-3 overflow-hidden rounded-[16px] border border-border bg-surface-2">
+          <div className="mt-[12px] overflow-hidden rounded-[16px] border border-border bg-surface-2">
             <img src={post.image_url} alt="" loading="lazy" className="aspect-[5/4] w-full object-cover transition-transform duration-500 hover:scale-[1.02]" />
           </div>
         )}
@@ -228,7 +228,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
           return action ? <InlineActionCard action={action} postId={post.id} /> : null;
         })()}
 
-        <div className={cn("-ml-2 flex items-center justify-between pr-1 text-muted-foreground", post.image_url ? "mt-2.5" : "mt-3")}>
+        <div className={cn("-ml-2 flex items-center justify-between pr-1 text-muted-foreground", post.image_url ? "mt-[10px]" : "mt-[12px]")}>
           <button
             onClick={(e) => { e.stopPropagation(); navigate(`/p/${post.id}`); }}
             className="tap inline-flex h-9 min-w-9 items-center gap-1 rounded-full px-2 transition-colors hover:bg-foreground/5 hover:text-foreground"
