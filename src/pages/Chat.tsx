@@ -98,10 +98,14 @@ const Chat = () => {
             {handle && <p className="truncate text-[12px] text-muted-foreground">@{handle}</p>}
           </div>
         </Link>
-        <button aria-label="More" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full">
-          <MoreHorizontal className="h-[20px] w-[20px]" />
+        <button aria-label="Call" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full text-primary">
+          <Phone className="h-[20px] w-[20px]" strokeWidth={1.9} />
+        </button>
+        <button aria-label="Video" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full text-primary">
+          <Video className="h-[20px] w-[20px]" strokeWidth={1.9} />
         </button>
       </header>
+
 
       <div ref={scrollRef} className="flex-1 space-y-1.5 overflow-y-auto px-3 pb-[96px] pt-4">
         {messages === null ? (
