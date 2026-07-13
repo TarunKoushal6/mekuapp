@@ -6,60 +6,62 @@
 
 @layer base {
   :root {
-    /* MEKU — Light theme with purple identity */
+    /* MEKU — Light canvas, vivid violet identity (matches reference mockup) */
     --background: 0 0% 100%;
-    --foreground: 236 40% 12%;
-    --surface:    240 30% 97%;
-    --surface-2:  240 24% 94%;
+    --foreground: 240 24% 10%;
+    --surface:    240 33% 98%;
+    --surface-2:  240 22% 95%;
 
-    --muted: 240 20% 96%;
-    --muted-foreground: 236 12% 42%;
+    --muted: 240 22% 96%;
+    --muted-foreground: 240 8% 46%;
 
     --card: 0 0% 100%;
-    --card-foreground: 236 40% 12%;
+    --card-foreground: 240 24% 10%;
     --popover: 0 0% 100%;
-    --popover-foreground: 236 40% 12%;
+    --popover-foreground: 240 24% 10%;
 
-    --primary: 243 76% 59%;
+    /* Mockup violet ≈ #6C5CE7 */
+    --primary: 250 76% 63%;
     --primary-foreground: 0 0% 100%;
-    --primary-soft: 243 90% 96%;
-    --primary-glow: 250 88% 72%;
+    --primary-soft: 250 100% 97%;
+    --primary-glow: 258 92% 74%;
 
-    --secondary: 240 24% 94%;
-    --secondary-foreground: 236 40% 12%;
-    --accent: 243 76% 59%;
+    --secondary: 240 22% 95%;
+    --secondary-foreground: 240 24% 10%;
+    --accent: 250 76% 63%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 78% 58%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 240 16% 88%;
-    --input: 240 16% 88%;
-    --ring: 243 76% 59%;
+    --border: 240 14% 90%;
+    --input: 240 14% 90%;
+    --ring: 250 76% 63%;
 
     --radius: 18px;
 
-    --gradient-purple: linear-gradient(135deg, hsl(243 90% 66%) 0%, hsl(258 80% 56%) 100%);
-    --gradient-card: linear-gradient(135deg, hsl(243 90% 66%) 0%, hsl(258 80% 56%) 100%);
-    --shadow-purple: 0 14px 44px -12px hsl(243 90% 50% / 0.35);
+    /* Wallet / hero gradient — deep indigo → violet, matches reference balance card */
+    --gradient-purple: linear-gradient(135deg, hsl(250 82% 66%) 0%, hsl(262 72% 52%) 100%);
+    --gradient-card:   linear-gradient(135deg, hsl(250 82% 66%) 0%, hsl(262 72% 52%) 100%);
+    --shadow-purple:   0 14px 44px -12px hsl(250 82% 50% / 0.35);
 
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 236 40% 12%;
-    --sidebar-primary: 243 76% 59%;
+    --sidebar-foreground: 240 24% 10%;
+    --sidebar-primary: 250 76% 63%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 24% 94%;
-    --sidebar-accent-foreground: 236 40% 12%;
-    --sidebar-border: 240 16% 88%;
-    --sidebar-ring: 243 76% 59%;
+    --sidebar-accent: 240 22% 95%;
+    --sidebar-accent-foreground: 240 24% 10%;
+    --sidebar-border: 240 14% 90%;
+    --sidebar-ring: 250 76% 63%;
 
+    /* Motion — Emil / Apple curves; UI stays sub-300ms */
     --ease: cubic-bezier(0.32, 0.72, 0, 1);
-    /* Emil / Apple curves — stronger than built-ins */
     --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
     --ease-in-out-strong: cubic-bezier(0.77, 0, 0.175, 1);
     --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
-    /* Duration scale — UI stays sub-300ms */
     --d1: 120ms; --d2: 160ms; --d3: 220ms; --d4: 280ms; --d5: 380ms;
   }
+
 
   .dark {
     --background: 0 0% 100%;
