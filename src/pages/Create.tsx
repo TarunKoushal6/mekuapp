@@ -16,12 +16,15 @@ import { toast } from "sonner";
 
 const Create = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [body, setBody] = useState("");
   const [title, setTitle] = useState("");
   const [caret, setCaret] = useState(0);
   const [busy, setBusy] = useState(false);
+  const [mediaLoading, setMediaLoading] = useState(false);
   const bodyRef = useRef<HTMLTextAreaElement>(null);
+
+  const showSkeleton = authLoading || busy;
 
   const canPublish = body.trim().length > 0;
 
