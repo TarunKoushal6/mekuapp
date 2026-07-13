@@ -66,24 +66,25 @@ const Inbox = () => {
 
   return (
     <AppShell>
-      <header className="sticky top-0 z-30 grid h-[52px] grid-cols-[1fr_auto_1fr] items-center bg-background/85 px-4 backdrop-blur-xl">
-        <button aria-label="Open menu" className="tap inline-flex items-center justify-self-start rounded-full">
-          <Avatar name={me?.display_name || "You"} src={me?.avatar_url ?? undefined} size="xs" />
-        </button>
-        <div className="text-[17px] font-bold tracking-[-0.01em]">Messages</div>
-        <Link to="/settings" aria-label="Settings" className="tap inline-flex h-10 w-10 items-center justify-center justify-self-end rounded-full">
-          <IconSettings size={20} />
+      <header className="sticky top-0 z-30 flex h-[52px] items-center justify-between bg-background/85 px-4 backdrop-blur-xl">
+        <div className="text-[22px] font-bold tracking-[-0.02em]">Chat</div>
+        <Link
+          to="/inbox/new"
+          aria-label="New message"
+          className="tap inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground"
+        >
+          <IconCompose size={18} />
         </Link>
       </header>
 
-      <section className="px-4 pb-3 pt-3">
-        <label className="flex h-11 items-center gap-2.5 rounded-full border border-border bg-surface/60 px-4">
+      <section className="px-4 pb-3 pt-2">
+        <label className="flex h-11 items-center gap-2.5 rounded-full bg-surface-2 px-4">
           <IconSearch size={18} className="text-muted-foreground" />
           <input
             type="search"
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Search Direct Messages"
+            placeholder="Search conversations"
             className="w-full bg-transparent text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none"
           />
         </label>
@@ -115,23 +116,28 @@ const Inbox = () => {
         <ul>
           {filtered.map((t) => {
             const name = t.other?.display_name || t.other?.username || "User";
+            const isMine = t.last.sender_id === me?.id;
             return (
-              <li key={t.otherId} className="hairline-b">
+              <li key={t.otherId}>
                 <Link
                   to={`/inbox/${t.otherId}`}
-                  className="tap flex w-full items-start gap-3 px-4 py-3.5 text-left transition-colors hover:bg-surface/40"
+                  className="tap flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-surface/40"
                 >
                   <Avatar name={name} src={t.other?.avatar_url ?? undefined} size="lg" />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-baseline justify-between gap-2">
-                      <span className="truncate text-[15px] font-bold text-foreground">{name}</span>
+                      <span className="truncate text-[15px] font-semibold text-foreground">{name}</span>
                       <span className="shrink-0 text-[12.5px] text-muted-foreground tabular-nums">{timeAgo(t.last.created_at)}</span>
                     </div>
-                    <p className={`mt-0.5 truncate text-[14px] ${t.unread > 0 ? "font-semibold text-foreground" : "text-muted-foreground"}`}>
-                      {t.last.sender_id === (me?.id) ? "You: " : ""}{t.last.body}
+                    <p className={`mt-0.5 truncate text-[13.5px] ${t.unread > 0 ? "font-semibold text-foreground" : "text-muted-foreground"}`}>
+                      {isMine ? "You: " : ""}{t.last.body}
                     </p>
                   </div>
-                  {t.unread > 0 && <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-primary" />}
+                  {t.unread > 0 && (
+                    <span className="ml-1 inline-flex h-[22px] min-w-[22px] items-center justify-center rounded-full bg-primary px-1.5 text-[11px] font-bold text-primary-foreground tabular-nums">
+                      {t.unread > 99 ? "99+" : t.unread}
+                    </span>
+                  )}
                 </Link>
               </li>
             );
@@ -139,13 +145,6 @@ const Inbox = () => {
         </ul>
       )}
 
-      <Link
-        to="/inbox/new"
-        aria-label="New message"
-        className="fixed bottom-[104px] right-4 z-30 inline-flex h-14 w-14 items-center justify-center rounded-full gradient-purple text-primary-foreground shadow-purple"
-      >
-        <IconCompose size={22} />
-      </Link>
     </AppShell>
   );
 };
