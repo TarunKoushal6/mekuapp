@@ -173,22 +173,26 @@ const Wallet = () => {
         }} />
       </div>
 
-      <div className="mt-6 px-5">
-        <div className="inline-flex w-full items-center gap-1 rounded-full bg-surface-2 p-1">
+      <nav className="mt-6 sticky top-[52px] z-20 bg-background/85 backdrop-blur-xl hairline-b">
+        <div className="grid grid-cols-2">
           {(["Tokens", "Activity"] as Tab[]).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
               className={cn(
-                "tap flex-1 rounded-full px-3 py-[10px] text-[13px] font-semibold",
-                tab === t ? "bg-foreground text-background" : "text-muted-foreground"
+                "tap relative py-3.5 text-[14px] font-semibold",
+                tab === t ? "text-foreground" : "text-muted-foreground",
               )}
             >
-              {t}
+              <span className="relative inline-block">
+                {t}
+                {tab === t && <span className="absolute -bottom-[13px] left-0 right-0 h-[3px] rounded-full bg-primary" />}
+              </span>
             </button>
           ))}
         </div>
-      </div>
+      </nav>
+
 
       <ul className="mt-2 px-3 pb-8">
         {tab === "Tokens" ? (
