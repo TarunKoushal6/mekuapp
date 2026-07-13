@@ -1,6 +1,7 @@
 import { AppShell } from "@/components/meku/AppShell";
 import { Avatar } from "@/components/meku/Avatar";
-import { ChevronLeft, MoreHorizontal } from "lucide-react";
+import { ChevronLeft, Phone, Video } from "lucide-react";
+
 import { IconSend } from "@/components/meku/MekuIcon";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
