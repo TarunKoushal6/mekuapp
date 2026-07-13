@@ -137,13 +137,13 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
   return (
     <article
       onClick={() => navigate(`/p/${post.id}`)}
-      className="hairline-b animate-fade-in cursor-pointer px-4 py-3 transition-colors duration-200 hover:bg-surface/40 active:bg-surface/60"
+      className="hairline-b animate-fade-in cursor-pointer px-2 py-3 transition-colors duration-200 hover:bg-surface/40 active:bg-surface/60"
     >
       {post.reposted_by && (
         <Link
           to={`/u/${post.reposted_by.username ?? ""}`}
           onClick={(e) => e.stopPropagation()}
-          className="mb-1 ml-[52px] flex items-center gap-1.5 text-[13px] font-semibold text-muted-foreground hover:underline"
+          className="mb-1 ml-[36px] flex items-center gap-1.5 text-[12px] font-semibold text-muted-foreground hover:underline"
         >
           <Repeat2 className="h-3.5 w-3.5" strokeWidth={1.8} />
           <span>
@@ -153,7 +153,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
           </span>
         </Link>
       )}
-      <header className="flex items-start gap-3">
+      <header className="flex items-start gap-2">
         <Link to={`/u/${handle}`} onClick={(e) => e.stopPropagation()} className="shrink-0">
           <Avatar name={name} src={author?.avatar_url ?? undefined} size="md" />
         </Link>
@@ -171,9 +171,9 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
               size={15}
               className="shrink-0"
             />
-            <span className="ml-1 min-w-0 truncate text-[15px] font-normal text-muted-foreground">@{handle}</span>
+            <span className="min-w-0 truncate text-[15px] text-muted-foreground">@{handle}</span>
             <span className="shrink-0 text-[15px] text-muted-foreground">·</span>
-            <span className="shrink-0 whitespace-nowrap text-[15px] font-normal text-muted-foreground tabular-nums">
+            <span className="shrink-0 whitespace-nowrap text-[15px] text-muted-foreground tabular-nums">
               {timeAgo(post.created_at)}
             </span>
           </div>
@@ -182,9 +182,9 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
               <button
                 aria-label="Tip USDC"
                 onClick={(e) => { e.stopPropagation(); if (!user) return navigate("/auth"); setTipOpen(true); }}
-                className="tap -mt-1 inline-flex h-10 w-10 items-center justify-center rounded-full text-amber-500 transition-colors hover:bg-amber-500/10"
+                className="tap -mt-1 inline-flex h-8 w-8 items-center justify-center rounded-full text-amber-500 transition-colors hover:bg-amber-500/10"
               >
-                <Coins size={18} strokeWidth={1.8} />
+                <Coins size={16} strokeWidth={1.8} />
               </button>
             )}
             {isOwn && (
@@ -193,9 +193,9 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
                   <button
                     aria-label="More"
                     onClick={(e) => e.stopPropagation()}
-                    className="tap -mt-1 inline-flex h-10 w-10 items-center justify-center rounded-full text-muted-foreground hover:bg-surface-2"
+                    className="tap -mt-1 inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-surface-2"
                   >
-                    <MoreHorizontal size={20} />
+                    <MoreHorizontal size={18} />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()} className="rounded-2xl">
@@ -210,16 +210,16 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
       </header>
 
 
-      <div className="ml-[52px] mt-1">
-        {post.title && <h2 className="text-[15px] font-bold leading-[1.4] tracking-[-0.01em] text-foreground">{post.title}</h2>}
+      <div className="ml-[48px] mt-0.5">
+        {post.title && <h2 className="text-[15px] font-bold leading-[1.35] tracking-[-0.01em] text-foreground">{post.title}</h2>}
         {post.body && (
           <PostBody
             text={post.body}
-            className={(post.title ? "mt-0.5 " : "") + "whitespace-pre-wrap text-[15px] leading-[22px] tracking-[0] text-foreground"}
+            className={(post.title ? "mt-0.5 " : "") + "whitespace-pre-wrap text-[15px] leading-[20px] tracking-[-0.003em] text-foreground"}
           />
         )}
         {post.image_url && (
-          <div className="mb-2.5 mt-2 overflow-hidden rounded-[16px] border border-border bg-surface-2">
+          <div className="mt-3 overflow-hidden rounded-[16px] border border-border bg-surface-2">
             <img src={post.image_url} alt="" loading="lazy" className="aspect-[5/4] w-full object-cover transition-transform duration-500 hover:scale-[1.02]" />
           </div>
         )}
@@ -231,7 +231,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
         <div className="-ml-2 mt-2 flex items-center justify-between pr-1 text-muted-foreground">
           <button
             onClick={(e) => { e.stopPropagation(); navigate(`/p/${post.id}`); }}
-            className="tap inline-flex h-9 items-center gap-1 rounded-full px-2 transition-colors hover:text-foreground"
+            className="tap inline-flex items-center gap-1.5 transition-colors hover:text-foreground"
             aria-label="Comment"
           >
             <MessageCircle className="h-[18px] w-[18px]" strokeWidth={1.6} />
@@ -239,13 +239,13 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
           </button>
           <button
             onClick={handleRepost}
-            className={cn("tap inline-flex h-9 items-center gap-1 rounded-full px-2 transition-colors", reposted ? "text-emerald-500" : "hover:text-foreground")}
+            className={cn("tap inline-flex items-center gap-1.5 transition-colors", reposted ? "text-emerald-500" : "hover:text-foreground")}
             aria-label="Repost"
           >
             <Repeat2 className="h-[18px] w-[18px]" strokeWidth={1.6} />
             {repostCount > 0 && <AnimatedCount value={repostCount} className="text-[13px]" />}
           </button>
-          <div className="inline-flex h-9 items-center gap-1 px-2">
+          <div className="inline-flex items-center gap-1.5">
             <HeartLike
               checked={liked}
               onChange={(e) => handleLike(e)}
@@ -256,13 +256,13 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
           </div>
           <button
             onClick={(e) => { e.stopPropagation(); navigate(`/p/${post.id}`); }}
-            className="tap inline-flex h-9 items-center gap-1 rounded-full px-2 transition-colors hover:text-foreground"
+            className="tap inline-flex items-center gap-1.5 transition-colors hover:text-foreground"
             aria-label="Views"
           >
             <BarChart2 className="h-[18px] w-[18px]" strokeWidth={1.6} />
             <AnimatedCount value={viewCount} className="text-[13px]" />
           </button>
-          <div className="inline-flex h-9 items-center gap-1 px-1">
+          <div className="inline-flex items-center gap-1">
             <BookmarkSave
               checked={bookmarked}
               onChange={(e) => {
@@ -274,7 +274,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
               size={18}
               aria-label="Save"
             />
-            <button onClick={handleShare} className="tap inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:text-foreground" aria-label="Share">
+            <button onClick={handleShare} className="tap transition-colors hover:text-foreground" aria-label="Share">
               <Upload className="h-[18px] w-[18px]" strokeWidth={1.6} />
             </button>
           </div>
