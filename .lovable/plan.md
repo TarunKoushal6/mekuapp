@@ -1,75 +1,57 @@
-# Redesign MEKU to match the reference mockup (pixel-perfect)
+Five fixes grouped by area. I'll ship them in this order.
 
-Goal: rebuild the 10 screens shown in the reference — Intro, Home Feed, Post Detail, Notifications, Chat list, DM thread, New Message, Wallet, Browser, Profile — to match layout, spacing, typography, and interaction feel exactly, while keeping our existing mascot/logo/avatar assets. **No Stories row on Home.**
+## 1. Per-account bookmarks/likes/reposts
+The likes/reposts are already user-scoped in DB — the bug is that `FeedCard`'s local optimistic state isn't refreshed after a logout/login (component holds the previous user's initial values). Bookmarks are the real bug: stored in a single `localStorage` key.
 
-Applied craft rules (from Emil Kowalski):
-- Custom easing `cubic-bezier(0.23, 1, 0.32, 1)` for enter, `(0.77, 0, 0.175, 1)` for movement.
-- Durations 150–250ms for UI, 100–160ms for press feedback, `scale(0.97)` on `:active`.
-- Enter from `scale(0.95) + opacity 0`, never `scale(0)`.
-- Origin-aware popovers, no `transition: all`, only `transform`/`opacity`.
-- Reduced-motion respected; stagger 30–80ms for list entries.
+- Namespace bookmarks per user: `meku.bookmarks.v1:<userId>` (anonymous bucket for logged-out).
+- On `user.id` change in `FeedCard`, reset `liked/likeCount/bookmarked/reposted` from current props/DB.
+- `Bookmarks` page reads the per-user key.
 
----
+## 2. Real-time notifications
+Add a `notifications` table + realtime publication. Insert rows from existing flows (likes, reposts, comments, @mentions in `Create.tsx`/`PostDetail.tsx` comment submit). Subscribe in a top-level `useNotifications` hook that:
+- Loads unread on mount.
+- Subscribes via `supabase.channel('notif:'+userId)` filtered to `user_id=eq.<me>`.
+- Pops a `toast.info(...)` and updates a badge on the bell icon in `TopBar`.
 
-## Chunk 1 — Design tokens & base
-- Lock type scale: 17sp titles / 16sp name / 14sp meta / 13sp counters / 15sp body.
-- Spacing rhythm: 20/16/12/10/8/6/4 dp; 44dp avatar; 52dp header.
-- Tune `index.css`: hairline dividers, surface/surface-2 tokens, purple primary matching the mockup violet (`#6C5CE7`-family), muted foreground grey.
-- Motion tokens: `--ease-out-strong`, `--ease-in-out-strong`, `--dur-fast/base/slow`.
+Schema:
+```sql
+create table public.notifications(
+  id uuid pk default gen_random_uuid(),
+  user_id uuid not null,           -- recipient
+  actor_id uuid,                   -- who did it
+  kind text not null,              -- 'like' | 'repost' | 'comment' | 'mention' | 'tip'
+  post_id uuid,
+  comment_id uuid,
+  read_at timestamptz,
+  created_at timestamptz default now()
+);
+-- GRANTs + RLS: recipient can select/update; service_role full.
+alter publication supabase_realtime add table public.notifications;
+```
+Inserts done client-side right after the social action (RLS allows authenticated insert when `actor_id = auth.uid()`).
 
-## Chunk 2 — App shell & Bottom Nav
-- 5-tab nav: Home, Explore, Wallet, Browser, Chat (icons match mockup, filled-on-active).
-- Center Create FAB **removed from nav** (Create lives as top-left tile in feed, per mockup).
-- Animated active indicator: subtle icon `y: -1` + scale `1.06`, filled variant swap; no dot.
+## 3. Confirmation cards for Send / Swap / Bridge
+Replace the "Review" button's direct execute path with a `ConfirmSheet` (shared component) showing:
+- From / To (address or chain)
+- Amount in + amount out (estimate for swap, 1:1 for bridge, single for send)
+- Network fee, route, slippage
+- Big "Confirm" button using `SendFlyButton`
 
-## Chunk 3 — Home Feed (For you / Following) — NO STORIES
-- Header: left Meku `M` logo, centered segmented `For you | Following` with 3dp underline, right bell with unread dot.
-- Feed cards already close; tighten to reference: 44dp avatar 20dp/12dp offsets, name+handle+time single baseline, 13sp action counts, 20dp icons, hairline dividers between posts (no card gaps).
-- Remove any stories rail if present.
+Send already has `SendSheet` — refactor it to a two-step (compose → confirm) using the same shared `ConfirmSheet`.
 
-## Chunk 4 — Post Detail
-- Sticky header "Post" with back + more.
-- Author block, body, action row identical to feed card.
-- "Replies" section header with "Most relevant" pill.
-- Reply composer docked at bottom with rounded pill input + purple send FAB.
+## 4. Button animations on success
+- `SendFlyButton` already animates the plane flying. Extend it: after `flying` finishes, swap to a `success` state — green bg + checkmark icon for ~1.2s before sheet closes. Use for Send + Bridge.
+- For Swap, build `SwapCardButton` mimicking the "credit card" flip animation (card slides in, flips to a check). Pure CSS keyframes, no new deps.
 
-## Chunk 5 — Notifications
-- Tabs: All / Mentions / Replies / Likes (scrollable).
-- Row = 26dp tinted icon (heart pink, repost green, comment/mention purple, tip amber, follow purple) + small avatar + text + timeAgo.
-- Grouped "Nina and 18 others liked…" with avatar stack.
+## 5. Destination-chain dropdown (Bridge)
+Replace the list of buttons with a proper `<Select>` (shadcn) anchored on the "Destination chain" row. Add more chains: Base Sepolia, Ethereum Sepolia, Arbitrum Sepolia, Optimism Sepolia, Polygon Amoy, Avalanche Fuji (Circle CCTP testnet set).
 
-## Chunk 6 — Chat list + DM thread + New Message
-- Chat list: search bar, rows with 44dp avatar, name + last message, right time + unread pill (purple).
-- Thread: iOS-style bubbles — mine purple right, theirs surface-2 left; header shows avatar, name, online, call/video icons; composer with mic/emoji/plus + purple send.
-- New Message: "To:" search, "Suggested" list with radio circles.
+## Technical notes
+- No new packages. Pure Tailwind/CSS for animations.
+- Edge functions unchanged (still gated on the Fly.io swap node for execution — confirmation UX still works and shows the 501 error inline).
+- Migration adds `notifications` table + grants + RLS + realtime publication.
 
-## Chunk 7 — Wallet
-- Purple gradient balance card with iridescent blob, eye toggle, address, arrow → detail.
-- Four action tiles: Send / Receive / Swap / History (rounded squares, icon + label).
-- Assets list rows: token logo, name/ticker, balance right + USD sub.
+## Out of scope (deferred per user)
+- Actually getting `circle-swap` to execute end-to-end (still needs Fly.io node).
 
-## Chunk 8 — Browser
-- Search/address bar with scan icon, tab count top-right.
-- Favorites row: 5 rounded-square icon tiles with labels.
-- Discover cards: title + description left, illustration right, rounded 20dp.
-
-## Chunk 9 — Profile
-- Cover-less header, back + settings, ellipsis top-left.
-- 88dp avatar, verified name, @handle, bio, `Edit profile` primary + secondary icon button.
-- Stat row Posts / Followers / Following.
-- Tabs Posts / Replies / Highlights / Likes, underline indicator, feed below.
-
-## Chunk 10 — Intro / Onboarding
-- Centered `Welcome to Meku` (Meku in primary), subtitle, waving mascot, full-width purple `Create account` CTA with arrow, ghost `I already have an account`.
-
-## Chunk 11 — Polish pass
-- Press states (`scale(0.97)`), origin-aware popovers, tooltip instant-repeat, stagger on feed mount, blur mask on tab crossfade, reduced-motion fallbacks.
-- Manual QA at 360×704 against each reference tile; screenshot diff via Playwright.
-
----
-
-### Technical notes
-- Assets: keep `src/assets/meku_*` (logo, wordmark, mascots) and `default_avatar`; no new binaries needed.
-- Files touched (approx): `index.css`, `tailwind.config.ts`, `BottomNav`, `FeedCard`, `Home`, `PostDetail`, `Notifications`, `Inbox`, `Chat`, `NewMessage`, `Wallet`, `Browser`, `Profile`, `Intro`, plus small primitives (`SegmentedTabs`, `ActionTile`, `NotifRow`).
-- No backend/schema changes.
-- Ship chunks sequentially; each chunk is independently reviewable in preview.
+Shall I proceed?

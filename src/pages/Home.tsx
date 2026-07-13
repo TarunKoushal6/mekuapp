@@ -193,25 +193,41 @@ const Home = () => {
         </div>
       </div>
 
-      <header className="sticky top-0 z-30 flex h-[52px] items-center gap-2 bg-background/85 pl-3 pr-3 backdrop-blur-xl hairline-b">
-        <button
-          onClick={() => setMenuOpen(true)}
-          aria-label="Open menu"
-          className="tap relative inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
-        >
-          <Logo size={26} />
-        </button>
+      <header className="sticky top-0 z-30 grid h-[52px] grid-cols-[1fr_auto_1fr] items-center bg-background/85 px-4 backdrop-blur-xl">
+        <div className="flex items-center">
+          <button
+            onClick={() => setMenuOpen(true)}
+            aria-label="Open menu"
+            className="tap relative inline-flex items-center justify-center rounded-full"
+          >
+            <Avatar name={me?.display_name || me?.username || "You"} src={me?.avatar_url ?? undefined} size="xs" />
+            {hasUnread && <span className="absolute -right-0.5 -top-0.5 h-[8px] w-[8px] rounded-full bg-primary ring-2 ring-background" />}
+          </button>
+        </div>
+        <div className="flex items-center justify-center">
+          <Logo size={32} wordmark />
+        </div>
+        <div className="flex items-center justify-end">
+          <Link to="/notifications" aria-label="Notifications" className="tap relative inline-flex h-9 w-9 items-center justify-center rounded-full text-foreground">
+            <Bell size={20} strokeWidth={1.75} />
+            {hasUnread && <span className="absolute right-1.5 top-1.5 h-[8px] w-[8px] rounded-full bg-primary ring-2 ring-background" />}
+          </Link>
+        </div>
+      </header>
 
-        {/* Inline segmented tabs — centered, animated underline */}
-        <nav className="relative flex flex-1 items-center justify-center">
-          <div className="relative flex items-center gap-7">
+      <SideMenu open={menuOpen} onOpenChange={setMenuOpen} />
+
+      {/* Sticky, horizontally scrollable tabs w/ animated indicator */}
+      <nav className="sticky top-[52px] z-20 bg-background/85 backdrop-blur-xl hairline-b">
+        <div className="relative flex overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+          <div className="relative flex min-w-full items-center">
             {tabs.map((t) => (
               <button
                 key={t}
                 ref={(el) => (tabRefs.current[t] = el)}
                 onClick={() => { haptic("light"); setTab(t); }}
                 className={cn(
-                  "tap relative whitespace-nowrap py-3.5 text-[15px] font-semibold transition-colors",
+                  "tap relative flex-1 whitespace-nowrap px-6 py-3.5 text-[15px] font-semibold transition-colors",
                   tab === t ? "text-foreground" : "text-muted-foreground",
                 )}
               >
@@ -220,26 +236,17 @@ const Home = () => {
             ))}
             <span
               aria-hidden
-              className="pointer-events-none absolute -bottom-[1px] h-[3px] rounded-full bg-primary"
+              className="pointer-events-none absolute bottom-0 h-[3.5px] rounded-full bg-primary"
               style={{
                 left: indicator.left,
                 width: indicator.width,
+                transform: `translateX(0)`,
                 transition: "left 260ms cubic-bezier(0.32,0.72,0,1), width 260ms cubic-bezier(0.32,0.72,0,1)",
               }}
             />
           </div>
-        </nav>
-
-        <Link
-          to="/notifications"
-          aria-label="Notifications"
-          className="tap relative inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-foreground"
-        >
-          <Bell size={20} strokeWidth={1.75} />
-          {hasUnread && <span className="absolute right-2 top-2 h-[8px] w-[8px] rounded-full bg-[#ff5b89] ring-2 ring-background" />}
-        </Link>
-      </header>
-
+        </div>
+      </nav>
 
       <section className="pb-6">
         <SkeletonCrossfade
