@@ -68,6 +68,13 @@ const Notifications = () => {
   }, [user?.id]);
 
   const filtered = useMemo(
+    () => tab === "All" ? items
+      : tab === "Mentions" ? items.filter((n) => n.kind === "mention")
+      : tab === "Replies" ? items.filter((n) => n.kind === "comment")
+      : items.filter((n) => n.kind === "like"),
+    [items, tab],
+  );
+
     () => tab === "Mentions" ? items.filter((n) => n.kind === "mention") : items,
     [items, tab],
   );
