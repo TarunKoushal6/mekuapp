@@ -39,6 +39,61 @@ export const PostListSkeleton = ({ count = 4 }: { count?: number }) => (
   </div>
 );
 
+/* ─────────── Composer / Create ─────────── */
+
+/** Content-shaped placeholder for the New Post composer while it hydrates or publishes. */
+export const ComposerSkeleton = () => (
+  <div className="shimmer-stagger px-4 pt-6">
+    {/* Author row */}
+    <div className="mb-5 flex items-center gap-3">
+      <Skeleton className="h-10 w-10 shrink-0 rounded-full" />
+      <div className="min-w-0 flex-1 space-y-2">
+        <Skeleton className="h-3.5 w-28" />
+        <Skeleton className="h-3 w-20" />
+      </div>
+    </div>
+    {/* Title */}
+    <Skeleton className="h-7 w-[70%] rounded-md" />
+    {/* Body lines */}
+    <div className="mt-4 space-y-2.5">
+      <Skeleton className="h-4 w-[96%]" />
+      <Skeleton className="h-4 w-[88%]" />
+      <Skeleton className="h-4 w-[92%]" />
+      <Skeleton className="h-4 w-[60%]" />
+    </div>
+    {/* Media placeholder */}
+    <MediaPlaceholderSkeleton className="mt-5" />
+  </div>
+);
+
+/** Rounded 5:4 media placeholder used for image uploads / previews. */
+export const MediaPlaceholderSkeleton = ({ className }: { className?: string }) => (
+  <div
+    className={cn(
+      "relative aspect-[5/4] w-full overflow-hidden rounded-[16px] border border-border bg-surface-2",
+      className,
+    )}
+  >
+    <Skeleton className="absolute inset-0 rounded-none" />
+    <div className="absolute inset-0 flex items-center justify-center">
+      <div className="flex flex-col items-center gap-2 opacity-70">
+        <Skeleton className="h-8 w-8 rounded-full" />
+        <Skeleton className="h-3 w-20" />
+      </div>
+    </div>
+  </div>
+);
+
+/** Bottom toolbar skeleton (image / hashtag / mention chips). */
+export const ComposerToolbarSkeleton = () => (
+  <div className="mx-auto flex h-[56px] max-w-[440px] items-center gap-2 px-3">
+    <Skeleton className="h-9 w-9 rounded-full" />
+    <Skeleton className="h-9 w-9 rounded-full" />
+    <Skeleton className="h-9 w-9 rounded-full" />
+    <Skeleton className="ml-auto h-3 w-6" />
+  </div>
+);
+
 /* ─────────── Profile ─────────── */
 
 export const ProfileHeaderSkeleton = () => (
