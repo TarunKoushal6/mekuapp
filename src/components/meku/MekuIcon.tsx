@@ -6,7 +6,7 @@ type IconProps = SVGProps<SVGSVGElement> & { size?: number; strokeWidth?: number
 
 
 const wrap = (children: React.ReactNode) =>
-  (({ size = 24, strokeWidth = 2, ...rest }: IconProps) => (
+  (({ size = 24, strokeWidth = 1.75, ...rest }: IconProps) => (
     <svg
       viewBox="0 0 24 24"
       width={size}
