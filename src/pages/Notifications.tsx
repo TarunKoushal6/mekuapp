@@ -75,9 +75,7 @@ const Notifications = () => {
     [items, tab],
   );
 
-    () => tab === "Mentions" ? items.filter((n) => n.kind === "mention") : items,
-    [items, tab],
-  );
+
 
   const openTarget = (n: NotificationWithActor) => {
     if (n.post_id) navigate(`/p/${n.post_id}`);
