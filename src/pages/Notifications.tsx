@@ -1,5 +1,6 @@
 import { AppShell } from "@/components/meku/AppShell";
 import { EmptyState } from "@/components/meku/EmptyState";
+import { NotificationListSkeleton } from "@/components/meku/Skeletons";
 import { IconBack, IconSettings } from "@/components/meku/MekuIcon";
 import { Logo } from "@/components/meku/Logo";
 import { Link, useNavigate } from "react-router-dom";
@@ -111,7 +112,7 @@ const Notifications = () => {
       </nav>
 
       {loading ? (
-        <EmptyState pose="searching" title="Loading notifications" description="Fetching the latest activity for you." />
+        <NotificationListSkeleton count={7} />
       ) : filtered.length === 0 ? (
         <EmptyState pose="caughtup" title="You're all caught up" description="New replies, follows and mentions will appear here." />
       ) : (

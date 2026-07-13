@@ -12,6 +12,7 @@ import { toast } from "sonner";
 
 import { MessageBubble } from "@/components/meku/MessageBubble";
 import { EmptyState } from "@/components/meku/EmptyState";
+import { ChatSkeleton } from "@/components/meku/Skeletons";
 
 const Chat = () => {
   const navigate = useNavigate();
@@ -103,7 +104,7 @@ const Chat = () => {
 
       <div ref={scrollRef} className="flex-1 space-y-1.5 overflow-y-auto px-3 pb-[96px] pt-4">
         {messages === null ? (
-          <EmptyState pose="searching" title="Loading messages" description="Hang tight while we fetch your chat." />
+          <ChatSkeleton count={8} />
         ) : messages.length === 0 ? (
           <EmptyState
             pose="waving"

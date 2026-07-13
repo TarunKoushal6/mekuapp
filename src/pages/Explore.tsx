@@ -146,17 +146,7 @@ const Explore = () => {
       {/* Live search results */}
       {showResults && (
         loading ? (
-          <ul className="mt-1">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <li key={i} className="flex items-center gap-3 px-4 py-3">
-                <div className="h-12 w-12 rounded-full bg-surface-2 animate-pulse" />
-                <div className="flex-1 space-y-2">
-                  <div className="h-3.5 w-32 rounded bg-surface-2 animate-pulse" />
-                  <div className="h-3 w-20 rounded bg-surface-2 animate-pulse" />
-                </div>
-              </li>
-            ))}
-          </ul>
+          <UserListSkeleton count={6} />
         ) : results.length === 0 ? (
           <EmptyState pose="thinking" title={`No results for "${q}"`} description="Try a different name or handle." />
         ) : (
