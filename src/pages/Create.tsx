@@ -6,16 +6,25 @@ import { TopBar, IconButton } from "@/components/meku/TopBar";
 import { useAuth } from "@/hooks/useAuth";
 import { createPost } from "@/lib/social";
 import { MentionAutocomplete } from "@/components/meku/MentionAutocomplete";
+import {
+  ComposerSkeleton,
+  ComposerToolbarSkeleton,
+  MediaPlaceholderSkeleton,
+  SkeletonCrossfade,
+} from "@/components/meku/Skeletons";
 import { toast } from "sonner";
 
 const Create = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [body, setBody] = useState("");
   const [title, setTitle] = useState("");
   const [caret, setCaret] = useState(0);
   const [busy, setBusy] = useState(false);
+  const [mediaLoading, setMediaLoading] = useState(false);
   const bodyRef = useRef<HTMLTextAreaElement>(null);
+
+  const showSkeleton = authLoading || busy;
 
   const canPublish = body.trim().length > 0;
 
@@ -64,48 +73,59 @@ const Create = () => {
         }
       />
 
-      <div className="relative px-4 pt-6">
-        <input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Title (optional)"
-          className="w-full bg-transparent text-[26px] font-bold leading-[1.15] tracking-[-0.02em] text-foreground outline-none placeholder:text-muted-foreground/50"
-        />
-        <div className="relative mt-3">
-          <textarea
-            ref={bodyRef}
-            value={body}
-            onChange={(e) => { setBody(e.target.value); setCaret(e.target.selectionStart ?? e.target.value.length); }}
-            onKeyUp={(e) => setCaret((e.target as HTMLTextAreaElement).selectionStart ?? 0)}
-            onClick={(e) => setCaret((e.target as HTMLTextAreaElement).selectionStart ?? 0)}
-            rows={12}
-            placeholder="What's on your mind? Type @ to mention someone."
-            className="w-full resize-none bg-transparent text-[16px] leading-[1.55] text-foreground outline-none placeholder:text-muted-foreground/60"
+      <SkeletonCrossfade loading={showSkeleton} skeleton={<ComposerSkeleton />}>
+        <div className="relative px-4 pt-6">
+          <input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Title (optional)"
+            className="w-full bg-transparent text-[26px] font-bold leading-[1.15] tracking-[-0.02em] text-foreground outline-none placeholder:text-muted-foreground/50"
           />
-          <MentionAutocomplete
-            value={body}
-            onChange={setBody}
-            caret={caret}
-            setCaret={setCaret}
-            inputRef={bodyRef}
-          />
+          <div className="relative mt-3">
+            <textarea
+              ref={bodyRef}
+              value={body}
+              onChange={(e) => { setBody(e.target.value); setCaret(e.target.selectionStart ?? e.target.value.length); }}
+              onKeyUp={(e) => setCaret((e.target as HTMLTextAreaElement).selectionStart ?? 0)}
+              onClick={(e) => setCaret((e.target as HTMLTextAreaElement).selectionStart ?? 0)}
+              rows={12}
+              placeholder="What's on your mind? Type @ to mention someone."
+              className="w-full resize-none bg-transparent text-[16px] leading-[1.55] text-foreground outline-none placeholder:text-muted-foreground/60"
+            />
+            <MentionAutocomplete
+              value={body}
+              onChange={setBody}
+              caret={caret}
+              setCaret={setCaret}
+              inputRef={bodyRef}
+            />
+          </div>
+          {mediaLoading && <MediaPlaceholderSkeleton className="mt-4" />}
         </div>
-      </div>
+      </SkeletonCrossfade>
 
 
       <div className="fixed inset-x-0 bottom-0 z-30 hairline-t bg-background/90 backdrop-blur-xl" style={{ paddingBottom: "max(env(safe-area-inset-bottom), 8px)" }}>
-        <div className="mx-auto flex h-[56px] max-w-[440px] items-center gap-1 px-3 text-muted-foreground">
-          <button className="tap inline-flex h-[40px] w-[40px] items-center justify-center rounded-full" aria-label="Insert image">
-            <ImageIcon className="h-[18px] w-[18px]" strokeWidth={1.4} />
-          </button>
-          <button className="tap inline-flex h-[40px] w-[40px] items-center justify-center rounded-full" aria-label="Insert hashtag">
-            <Hash className="h-[18px] w-[18px]" strokeWidth={1.4} />
-          </button>
-          <button onClick={insertAt} className="tap inline-flex h-[40px] w-[40px] items-center justify-center rounded-full" aria-label="Mention user">
-            <AtSign className="h-[18px] w-[18px]" strokeWidth={1.4} />
-          </button>
-          <span className="ml-auto text-[12px] tabular-nums">{body.length}</span>
-        </div>
+        {showSkeleton ? (
+          <ComposerToolbarSkeleton />
+        ) : (
+          <div className="mx-auto flex h-[56px] max-w-[440px] items-center gap-1 px-3 text-muted-foreground">
+            <button
+              onClick={() => { setMediaLoading(true); setTimeout(() => setMediaLoading(false), 1200); }}
+              className="tap inline-flex h-[40px] w-[40px] items-center justify-center rounded-full"
+              aria-label="Insert image"
+            >
+              <ImageIcon className="h-[18px] w-[18px]" strokeWidth={1.4} />
+            </button>
+            <button className="tap inline-flex h-[40px] w-[40px] items-center justify-center rounded-full" aria-label="Insert hashtag">
+              <Hash className="h-[18px] w-[18px]" strokeWidth={1.4} />
+            </button>
+            <button onClick={insertAt} className="tap inline-flex h-[40px] w-[40px] items-center justify-center rounded-full" aria-label="Mention user">
+              <AtSign className="h-[18px] w-[18px]" strokeWidth={1.4} />
+            </button>
+            <span className="ml-auto text-[12px] tabular-nums">{body.length}</span>
+          </div>
+        )}
       </div>
     </AppShell>
   );
