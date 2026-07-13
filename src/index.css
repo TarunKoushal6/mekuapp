@@ -175,22 +175,38 @@
     border: 1px solid hsl(var(--border) / 0.6);
   }
 
-  /* Skeleton shimmer — replaces spinners */
+  /* Skeleton shimmer — content-shaped loading state */
   .shimmer {
     position: relative;
     overflow: hidden;
-    background: hsl(var(--muted));
+    isolation: isolate;
+    background: hsl(var(--muted) / 0.85);
   }
   .shimmer::after {
     content: "";
     position: absolute; inset: 0;
-    background: linear-gradient(90deg, transparent, hsl(var(--foreground) / 0.06), transparent);
+    background: linear-gradient(
+      100deg,
+      transparent 20%,
+      hsl(var(--foreground) / 0.045) 40%,
+      hsl(var(--foreground) / 0.09) 50%,
+      hsl(var(--foreground) / 0.045) 60%,
+      transparent 80%
+    );
     transform: translateX(-100%);
-    animation: shimmer 1.4s cubic-bezier(.4,0,.2,1) infinite;
+    animation: shimmer 1.8s cubic-bezier(.4,0,.2,1) infinite;
+    will-change: transform;
   }
   @keyframes shimmer {
     100% { transform: translateX(100%); }
   }
+  /* Stagger sibling shimmers so a list feels alive, not synchronized */
+  .shimmer-stagger > *:nth-child(2) .shimmer::after { animation-delay: 120ms; }
+  .shimmer-stagger > *:nth-child(3) .shimmer::after { animation-delay: 240ms; }
+  .shimmer-stagger > *:nth-child(4) .shimmer::after { animation-delay: 360ms; }
+  .shimmer-stagger > *:nth-child(5) .shimmer::after { animation-delay: 480ms; }
+  .shimmer-stagger > *:nth-child(6) .shimmer::after { animation-delay: 600ms; }
+  .shimmer-stagger > *:nth-child(n+7) .shimmer::after { animation-delay: 720ms; }
 
   @media (prefers-reduced-motion: reduce) {
     .shimmer::after { animation: none; }
