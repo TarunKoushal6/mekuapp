@@ -256,13 +256,13 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
           </div>
           <button
             onClick={(e) => { e.stopPropagation(); navigate(`/p/${post.id}`); }}
-            className="tap inline-flex items-center gap-1.5 transition-colors hover:text-foreground"
+            className="tap inline-flex h-9 items-center gap-1 rounded-full px-2 transition-colors hover:text-foreground"
             aria-label="Views"
           >
             <BarChart2 className="h-[18px] w-[18px]" strokeWidth={1.6} />
             <AnimatedCount value={viewCount} className="text-[13px]" />
           </button>
-          <div className="inline-flex items-center gap-1">
+          <div className="inline-flex h-9 items-center gap-1 px-1">
             <BookmarkSave
               checked={bookmarked}
               onChange={(e) => {
@@ -274,7 +274,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
               size={18}
               aria-label="Save"
             />
-            <button onClick={handleShare} className="tap transition-colors hover:text-foreground" aria-label="Share">
+            <button onClick={handleShare} className="tap inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:text-foreground" aria-label="Share">
               <Upload className="h-[18px] w-[18px]" strokeWidth={1.6} />
             </button>
           </div>
