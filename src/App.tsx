@@ -71,15 +71,17 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <ScrollToTop />
-        <NotificationsListener />
-        <AnimatedRoutes />
-      </BrowserRouter>
-    </TooltipProvider>
+    <MotionConfig reducedMotion="user" transition={{ duration: 0.22, ease: easeOutStrong }}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <ScrollToTop />
+          <NotificationsListener />
+          <AnimatedRoutes />
+        </BrowserRouter>
+      </TooltipProvider>
+    </MotionConfig>
   </QueryClientProvider>
 );
 
