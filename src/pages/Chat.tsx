@@ -94,7 +94,11 @@ const Chat = () => {
           <Avatar name={name} src={other?.avatar_url ?? undefined} size="sm" />
           <div className="min-w-0">
             <p className="truncate text-[15px] font-bold leading-tight text-foreground">{name}</p>
-            {handle && <p className="truncate text-[12px] text-muted-foreground">@{handle}</p>}
+            {sending ? (
+              <p className="truncate text-[12px] text-muted-foreground animate-pulse">Sending…</p>
+            ) : handle ? (
+              <p className="truncate text-[12px] text-muted-foreground">@{handle}</p>
+            ) : null}
           </div>
         </Link>
         <button aria-label="More" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full">
