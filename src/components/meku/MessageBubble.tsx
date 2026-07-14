@@ -58,7 +58,7 @@ export const MessageBubble = ({ body, mine, pos, showTime, onDelete, onReact }: 
           onPointerCancel={cancelPress}
           onContextMenu={(e) => { e.preventDefault(); haptic("medium"); setOpen(true); }}
           className={cn(
-            "max-w-[78%] cursor-pointer whitespace-pre-wrap break-words px-3.5 py-2 text-[15px] leading-[1.35] transition-transform active:scale-[0.98]",
+            "max-w-[78%] cursor-pointer whitespace-pre-wrap break-words px-3.5 py-2 text-[15px] leading-[1.35] transition-transform duration-150 ease-out active:scale-[0.96] motion-reduce:active:scale-100",
             mine ? "bg-primary text-primary-foreground" : "bg-surface-2 text-foreground",
             cornerFor(mine, pos),
           )}
