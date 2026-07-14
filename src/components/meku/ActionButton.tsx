@@ -26,9 +26,13 @@ export const ActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
     },
     ref,
   ) => {
+    // Phase 3 — taste + transitions-dev: springy press, unified radius, tabular counters.
     const cls = cn(
-      "tap group inline-flex h-8 flex-1 basis-0 min-w-0 items-center justify-center gap-1.5 rounded-full px-1 text-[13px] leading-none transition-colors",
-      "[&_svg]:h-[18px] [&_svg]:w-[18px] [&_svg]:shrink-0",
+      "tap group inline-flex h-8 flex-1 basis-0 min-w-0 items-center justify-center gap-1.5 rounded-full px-1 text-[13px] leading-none tabular-nums",
+      "transition-[background-color,color,transform] duration-[160ms] ease-[cubic-bezier(0.23,1,0.32,1)]",
+      "active:scale-[0.94] motion-reduce:active:scale-100",
+      "[&_svg]:h-[18px] [&_svg]:w-[18px] [&_svg]:shrink-0 [&_svg]:transition-transform [&_svg]:duration-[160ms]",
+      "group-active:[&_svg]:scale-[0.92]",
       active ? activeClassName : hoverClassName,
       className,
     );
