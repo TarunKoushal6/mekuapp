@@ -226,7 +226,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
         )}
         {(() => {
           const action = parseInlineAction([post.title, post.body].filter(Boolean).join(" "));
-          return action ? <InlineActionCard action={action} postId={post.id} /> : null;
+          return action ? <InlineActionCard action={action} postId={post.id} authorId={post.user_id} /> : null;
         })()}
 
         <div className={cn("-ml-2 flex items-center gap-1 pr-1 text-muted-foreground", post.image_url ? "mt-2.5" : "mt-3")}>
