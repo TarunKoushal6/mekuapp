@@ -79,10 +79,10 @@ const Onchain = () => {
         const preflightErr = (preflight.data as any)?.error ?? preflight.error?.message;
         if (preflightErr) throw new Error(preflightErr);
 
-        const ok = await requirePin();
-        if (!ok) return;
+        const pinHash = await requirePin();
+        if (!pinHash) return;
         const { data, error } = await supabase.functions.invoke("circle-swap", {
-          body: { chain: "Arc_Testnet", tokenIn: tokenIn.symbol, tokenOut: tokenOut.symbol, amountIn: payAmount, slippageBps: 50 },
+          body: { chain: "Arc_Testnet", tokenIn: tokenIn.symbol, tokenOut: tokenOut.symbol, amountIn: payAmount, slippageBps: 50, pinHash: typeof pinHash === "string" ? pinHash : undefined },
         });
         const errMsg = (data as any)?.error ?? error?.message;
         if (errMsg) throw new Error(errMsg);
@@ -96,10 +96,10 @@ const Onchain = () => {
           });
         }, 1100);
       } else if (tab === "Bridge") {
-        const ok = await requirePin();
-        if (!ok) return;
+        const pinHash = await requirePin();
+        if (!pinHash) return;
         const { data, error } = await supabase.functions.invoke("circle-bridge", {
-          body: { fromChain: "Arc_Testnet", toChain: destinationChain, amount: payAmount, recipientAddress: wallet.address },
+          body: { fromChain: "Arc_Testnet", toChain: destinationChain, amount: payAmount, recipientAddress: wallet.address, pinHash: typeof pinHash === "string" ? pinHash : undefined },
         });
         if (error || (data as any)?.error) throw new Error((data as any)?.error ?? error?.message);
         const transactionId = (data as any)?.transactionId;

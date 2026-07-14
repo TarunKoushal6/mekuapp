@@ -94,3 +94,47 @@ function hexToBytes(hex: string): Uint8Array {
 // different code in the future.
 export const ARC_TESTNET = "ARC-TESTNET";
 export const USDC_TOKEN_ALIAS = "USDC";
+
+// ---------------- PIN verification ----------------
+// Server-side check that the caller supplied the correct wallet PIN before
+// signing a transfer. Client sends `pinHash` computed with the same salt as
+// src/lib/pin.ts. If the user has no PIN set, the check is skipped.
+const PIN_SALT = "meku.wallet.pin.v1";
+
+export async function hashPinServer(pin: string): Promise<string> {
+  const buf = await crypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(`${PIN_SALT}:${pin}`),
+  );
+  return Array.from(new Uint8Array(buf))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+/** Returns null on success, or an error message string on failure. */
+export async function verifyWalletPin(
+  admin: any,
+  userId: string,
+  supplied: { pin?: string; pinHash?: string } | null | undefined,
+): Promise<string | null> {
+  const { data } = await admin
+    .from("wallet_pins")
+    .select("pin_hash")
+    .eq("user_id", userId)
+    .maybeSingle();
+  const stored: string | undefined = data?.pin_hash;
+  if (!stored) return null; // no pin set — nothing to verify
+  const candidate = supplied?.pinHash
+    ? String(supplied.pinHash).toLowerCase()
+    : supplied?.pin
+      ? await hashPinServer(String(supplied.pin))
+      : null;
+  if (!candidate) return "Wallet PIN required";
+  // constant-time compare
+  const a = candidate;
+  const b = stored.toLowerCase();
+  if (a.length !== b.length) return "Wrong wallet PIN";
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0 ? null : "Wrong wallet PIN";
+}

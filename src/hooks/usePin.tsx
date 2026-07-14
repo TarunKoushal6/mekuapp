@@ -10,8 +10,8 @@ import { toast } from "sonner";
 interface PinCtx {
   hasPin: boolean;
   loading: boolean;
-  /** Prompt for PIN (creating it on first use). Resolves true on success. */
-  requirePin: (purpose?: string) => Promise<boolean>;
+  /** Prompt for PIN (creating it on first use). Resolves the PIN hash on success, null on cancel. */
+  requirePin: (purpose?: string) => Promise<string | null>;
   /** Open a setup flow from settings. */
   openSetup: () => Promise<boolean>;
   refresh: () => Promise<void>;
@@ -20,14 +20,14 @@ interface PinCtx {
 const Ctx = createContext<PinCtx>({
   hasPin: false,
   loading: true,
-  requirePin: async () => false,
+  requirePin: async () => null,
   openSetup: async () => false,
   refresh: async () => {},
 });
 
 type Mode = {
   kind: PinMode;
-  resolve: (ok: boolean) => void;
+  resolve: (ok: boolean | string | null) => void;
   recoveryQuestions?: [string, string, string];
 } | null;
 
@@ -38,7 +38,8 @@ export const PinProvider = ({ children }: { children: ReactNode }) => {
   const [loadedUserId, setLoadedUserId] = useState<string | null>(null);
   const [lookupFailed, setLookupFailed] = useState(false);
   const [mode, setMode] = useState<Mode>(null);
-  const resolverRef = useRef<((ok: boolean) => void) | null>(null);
+  const resolverRef = useRef<((v: any) => void) | null>(null);
+  const pendingHashRef = useRef<string | null>(null);
   const autoPromptedRef = useRef<string | null>(null);
 
   const refresh = useCallback(async () => {
@@ -86,39 +87,39 @@ export const PinProvider = ({ children }: { children: ReactNode }) => {
     if (!user) autoPromptedRef.current = null;
   }, [user]);
 
-  const requirePin = useCallback(async () => {
-    if (!user) return false;
+  const requirePin = useCallback(async (): Promise<string | null> => {
+    if (!user) return null;
     let current: string | null;
     try {
       current = hash ?? (await getPinHash(user.id));
     } catch (e) {
       console.warn("pin lookup failed", e);
       toast.error("Could not check your wallet PIN. Try again.");
-      return false;
+      return null;
     }
     if (!current) {
       setHash(null);
-      return new Promise<boolean>((resolve) => {
-        resolverRef.current = resolve;
-        setMode({ kind: "setup", resolve });
+      return new Promise<string | null>((resolve) => {
+        resolverRef.current = resolve as (v: any) => void;
+        setMode({ kind: "setup", resolve: resolve as (v: any) => void });
       });
     }
-    return new Promise<boolean>((resolve) => {
-      resolverRef.current = resolve;
-      setMode({ kind: "confirm", resolve });
+    return new Promise<string | null>((resolve) => {
+      resolverRef.current = resolve as (v: any) => void;
+      setMode({ kind: "confirm", resolve: resolve as (v: any) => void });
     });
   }, [user, hash]);
 
   const openSetup = useCallback(async () => {
     if (!user) return false;
     return new Promise<boolean>((resolve) => {
-      resolverRef.current = resolve;
-      setMode({ kind: "setup", resolve });
+      resolverRef.current = resolve as (v: any) => void;
+      setMode({ kind: "setup", resolve: resolve as (v: any) => void });
     });
   }, [user]);
 
-  const handleClose = (ok: boolean) => {
-    resolverRef.current?.(ok);
+  const handleClose = (result: boolean | string | null) => {
+    resolverRef.current?.(result as any);
     resolverRef.current = null;
     setMode(null);
   };
@@ -131,6 +132,7 @@ export const PinProvider = ({ children }: { children: ReactNode }) => {
         await savePin(user.id, pin);
         const h = await hashPin(pin);
         setHash(h);
+        pendingHashRef.current = h;
         // Do NOT close — PinSheet transitions to the recovery step next.
         return null;
       } catch (e: any) {
@@ -141,7 +143,7 @@ export const PinProvider = ({ children }: { children: ReactNode }) => {
     const candidate = await hashPin(pin);
     const stored = hash ?? (await getPinHash(user.id));
     if (stored && candidate === stored) {
-      handleClose(true);
+      handleClose(candidate);
       return null;
     }
     return "Wrong PIN";
@@ -163,7 +165,9 @@ export const PinProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const handleComplete = () => {
-    resolverRef.current?.(true);
+    const h = pendingHashRef.current;
+    pendingHashRef.current = null;
+    resolverRef.current?.(h ?? true);
     resolverRef.current = null;
     setMode(null);
   };

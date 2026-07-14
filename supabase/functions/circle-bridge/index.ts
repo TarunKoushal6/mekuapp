@@ -12,6 +12,7 @@ import {
   entitySecretCiphertext,
   getCircleTransaction,
   uuid,
+  verifyWalletPin,
 } from "../_shared/circle.ts";
 
 interface Body {
@@ -19,6 +20,8 @@ interface Body {
   toChain?: string;
   amount: string;
   recipientAddress?: string;
+  pin?: string;
+  pinHash?: string;
 }
 
 // CCTP V2 testnet config. TokenMessengerV2 happens to share the same address
@@ -120,6 +123,10 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
+
+    const pinErr = await verifyWalletPin(admin, user.id, { pin: body.pin, pinHash: body.pinHash });
+    if (pinErr) return json({ error: pinErr }, 401);
+
     const { data: wallet } = await admin
       .from("wallets").select("*").eq("user_id", user.id).maybeSingle();
     const walletId = wallet?.dcw_wallet_id;
