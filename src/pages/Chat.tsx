@@ -20,9 +20,11 @@ const Chat = () => {
   const { user } = useAuth();
   const [other, setOther] = useState<Profile | null>(null);
   const [messages, setMessages] = useState<DirectMessage[] | null>(null);
+  const [reactions, setReactions] = useState<Record<string, string[]>>({});
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const draftRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (otherId) getProfile(otherId).then(setOther).catch(() => {});
@@ -135,15 +137,39 @@ const Chat = () => {
               if (error) return toast.error(error.message);
               setMessages((prev) => prev?.filter((x) => x.id !== m.id) ?? prev);
             };
+            const onReact = (emoji: string) => {
+              setReactions((r) => {
+                const list = r[m.id] ?? [];
+                return { ...r, [m.id]: list.includes(emoji) ? list.filter((x) => x !== emoji) : [...list, emoji] };
+              });
+            };
+            const onReply = (body: string) => {
+              const quoted = body.split("\n").map((l) => `> ${l}`).join("\n");
+              setDraft((d) => (d ? d : `${quoted}\n\n`));
+              setTimeout(() => draftRef.current?.focus(), 30);
+            };
+            const chips = reactions[m.id] ?? [];
             return (
-              <MessageBubble
-                key={m.id}
-                body={m.body}
-                mine={mine}
-                pos={pos}
-                showTime={showTime}
-                onDelete={mine ? onDelete : undefined}
-              />
+              <div key={m.id}>
+                <MessageBubble
+                  body={m.body}
+                  mine={mine}
+                  pos={pos}
+                  showTime={showTime}
+                  onDelete={mine ? onDelete : undefined}
+                  onReact={onReact}
+                  onReply={onReply}
+                />
+                {chips.length > 0 && (
+                  <div className={`mt-0.5 flex ${mine ? "justify-end" : "justify-start"}`}>
+                    <div className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2 py-0.5 text-[13px] shadow-sm">
+                      {chips.map((c) => (
+                        <span key={c}>{c}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             );
           })
         )}
@@ -158,6 +184,7 @@ const Chat = () => {
         <div className="flex items-end gap-2">
           <div className="flex min-h-[44px] flex-1 items-center rounded-3xl border border-border bg-surface-2 px-4 py-2">
             <textarea
+              ref={draftRef}
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); onSend(e as any); } }}
