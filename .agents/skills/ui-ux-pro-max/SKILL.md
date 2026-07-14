@@ -1,6 +1,6 @@
 ---
 name: ui-ux-pro-max
-description: "Awwwards-level UX/UI direction. Use when redesigning or polishing screens, picking layout/type/color combinations, or auditing for cheap AI defaults (Inter fonts, purple-on-white gradients, generic hero/nav/footer, meta-labels like "SECTION 01"). Enforces distinctive typography, gapless bento grids, wide cinematic heros, and premium motion. Source: nextlevelbuilder/ui-ux-pro-max-skill."
+description: "Awwwards-level UX/UI direction. Use when redesigning or polishing screens, picking layout/type/color combinations, or auditing for cheap AI defaults (Inter fonts, purple-on-white gradients, generic hero/nav/footer, meta-labels like 'SECTION 01'). Enforces distinctive typography, gapless bento grids, wide cinematic heros, and premium motion. Source: nextlevelbuilder/ui-ux-pro-max-skill."
 ---
 
 # UI/UX Pro Max — Distilled

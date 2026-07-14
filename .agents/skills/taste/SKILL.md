@@ -1,6 +1,6 @@
 ---
 name: taste
-description: "Elite editorial taste and craft direction for premium interfaces. Use when the request calls for "make it feel more premium", "add taste", brand identity work, aesthetic refinement, or Awwwards-quality craft. Complements ui-ux-pro-max with a stronger emphasis on restraint, editorial typography, and asset curation. Source: Leonxlnx/taste-skill (gpt-taste)."
+description: "Elite editorial taste and craft direction for premium interfaces. Use when the request calls for 'make it feel more premium', 'add taste', brand identity work, aesthetic refinement, or Awwwards-quality craft. Complements ui-ux-pro-max with a stronger emphasis on restraint, editorial typography, and asset curation. Source: Leonxlnx/taste-skill (gpt-taste)."
 ---
 
 # Taste — Distilled
