@@ -12,6 +12,8 @@ interface Body {
   postId?: string;
   commentId?: string;
   kind?: "send" | "tip" | "request";
+  pin?: string;
+  pinHash?: string;
 }
 
 Deno.serve(async (req) => {
