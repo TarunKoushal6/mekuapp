@@ -1,6 +1,6 @@
 import { AppShell } from "@/components/meku/AppShell";
 import { VerificationBadge } from "@/components/meku/VerificationBadge";
-import { IconBack, IconMore, IconSettings, IconCopy, IconExternal } from "@/components/meku/MekuIcon";
+import { IconBack, IconMore, IconSettings, IconCopy, IconExternal, IconMessages } from "@/components/meku/MekuIcon";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
