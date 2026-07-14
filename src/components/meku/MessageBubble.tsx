@@ -62,6 +62,7 @@ export const MessageBubble = ({ body, mine, pos, showTime, onDelete, onReact, on
       <div className={cn("flex", mine ? "justify-end" : "justify-start")}>
         <div
           onPointerDown={startPress}
+          onPointerMove={trackMove}
           onPointerUp={cancelPress}
           onPointerLeave={cancelPress}
           onPointerCancel={cancelPress}
@@ -86,7 +87,7 @@ export const MessageBubble = ({ body, mine, pos, showTime, onDelete, onReact, on
             {REACTIONS.map((e) => (
               <button
                 key={e}
-                onClick={() => { onReact?.(e); haptic("light"); setOpen(false); toast(`Reacted ${e}`); }}
+                onClick={() => { onReact?.(e); haptic("light"); setOpen(false); }}
                 className="tap flex h-11 w-11 items-center justify-center rounded-full text-[22px] transition-transform hover:scale-110 active:scale-95"
               >
                 {e}
@@ -101,7 +102,7 @@ export const MessageBubble = ({ body, mine, pos, showTime, onDelete, onReact, on
               <Copy size={18} /> Copy
             </button>
             <button
-              onClick={() => setOpen(false)}
+              onClick={() => { onReply?.(body); setOpen(false); }}
               className="tap flex w-full items-center gap-3 px-5 py-3.5 text-left text-[15px] text-foreground hover:bg-surface/40"
             >
               <Reply size={18} /> Reply
