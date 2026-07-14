@@ -49,6 +49,10 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
+
+    const pinErr = await verifyWalletPin(admin, userId, { pin: body.pin, pinHash: body.pinHash });
+    if (pinErr) return json({ error: pinErr }, 401);
+
     const { data: sender } = await admin
       .from("wallets").select("*").eq("user_id", userId).maybeSingle();
     const walletId = sender?.dcw_wallet_id;
