@@ -118,26 +118,28 @@ const Wallet = () => {
       <h1 className="px-5 pt-2 text-[28px] font-bold tracking-[-0.02em] text-foreground">Wallet</h1>
 
       <div className="px-5 pt-4">
-        <div className="relative overflow-hidden rounded-[24px] p-5 gradient-card shadow-purple">
-          <div className="flex items-center justify-between">
-            <p className="text-[13px] text-white/70">USDC Balance · Arc Testnet</p>
-            <button onClick={() => setShow((s) => !s)} aria-label="Toggle balance" className="tap text-white/80">
+        <div className="relative overflow-hidden rounded-[24px] border border-border bg-surface p-5">
+          <div className="pointer-events-none absolute inset-x-0 -top-24 h-40 bg-[radial-gradient(60%_60%_at_50%_100%,hsl(var(--primary)/0.18),transparent_70%)]" />
+          <div className="relative flex items-center justify-between">
+            <p className="text-[13px] text-muted-foreground">USDC Balance · Arc Testnet</p>
+            <button onClick={() => setShow((s) => !s)} aria-label="Toggle balance" className="tap text-muted-foreground hover:text-foreground">
               <Eye className="h-[16px] w-[16px]" strokeWidth={1.8} />
             </button>
           </div>
-          <p className="mt-1 text-white">
-            <span style={{ fontSize: 40, fontWeight: 700, letterSpacing: "-0.02em" }}>
-              {loading ? "…" : show ? formatAmount(usdc) : "••••"}
-            </span>
-            <span className="ml-2 text-[14px] font-semibold text-white/80">USDC</span>
+          <p className="relative mt-1 text-foreground">
+            <AnimatedCount
+              value={loading ? "…" : show ? formatAmount(usdc) : "••••"}
+              className="text-[40px] font-bold tracking-[-0.02em]"
+            />
+            <span className="ml-2 text-[14px] font-semibold text-muted-foreground">USDC</span>
           </p>
           {wallet?.address ? (
-            <button onClick={copy} className="tap mt-1 inline-flex items-center gap-1 text-[12px] text-white/70">
+            <button onClick={copy} className="tap relative mt-1 inline-flex items-center gap-1 text-[12px] text-muted-foreground">
               {wallet.address.slice(0, 6)}…{wallet.address.slice(-4)}
               {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
             </button>
           ) : (
-            <p className="text-[12px] text-white/70">
+            <p className="relative text-[12px] text-muted-foreground">
               {wallet?.status === "challenge_pending" ? "Set your PIN to finish wallet setup" : "Provisioning wallet…"}
             </p>
           )}
