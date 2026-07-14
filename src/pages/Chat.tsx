@@ -137,15 +137,39 @@ const Chat = () => {
               if (error) return toast.error(error.message);
               setMessages((prev) => prev?.filter((x) => x.id !== m.id) ?? prev);
             };
+            const onReact = (emoji: string) => {
+              setReactions((r) => {
+                const list = r[m.id] ?? [];
+                return { ...r, [m.id]: list.includes(emoji) ? list.filter((x) => x !== emoji) : [...list, emoji] };
+              });
+            };
+            const onReply = (body: string) => {
+              const quoted = body.split("\n").map((l) => `> ${l}`).join("\n");
+              setDraft((d) => (d ? d : `${quoted}\n\n`));
+              setTimeout(() => draftRef.current?.focus(), 30);
+            };
+            const chips = reactions[m.id] ?? [];
             return (
-              <MessageBubble
-                key={m.id}
-                body={m.body}
-                mine={mine}
-                pos={pos}
-                showTime={showTime}
-                onDelete={mine ? onDelete : undefined}
-              />
+              <div key={m.id}>
+                <MessageBubble
+                  body={m.body}
+                  mine={mine}
+                  pos={pos}
+                  showTime={showTime}
+                  onDelete={mine ? onDelete : undefined}
+                  onReact={onReact}
+                  onReply={onReply}
+                />
+                {chips.length > 0 && (
+                  <div className={`mt-0.5 flex ${mine ? "justify-end" : "justify-start"}`}>
+                    <div className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2 py-0.5 text-[13px] shadow-sm">
+                      {chips.map((c) => (
+                        <span key={c}>{c}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             );
           })
         )}
