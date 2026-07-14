@@ -1,6 +1,6 @@
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { useNavigate } from "react-router-dom";
-import { IconCompose, IconShield, IconActivity, IconRequest } from "./MekuIcon";
+import { IconCompose, IconActivity, IconRequest } from "./MekuIcon";
 import { haptic } from "@/lib/haptics";
 
 interface Props {
