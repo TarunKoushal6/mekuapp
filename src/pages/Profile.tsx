@@ -3,6 +3,7 @@ import { VerificationBadge } from "@/components/meku/VerificationBadge";
 import { IconBack, IconMore, IconSettings, IconCopy, IconExternal } from "@/components/meku/MekuIcon";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect, useCallback, useMemo } from "react";
+import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/meku/Avatar";
 import { EmptyState } from "@/components/meku/EmptyState";
@@ -24,6 +25,11 @@ const Profile = () => {
   const navigate = useNavigate();
   const { handle } = useParams();
   const { user, loading: authLoading } = useAuth();
+  const reduce = useReducedMotion();
+  const { scrollY } = useScroll();
+  // Phase 6 — subtle scroll parallax on banner (never on the avatar itself).
+  const bannerY = useTransform(scrollY, [0, 200], [0, -30]);
+  const bannerScale = useTransform(scrollY, [-160, 0], [1.18, 1]);
   const [tab, setTab] = useState<Tab>("Posts");
   const [profile, setProfile] = useState<ProfileT | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
@@ -205,8 +211,13 @@ const Profile = () => {
         </>
       ) : (
         <div className="meku-page-in">
-          {/* Banner — indigo gradient stand-in until banners exist */}
-          <div className="-mt-[52px] h-[150px] w-full gradient-purple" />
+          {/* Banner with subtle scroll parallax. Reduced motion → static. */}
+          <div className="-mt-[52px] h-[150px] w-full overflow-hidden">
+            <motion.div
+              className="h-full w-full gradient-purple"
+              style={reduce ? undefined : { y: bannerY, scale: bannerScale }}
+            />
+          </div>
 
           <section className="px-4 pb-4">
             <div className="-mt-[64px] flex items-end justify-between">
@@ -260,11 +271,20 @@ const Profile = () => {
                 <li key={t} className="flex justify-center">
                   <button
                     onClick={() => setTab(t)}
-                    className={cn("tap relative py-3.5 text-[14px] font-semibold", tab === t ? "text-foreground" : "text-muted-foreground")}
+                    className={cn(
+                      "tap relative py-3.5 text-[14px] font-semibold transition-colors duration-[160ms]",
+                      tab === t ? "text-foreground" : "text-muted-foreground hover:text-foreground",
+                    )}
                   >
                     <span className="relative inline-block">
                       {t}
-                      {tab === t && <span className="absolute -bottom-[13px] left-0 right-0 h-[3px] rounded-full bg-primary" />}
+                      {tab === t && (
+                        <motion.span
+                          layoutId="profile-tab-underline"
+                          className="absolute -bottom-[13px] left-0 right-0 h-[3px] rounded-full bg-primary"
+                          transition={{ type: "spring", stiffness: 520, damping: 34, mass: 0.7 }}
+                        />
+                      )}
                     </span>
                   </button>
                 </li>
