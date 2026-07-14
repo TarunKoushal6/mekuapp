@@ -2,7 +2,7 @@
 // No PIN modal — Circle signs with the entity secret on the server.
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { circleFetch, circleStateToStatus, entitySecretCiphertext, getCircleTransaction, uuid } from "../_shared/circle.ts";
+import { circleFetch, circleStateToStatus, entitySecretCiphertext, getCircleTransaction, uuid, verifyWalletPin } from "../_shared/circle.ts";
 
 interface Body {
   destinationAddress?: string;
