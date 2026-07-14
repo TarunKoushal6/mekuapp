@@ -27,7 +27,7 @@ const Ctx = createContext<PinCtx>({
 
 type Mode = {
   kind: PinMode;
-  resolve: (ok: boolean) => void;
+  resolve: (ok: boolean | string | null) => void;
   recoveryQuestions?: [string, string, string];
 } | null;
 
