@@ -40,9 +40,16 @@ export const TokenDetailSheet = ({ open, onOpenChange, token }: Props) => {
 
   if (!token) return null;
 
+  const reduce = useReducedMotion();
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="max-h-[88vh] overflow-y-auto rounded-t-3xl border-border bg-background">
+      <SheetContent side="bottom" className="max-h-[88vh] overflow-y-auto rounded-t-[var(--r4)] border-border bg-background">
+        <motion.div
+          initial={reduce ? { opacity: 0 } : { y: 24, opacity: 0 }}
+          animate={reduce ? { opacity: 1 } : { y: 0, opacity: 1 }}
+          transition={springSheet}
+        >
         <SheetHeader>
           <SheetTitle className="flex items-center gap-3">
             {token.logo ? (
@@ -61,8 +68,8 @@ export const TokenDetailSheet = ({ open, onOpenChange, token }: Props) => {
 
         <div className="mt-4 rounded-[20px] border border-border bg-surface p-4">
           <p className="text-[12px] text-muted-foreground">Balance</p>
-          <p className="mt-1 text-[28px] font-bold tabular-nums text-foreground">
-            {formatAmount(token.amount)} <span className="text-[14px] text-muted-foreground">{token.symbol}</span>
+          <p className="mt-1 text-[28px] font-bold text-foreground">
+            <AnimatedCount value={formatAmount(token.amount)} /> <span className="text-[14px] text-muted-foreground">{token.symbol}</span>
           </p>
         </div>
 
