@@ -10,8 +10,8 @@ import { toast } from "sonner";
 interface PinCtx {
   hasPin: boolean;
   loading: boolean;
-  /** Prompt for PIN (creating it on first use). Resolves true on success. */
-  requirePin: (purpose?: string) => Promise<boolean>;
+  /** Prompt for PIN (creating it on first use). Resolves the PIN hash on success, null on cancel. */
+  requirePin: (purpose?: string) => Promise<string | null>;
   /** Open a setup flow from settings. */
   openSetup: () => Promise<boolean>;
   refresh: () => Promise<void>;
@@ -20,7 +20,7 @@ interface PinCtx {
 const Ctx = createContext<PinCtx>({
   hasPin: false,
   loading: true,
-  requirePin: async () => false,
+  requirePin: async () => null,
   openSetup: async () => false,
   refresh: async () => {},
 });
