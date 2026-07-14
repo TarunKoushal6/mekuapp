@@ -286,7 +286,7 @@ const PostDetail = () => {
         {post.image_url && <div className="mt-3 overflow-hidden rounded-[14px] border border-border"><img src={post.image_url} alt="" className="w-full" /></div>}
         {(() => {
           const action = parseInlineAction([post.title, post.body].filter(Boolean).join(" "));
-          return action ? <InlineActionCard action={action} postId={post.id} /> : null;
+          return action ? <InlineActionCard action={action} postId={post.id} authorId={post.user_id} /> : null;
         })()}
 
         <p className="mt-3 text-[12px] text-muted-foreground">

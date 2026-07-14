@@ -14,7 +14,7 @@ interface Props {
   showTime?: string | null;
   onDelete?: () => void;
   onReact?: (emoji: string) => void;
-  onReply?: (body: string) => void;
+  onReply?: () => void;
 }
 
 const REACTIONS = ["❤️", "😂", "👍", "😮", "😢", "🔥"];
@@ -31,6 +31,17 @@ const cornerFor = (mine: boolean, pos: BubblePos) => {
   if (pos === "middle") return `${base} rounded-l-md`;
   return `${base} rounded-tl-md`;
 };
+
+// Detects a serialized reply header of the form:
+//   ↪ @name: "snippet"\n\n{body}
+// produced by the composer's reply flow so the bubble can render a
+// pretty inset instead of raw text.
+const REPLY_RE = /^↪\s+@([^:\n]+):\s+"([\s\S]*?)"\n\n([\s\S]*)$/;
+function parseReply(body: string): { quotedName: string; quotedText: string; rest: string } | null {
+  const m = body.match(REPLY_RE);
+  if (!m) return null;
+  return { quotedName: m[1].trim(), quotedText: m[2].trim(), rest: m[3] };
+}
 
 export const MessageBubble = ({ body, mine, pos, showTime, onDelete, onReact, onReply }: Props) => {
   const [open, setOpen] = useState(false);
@@ -54,6 +65,8 @@ export const MessageBubble = ({ body, mine, pos, showTime, onDelete, onReact, on
     if (timer.current) { clearTimeout(timer.current); timer.current = null; }
   };
 
+  const reply = parseReply(body);
+
   return (
     <>
       {showTime && (
@@ -73,7 +86,22 @@ export const MessageBubble = ({ body, mine, pos, showTime, onDelete, onReact, on
             cornerFor(mine, pos),
           )}
         >
-          {body}
+          {reply && (
+            <div
+              className={cn(
+                "mb-1.5 overflow-hidden rounded-lg border-l-[3px] pl-2 pr-2 py-1.5 text-[12.5px] leading-tight",
+                mine
+                  ? "border-primary-foreground/70 bg-primary-foreground/10 text-primary-foreground/85"
+                  : "border-primary bg-primary/10 text-foreground/80",
+              )}
+            >
+              <p className={cn("truncate font-semibold text-[12px]", mine ? "text-primary-foreground" : "text-primary")}>
+                @{reply.quotedName}
+              </p>
+              <p className="line-clamp-2 opacity-90">{reply.quotedText}</p>
+            </div>
+          )}
+          {reply ? reply.rest : body}
         </div>
       </div>
 
@@ -96,13 +124,13 @@ export const MessageBubble = ({ body, mine, pos, showTime, onDelete, onReact, on
           </div>
           <div className="hairline-t">
             <button
-              onClick={() => { navigator.clipboard?.writeText(body); toast.success("Copied"); setOpen(false); }}
+              onClick={() => { navigator.clipboard?.writeText(reply ? reply.rest : body); toast.success("Copied"); setOpen(false); }}
               className="tap flex w-full items-center gap-3 px-5 py-3.5 text-left text-[15px] text-foreground hover:bg-surface/40"
             >
               <Copy size={18} /> Copy
             </button>
             <button
-              onClick={() => { onReply?.(body); setOpen(false); }}
+              onClick={() => { onReply?.(); setOpen(false); }}
               className="tap flex w-full items-center gap-3 px-5 py-3.5 text-left text-[15px] text-foreground hover:bg-surface/40"
             >
               <Reply size={18} /> Reply

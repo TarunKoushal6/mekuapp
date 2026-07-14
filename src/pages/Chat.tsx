@@ -1,14 +1,15 @@
 import { AppShell } from "@/components/meku/AppShell";
 import { Avatar } from "@/components/meku/Avatar";
-import { ChevronLeft, MoreHorizontal } from "lucide-react";
+import { ChevronLeft, MoreHorizontal, X, Reply } from "lucide-react";
 import { IconSend } from "@/components/meku/MekuIcon";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { getProfile, type Profile } from "@/lib/social";
 import { fetchThread, sendMessage, markThreadRead, type DirectMessage } from "@/lib/dm";
 import { toast } from "sonner";
+import { AnimatePresence, motion } from "framer-motion";
 
 import { MessageBubble } from "@/components/meku/MessageBubble";
 import { EmptyState } from "@/components/meku/EmptyState";
@@ -23,6 +24,7 @@ const Chat = () => {
   const [reactions, setReactions] = useState<Record<string, string[]>>({});
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
+  const [replyTo, setReplyTo] = useState<DirectMessage | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const draftRef = useRef<HTMLTextAreaElement>(null);
 
@@ -66,17 +68,26 @@ const Chat = () => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
   }, [messages?.length]);
 
+  const replyName = useMemo(() => {
+    if (!replyTo) return "";
+    return replyTo.sender_id === user?.id ? "You" : (other?.display_name || other?.username || "them");
+  }, [replyTo, user?.id, other]);
+
   const onSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || !otherId || !draft.trim() || sending) return;
     setSending(true);
-    const body = draft;
+    const raw = draft.trim();
+    // Prepend a machine-parseable reply header MessageBubble can render as a pretty inset.
+    const snippet = replyTo ? replyTo.body.replace(/\s+/g, " ").slice(0, 140) : null;
+    const body = replyTo && snippet ? `↪ @${replyName}: "${snippet}"\n\n${raw}` : raw;
     setDraft("");
+    setReplyTo(null);
     try {
       const m = await sendMessage(user.id, otherId, body);
       if (m) setMessages((prev) => (prev?.find((x) => x.id === m.id) ? prev : [...(prev ?? []), m]));
     } catch (err: any) {
-      setDraft(body);
+      setDraft(raw);
       toast.error(err.message ?? "Could not send");
     } finally {
       setSending(false);
@@ -85,6 +96,7 @@ const Chat = () => {
 
   const name = other?.display_name || other?.username || "User";
   const handle = other?.username;
+
 
   return (
     <AppShell hideNav>
@@ -153,9 +165,8 @@ const Chat = () => {
                 toast.error(err?.message ?? "Could not react");
               }
             };
-            const onReply = (body: string) => {
-              const quoted = body.split("\n").map((l) => `> ${l}`).join("\n");
-              setDraft((d) => (d ? d : `${quoted}\n\n`));
+            const onReply = () => {
+              setReplyTo(m);
               setTimeout(() => draftRef.current?.focus(), 30);
             };
             const chips = reactions[m.id] ?? [];
@@ -191,6 +202,41 @@ const Chat = () => {
         onSubmit={onSend}
         className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[440px] bg-background/95 px-3 pb-4 pt-2 backdrop-blur-xl"
       >
+        <AnimatePresence initial={false}>
+          {replyTo && (
+            <motion.div
+              key="reply-preview"
+              initial={{ opacity: 0, y: 8, height: 0 }}
+              animate={{ opacity: 1, y: 0, height: "auto" }}
+              exit={{ opacity: 0, y: 6, height: 0 }}
+              transition={{ duration: 0.16, ease: [0.22, 1, 0.36, 1] }}
+              className="mb-2 overflow-hidden"
+            >
+              <div className="flex items-stretch gap-2 rounded-2xl border border-primary/25 bg-primary/8 pl-2.5 pr-2 py-2 shadow-[0_1px_0_hsl(var(--border))]">
+                <div className="w-[3px] shrink-0 self-stretch rounded-full bg-primary" />
+                <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">
+                  <Reply size={13} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-[12px] font-bold uppercase tracking-[0.06em] text-primary">
+                    Replying to {replyName}
+                  </p>
+                  <p className="line-clamp-2 text-[13px] leading-snug text-foreground/80">
+                    {replyTo.body.replace(/^↪\s+@[^:\n]+:\s+"[\s\S]*?"\n\n/, "")}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  aria-label="Cancel reply"
+                  onClick={() => setReplyTo(null)}
+                  className="tap mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-surface hover:text-foreground"
+                >
+                  <X size={15} />
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
         <div className="flex items-end gap-2">
           <div className="flex min-h-[44px] flex-1 items-center rounded-3xl border border-border bg-surface-2 px-4 py-2">
             <textarea
@@ -198,7 +244,7 @@ const Chat = () => {
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); onSend(e as any); } }}
-              placeholder="Start a message"
+              placeholder={replyTo ? `Reply to ${replyName}…` : "Start a message"}
               rows={1}
               className="max-h-[120px] w-full resize-none bg-transparent text-[15px] text-foreground outline-none placeholder:text-muted-foreground"
             />

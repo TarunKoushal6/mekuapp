@@ -28,14 +28,22 @@ interface Props {
   action: InlineAction;
   postId?: string;
   commentId?: string;
+  /** ID of the author who wrote the post/comment containing the tag. Only they see the Send CTA. */
+  authorId?: string;
 }
 
-export const InlineActionCard = ({ action, postId, commentId }: Props) => {
+export const InlineActionCard = ({ action, postId, commentId, authorId }: Props) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [recipientId, setRecipientId] = useState<string | null>(null);
   const [lookedUp, setLookedUp] = useState(false);
   const [open, setOpen] = useState(false);
+
+  // Only the author of the post/comment can act on their own tag-to-tip card.
+  // Everyone else just sees the post text — no exposed transfer button.
+  const canAct = !!user && !!authorId && user.id === authorId;
+  if (!canAct) return null;
+
 
   useEffect(() => {
     supabase
