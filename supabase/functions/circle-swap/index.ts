@@ -1,5 +1,6 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { verifyWalletPin } from "../_shared/circle.ts";
 
 const SUPPORTED_CHAINS = new Set(["Arc_Testnet"]);
 const SUPPORTED_TOKENS = new Set(["USDC", "EURC"]);
