@@ -28,8 +28,21 @@ export const BottomNav = () => {
       className="fixed inset-x-0 bottom-0 z-40"
       style={{ paddingBottom: "max(env(safe-area-inset-bottom), 6px)" }}
     >
+      {/* Scroll-edge fade — bridges page content into the floating pill.
+          Taste: no hard hairline; softer material read. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 -top-6 h-6"
+        style={{
+          background:
+            "linear-gradient(to top, hsl(var(--background) / 0.85), hsl(var(--background) / 0))",
+        }}
+      />
       <div className="mx-auto max-w-[440px] px-3 pt-1.5">
-        <ul className="glass-floating flex h-[62px] items-center justify-between rounded-[22px] px-2 shadow-[0_10px_40px_-14px_hsl(252_95%_40%/0.28)]">
+        <ul
+          className="glass-floating flex h-[62px] items-center justify-between rounded-[22px] px-2"
+          style={{ boxShadow: "0 12px 40px -14px hsl(var(--primary) / 0.28), var(--shadow-2)" }}
+        >
           {items.map(({ to, label, icon: Icon }) => {
             const active =
               pathname === to || (to !== "/home" && pathname.startsWith(to));
@@ -41,7 +54,7 @@ export const BottomNav = () => {
                   onClick={() => haptic("selection")}
                   className={cn(
                     "relative inline-flex h-[44px] w-[44px] items-center justify-center rounded-full outline-none",
-                    "transition-colors duration-200 ease-[cubic-bezier(0.23,1,0.32,1)]",
+                    "transition-colors duration-[var(--d2)] ease-[cubic-bezier(0.23,1,0.32,1)]",
                     active ? "text-primary" : "text-muted-foreground",
                   )}
                   style={{ WebkitTapHighlightColor: "transparent" }}
@@ -57,7 +70,7 @@ export const BottomNav = () => {
                         {isOn && (
                           <motion.span
                             layoutId="bottomnav-pill"
-                            className="absolute inset-0 rounded-full bg-primary/12"
+                            className="absolute inset-0 rounded-full bg-primary/12 ring-1 ring-primary/15"
                             transition={
                               reduce
                                 ? { duration: 0.15 }
