@@ -24,6 +24,7 @@ const Chat = () => {
   const [reactions, setReactions] = useState<Record<string, string[]>>({});
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
+  const [replyTo, setReplyTo] = useState<DirectMessage | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const draftRef = useRef<HTMLTextAreaElement>(null);
 
