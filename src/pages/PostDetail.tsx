@@ -3,6 +3,7 @@ import { ChevronLeft, MoreHorizontal, MessageCircle, Repeat2, Upload, Loader2, C
 import { VerificationBadge } from "@/components/meku/VerificationBadge";
 import { HeartLike } from "@/components/meku/HeartLike";
 import { BookmarkSave } from "@/components/meku/BookmarkSave";
+import { InlineActionCard, parseInlineAction } from "@/components/meku/InlineActionCard";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
 import { Avatar } from "@/components/meku/Avatar";
