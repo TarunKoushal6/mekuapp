@@ -19,7 +19,6 @@ type Option = {
 
 const options: Option[] = [
   { key: "post", label: "Post", description: "Share what's happening", icon: IconCompose, to: "/create" },
-  { key: "anon", label: "Anonymous Post", description: "Post without your handle", icon: IconShield, to: "/create?anon=1" },
   { key: "article", label: "Article", description: "Long-form writing", icon: IconActivity, to: "/create?type=article", soon: true },
   { key: "poll", label: "Poll", description: "Ask your followers", icon: IconRequest, to: "/create?type=poll", soon: true },
 ];
