@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { formatAmount } from "@/lib/format";
 import { syncTransaction } from "@/lib/circle";
 import { TokenLogo } from "@/components/meku/TokenLogo";
+import { AnimatedCount } from "@/components/meku/AnimatedCount";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
