@@ -1,11 +1,12 @@
 import { AppShell } from "@/components/meku/AppShell";
 import { useNavigate } from "react-router-dom";
 import { X, Image as ImageIcon, AtSign, Hash, Loader2 } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { TopBar, IconButton } from "@/components/meku/TopBar";
 import { useAuth } from "@/hooks/useAuth";
 import { createPost } from "@/lib/social";
 import { MentionAutocomplete } from "@/components/meku/MentionAutocomplete";
+import { CharacterRing } from "@/components/meku/CharacterRing";
 import {
   ComposerSkeleton,
   ComposerToolbarSkeleton,
@@ -13,6 +14,8 @@ import {
   SkeletonCrossfade,
 } from "@/components/meku/Skeletons";
 import { toast } from "sonner";
+
+const MAX_CHARS = 280;
 
 const Create = () => {
   const navigate = useNavigate();
