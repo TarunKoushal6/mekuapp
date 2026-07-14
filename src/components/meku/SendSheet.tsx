@@ -43,8 +43,8 @@ export const SendSheet = ({ open, onOpenChange, defaults, recipientLabel, title 
 
   const submit = async () => {
     if (busy) return;
-    const ok = await requirePin();
-    if (!ok) return;
+    const pinHash = await requirePin();
+    if (!pinHash) return;
     setBusy(true);
     try {
       await sendUsdc({
@@ -52,6 +52,7 @@ export const SendSheet = ({ open, onOpenChange, defaults, recipientLabel, title 
         amount,
         destinationAddress: needsAddress ? address : defaults?.destinationAddress,
         kind: defaults?.kind ?? "send",
+        pinHash: typeof pinHash === "string" ? pinHash : undefined,
       });
       setFlying(true);
       setTimeout(() => setSuccess(true), 650);
