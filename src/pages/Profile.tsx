@@ -25,6 +25,11 @@ const Profile = () => {
   const navigate = useNavigate();
   const { handle } = useParams();
   const { user, loading: authLoading } = useAuth();
+  const reduce = useReducedMotion();
+  const { scrollY } = useScroll();
+  // Phase 6 — subtle scroll parallax on banner (never on the avatar itself).
+  const bannerY = useTransform(scrollY, [0, 200], [0, -30]);
+  const bannerScale = useTransform(scrollY, [-160, 0], [1.18, 1]);
   const [tab, setTab] = useState<Tab>("Posts");
   const [profile, setProfile] = useState<ProfileT | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
