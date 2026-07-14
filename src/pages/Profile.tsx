@@ -271,11 +271,20 @@ const Profile = () => {
                 <li key={t} className="flex justify-center">
                   <button
                     onClick={() => setTab(t)}
-                    className={cn("tap relative py-3.5 text-[14px] font-semibold", tab === t ? "text-foreground" : "text-muted-foreground")}
+                    className={cn(
+                      "tap relative py-3.5 text-[14px] font-semibold transition-colors duration-[160ms]",
+                      tab === t ? "text-foreground" : "text-muted-foreground hover:text-foreground",
+                    )}
                   >
                     <span className="relative inline-block">
                       {t}
-                      {tab === t && <span className="absolute -bottom-[13px] left-0 right-0 h-[3px] rounded-full bg-primary" />}
+                      {tab === t && (
+                        <motion.span
+                          layoutId="profile-tab-underline"
+                          className="absolute -bottom-[13px] left-0 right-0 h-[3px] rounded-full bg-primary"
+                          transition={{ type: "spring", stiffness: 520, damping: 34, mass: 0.7 }}
+                        />
+                      )}
                     </span>
                   </button>
                 </li>
