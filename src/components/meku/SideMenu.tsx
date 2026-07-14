@@ -40,13 +40,17 @@ export const SideMenu = ({ open, onOpenChange }: Props) => {
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="left" className="w-[300px] max-w-[85vw] border-border bg-background p-0">
+      <SheetContent
+        side="left"
+        className="w-[300px] max-w-[85vw] border-border bg-background p-0"
+        style={{ boxShadow: "var(--shadow-3)" }}
+      >
         <div className="flex h-full flex-col">
-          {/* Profile card */}
+          {/* Profile card — one accent surface, hairline instead of shadow. */}
           <Link
             to="/profile"
             onClick={() => onOpenChange(false)}
-            className="tap block rounded-2xl border border-border bg-surface/60 px-4 py-3.5 mx-3 mt-4"
+            className="tap mx-3 mt-4 block rounded-[var(--r3)] border border-border bg-surface/60 px-4 py-3.5 transition-colors duration-[var(--d2)] hover:bg-surface"
           >
             <div className="flex items-center gap-3">
               <Avatar name={name} src={me?.avatar_url ?? undefined} size="md" />
@@ -62,8 +66,8 @@ export const SideMenu = ({ open, onOpenChange }: Props) => {
               </div>
             </div>
             <div className="mt-2.5 flex items-center gap-4 text-[12.5px]">
-              <span><span className="font-bold text-foreground">{counts.following}</span> <span className="text-muted-foreground">Following</span></span>
-              <span><span className="font-bold text-foreground">{counts.followers}</span> <span className="text-muted-foreground">Followers</span></span>
+              <span><span className="num font-bold text-foreground">{counts.following}</span> <span className="text-muted-foreground">Following</span></span>
+              <span><span className="num font-bold text-foreground">{counts.followers}</span> <span className="text-muted-foreground">Followers</span></span>
             </div>
           </Link>
 
@@ -74,7 +78,7 @@ export const SideMenu = ({ open, onOpenChange }: Props) => {
                   <Link
                     to={to}
                     onClick={() => onOpenChange(false)}
-                    className="tap flex items-center gap-3.5 rounded-lg px-3 py-2 text-[15px] font-semibold tracking-[-0.005em] text-foreground hover:bg-surface-2"
+                    className="tap flex items-center gap-3.5 rounded-[var(--r2)] px-3 py-2.5 text-[15px] font-semibold tracking-[-0.005em] text-foreground transition-colors duration-[var(--d2)] hover:bg-surface-2"
                   >
                     <Icon size={20} strokeWidth={1.8} />
                     <span>{label}</span>
@@ -88,7 +92,7 @@ export const SideMenu = ({ open, onOpenChange }: Props) => {
             <Link
               to="/settings"
               onClick={() => onOpenChange(false)}
-              className="tap flex items-center gap-3.5 rounded-lg px-3 py-2 text-[14px] font-medium text-foreground hover:bg-surface-2"
+              className="tap flex items-center gap-3.5 rounded-[var(--r2)] px-3 py-2 text-[14px] font-medium text-foreground transition-colors duration-[var(--d2)] hover:bg-surface-2"
             >
               <IconSettings size={18} strokeWidth={1.7} />
               <span>Settings and privacy</span>
@@ -97,7 +101,7 @@ export const SideMenu = ({ open, onOpenChange }: Props) => {
               href="https://faucet.circle.com"
               target="_blank"
               rel="noreferrer"
-              className="tap flex items-center justify-between rounded-lg px-3 py-2 text-[14px] font-medium text-muted-foreground hover:bg-surface-2"
+              className="tap flex items-center justify-between rounded-[var(--r2)] px-3 py-2 text-[14px] font-medium text-muted-foreground transition-colors duration-[var(--d2)] hover:bg-surface-2"
             >
               <span>Get testnet USDC</span>
               <IconExternal size={14} />
@@ -105,7 +109,7 @@ export const SideMenu = ({ open, onOpenChange }: Props) => {
             {user && (
               <button
                 onClick={async () => { await signOut(); onOpenChange(false); }}
-                className="tap flex w-full items-center gap-3.5 rounded-lg px-3 py-2 text-left text-[14px] font-medium text-foreground hover:bg-surface-2"
+                className="tap flex w-full items-center gap-3.5 rounded-[var(--r2)] px-3 py-2 text-left text-[14px] font-medium text-foreground transition-colors duration-[var(--d2)] hover:bg-surface-2"
               >
                 <IconLogout size={18} strokeWidth={1.7} />
                 <span>Log out</span>

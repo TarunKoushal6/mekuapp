@@ -93,7 +93,7 @@ Reference bar: X (density), Apple (physics), Linear (keyboard-grade speed), Arc 
 
 ## Progress
 - [x] Phase 1 — Foundations
-- [ ] Phase 2 — Navigation
+- [x] Phase 2 — Navigation
 - [ ] Phase 3 — Feed
 - [ ] Phase 4 — Composer
 - [ ] Phase 5 — Auth/Intro
