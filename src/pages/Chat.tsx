@@ -68,17 +68,26 @@ const Chat = () => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
   }, [messages?.length]);
 
+  const replyName = useMemo(() => {
+    if (!replyTo) return "";
+    return replyTo.sender_id === user?.id ? "You" : (other?.display_name || other?.username || "them");
+  }, [replyTo, user?.id, other]);
+
   const onSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || !otherId || !draft.trim() || sending) return;
     setSending(true);
-    const body = draft;
+    const raw = draft.trim();
+    // Prepend a machine-parseable reply header MessageBubble can render as a pretty inset.
+    const snippet = replyTo ? replyTo.body.replace(/\s+/g, " ").slice(0, 140) : null;
+    const body = replyTo && snippet ? `↪ @${replyName}: "${snippet}"\n\n${raw}` : raw;
     setDraft("");
+    setReplyTo(null);
     try {
       const m = await sendMessage(user.id, otherId, body);
       if (m) setMessages((prev) => (prev?.find((x) => x.id === m.id) ? prev : [...(prev ?? []), m]));
     } catch (err: any) {
-      setDraft(body);
+      setDraft(raw);
       toast.error(err.message ?? "Could not send");
     } finally {
       setSending(false);
@@ -87,6 +96,7 @@ const Chat = () => {
 
   const name = other?.display_name || other?.username || "User";
   const handle = other?.username;
+
 
   return (
     <AppShell hideNav>
