@@ -12,6 +12,7 @@ import {
   entitySecretCiphertext,
   getCircleTransaction,
   uuid,
+  verifyWalletPin,
 } from "../_shared/circle.ts";
 
 interface Body {
@@ -19,6 +20,8 @@ interface Body {
   toChain?: string;
   amount: string;
   recipientAddress?: string;
+  pin?: string;
+  pinHash?: string;
 }
 
 // CCTP V2 testnet config. TokenMessengerV2 happens to share the same address
