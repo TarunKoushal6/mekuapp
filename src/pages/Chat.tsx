@@ -1,14 +1,15 @@
 import { AppShell } from "@/components/meku/AppShell";
 import { Avatar } from "@/components/meku/Avatar";
-import { ChevronLeft, MoreHorizontal } from "lucide-react";
+import { ChevronLeft, MoreHorizontal, X, Reply } from "lucide-react";
 import { IconSend } from "@/components/meku/MekuIcon";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { getProfile, type Profile } from "@/lib/social";
 import { fetchThread, sendMessage, markThreadRead, type DirectMessage } from "@/lib/dm";
 import { toast } from "sonner";
+import { AnimatePresence, motion } from "framer-motion";
 
 import { MessageBubble } from "@/components/meku/MessageBubble";
 import { EmptyState } from "@/components/meku/EmptyState";
