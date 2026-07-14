@@ -283,6 +283,10 @@ const PostDetail = () => {
         {post.title && <h1 className="mt-4 text-[20px] font-bold leading-tight tracking-[-0.01em] text-foreground">{post.title}</h1>}
         <PostBody text={post.body} className="mt-2 whitespace-pre-wrap break-words text-[16px] leading-[1.55] text-foreground/90" />
         {post.image_url && <div className="mt-3 overflow-hidden rounded-[14px] border border-border"><img src={post.image_url} alt="" className="w-full" /></div>}
+        {(() => {
+          const action = parseInlineAction([post.title, post.body].filter(Boolean).join(" "));
+          return action ? <InlineActionCard action={action} postId={post.id} /> : null;
+        })()}
 
         <p className="mt-3 text-[12px] text-muted-foreground">
           {new Date(post.created_at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
