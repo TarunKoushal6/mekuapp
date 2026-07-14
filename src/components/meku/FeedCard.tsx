@@ -16,6 +16,7 @@ import { BookmarkSave } from "./BookmarkSave";
 import { readBookmarks, toggleBookmark } from "@/lib/bookmarks";
 import { supabase } from "@/integrations/supabase/client";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { ActionButton } from "./ActionButton";
 
 interface FeedCardProps {
   post: Post;
@@ -229,43 +230,38 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
         })()}
 
         <div className={cn("-ml-2 flex items-center justify-between pr-1 text-muted-foreground", post.image_url ? "mt-2.5" : "mt-3")}>
-          <button
-            onClick={(e) => { e.stopPropagation(); navigate(`/p/${post.id}`); }}
-            className="tap inline-flex h-9 min-w-9 items-center gap-1 rounded-full px-2 transition-colors hover:bg-foreground/5 hover:text-foreground"
+          <ActionButton
             aria-label="Comment"
+            onClick={(e) => { e.stopPropagation(); navigate(`/p/${post.id}`); }}
           >
             <MessageCircle className="h-5 w-5" strokeWidth={1.7} />
             <AnimatedCount value={post.comment_count} className="text-[13px]" />
-          </button>
-          <button
-            onClick={handleRepost}
-            className={cn(
-              "tap inline-flex h-9 min-w-9 items-center gap-1 rounded-full px-2 transition-colors",
-              reposted ? "text-emerald-500 hover:bg-emerald-500/10" : "hover:bg-foreground/5 hover:text-foreground",
-            )}
+          </ActionButton>
+
+          <ActionButton
             aria-label="Repost"
+            onClick={handleRepost}
+            active={reposted}
+            activeClassName="text-emerald-500 hover:bg-emerald-500/10"
           >
             <Repeat2 className="h-5 w-5" strokeWidth={1.7} />
             {repostCount > 0 && <AnimatedCount value={repostCount} className="text-[13px]" />}
-          </button>
-          <div className="inline-flex h-9 min-w-9 items-center gap-1 rounded-full px-2">
-            <HeartLike
-              checked={liked}
-              onChange={(e) => handleLike(e)}
-              size={20}
-              aria-label="Like"
-            />
+          </ActionButton>
+
+          <ActionButton as="div" aria-label="Like">
+            <HeartLike checked={liked} onChange={(e) => handleLike(e)} size={20} aria-label="Like" />
             <AnimatedCount value={likeCount} className={cn("text-[13px]", liked && "text-[#ff5b89]")} />
-          </div>
-          <button
-            onClick={(e) => { e.stopPropagation(); navigate(`/p/${post.id}`); }}
-            className="tap inline-flex h-9 min-w-9 items-center gap-1 rounded-full px-2 transition-colors hover:bg-foreground/5 hover:text-foreground"
+          </ActionButton>
+
+          <ActionButton
             aria-label="Views"
+            onClick={(e) => { e.stopPropagation(); navigate(`/p/${post.id}`); }}
           >
             <BarChart2 className="h-5 w-5" strokeWidth={1.7} />
             <AnimatedCount value={viewCount} className="text-[13px]" />
-          </button>
-          <div className="inline-flex h-9 min-w-9 items-center justify-center rounded-full px-2">
+          </ActionButton>
+
+          <ActionButton as="div" aria-label="Save">
             <BookmarkSave
               checked={bookmarked}
               onChange={(e) => {
@@ -277,18 +273,16 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
               size={20}
               aria-label="Save"
             />
-          </div>
-          <button
-            onClick={handleShare}
-            className="tap inline-flex h-9 min-w-9 items-center justify-center rounded-full px-2 transition-colors hover:bg-foreground/5 hover:text-foreground"
-            aria-label="Share"
-          >
+          </ActionButton>
+
+          <ActionButton aria-label="Share" onClick={handleShare}>
             <Upload className="h-5 w-5" strokeWidth={1.7} />
-          </button>
+          </ActionButton>
         </div>
       </div>
 
       {tipOpen && (
+
 
         <SendSheet
           open={tipOpen}
