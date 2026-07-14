@@ -31,6 +31,8 @@ import ScrollToTop from "./components/ScrollToTop.tsx";
 import { NotificationsListener } from "./hooks/useNotifications.tsx";
 import { PageTransition } from "./components/meku/PageTransition.tsx";
 import { useLocation } from "react-router-dom";
+import { MotionConfig } from "framer-motion";
+import { easeOutStrong } from "./lib/motion";
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -69,15 +71,17 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <ScrollToTop />
-        <NotificationsListener />
-        <AnimatedRoutes />
-      </BrowserRouter>
-    </TooltipProvider>
+    <MotionConfig reducedMotion="user" transition={{ duration: 0.22, ease: easeOutStrong }}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <ScrollToTop />
+          <NotificationsListener />
+          <AnimatedRoutes />
+        </BrowserRouter>
+      </TooltipProvider>
+    </MotionConfig>
   </QueryClientProvider>
 );
 

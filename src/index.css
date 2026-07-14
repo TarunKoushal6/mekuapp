@@ -56,9 +56,19 @@
     /* Emil / Apple curves — stronger than built-ins */
     --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
     --ease-in-out-strong: cubic-bezier(0.77, 0, 0.175, 1);
+    --ease-emphasized: cubic-bezier(0.2, 0, 0, 1);
     --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
     /* Duration scale — UI stays sub-300ms */
     --d1: 120ms; --d2: 160ms; --d3: 220ms; --d4: 280ms; --d5: 380ms;
+
+    /* Spacing scale (px) */
+    --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 20px; --s6: 24px; --s7: 32px; --s8: 40px;
+    /* Radii */
+    --r1: 10px; --r2: 14px; --r3: 18px; --r4: 24px; --r-pill: 999px;
+    /* Elevation */
+    --shadow-1: 0 1px 2px hsl(240 12% 10% / 0.04), 0 1px 1px hsl(240 12% 10% / 0.03);
+    --shadow-2: 0 6px 16px -6px hsl(240 12% 10% / 0.10), 0 2px 4px hsl(240 12% 10% / 0.04);
+    --shadow-3: 0 24px 48px -18px hsl(240 12% 10% / 0.20), 0 4px 12px hsl(240 12% 10% / 0.06);
   }
 
   .dark {
