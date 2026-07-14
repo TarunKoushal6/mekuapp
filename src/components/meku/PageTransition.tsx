@@ -14,15 +14,15 @@ export const PageTransition = ({ children }: { children: ReactNode }) => {
   // into a containing block for `position: fixed` descendants (BottomNav / FAB),
   // which visibly hides the bottom navigation on route change.
   return (
-    <AnimatePresence mode="wait" initial={false}>
+    <AnimatePresence mode="popLayout" initial={false}>
       <motion.div
         key={location.pathname}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{
-          duration: reduce ? 0.12 : 0.22,
-          ease: [0.22, 1, 0.36, 1], // transitions.dev --page-slide-ease
+          duration: reduce ? 0.08 : 0.14,
+          ease: [0.22, 1, 0.36, 1],
         }}
       >
         {children}

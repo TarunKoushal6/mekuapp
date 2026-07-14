@@ -71,7 +71,7 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <MotionConfig reducedMotion="user" transition={{ duration: 0.22, ease: easeOutStrong }}>
+    <MotionConfig reducedMotion="user" transition={{ duration: 0.14, ease: easeOutStrong }}>
       <TooltipProvider>
         <Toaster />
         <Sonner />
