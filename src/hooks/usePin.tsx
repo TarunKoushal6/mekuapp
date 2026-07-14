@@ -165,7 +165,9 @@ export const PinProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const handleComplete = () => {
-    resolverRef.current?.(true);
+    const h = pendingHashRef.current;
+    pendingHashRef.current = null;
+    resolverRef.current?.(h ?? true);
     resolverRef.current = null;
     setMode(null);
   };
