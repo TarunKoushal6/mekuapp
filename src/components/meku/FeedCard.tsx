@@ -270,7 +270,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
                 setBookmarked(next);
                 toggleBookmark(user?.id, post.id, next);
               }}
-              size={20}
+              size={18}
               aria-label="Save"
             />
           </ActionButton>
