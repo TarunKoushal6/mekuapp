@@ -1,11 +1,12 @@
 import { AppShell } from "@/components/meku/AppShell";
 import { useNavigate } from "react-router-dom";
 import { X, Image as ImageIcon, AtSign, Hash, Loader2 } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { TopBar, IconButton } from "@/components/meku/TopBar";
 import { useAuth } from "@/hooks/useAuth";
 import { createPost } from "@/lib/social";
 import { MentionAutocomplete } from "@/components/meku/MentionAutocomplete";
+import { CharacterRing } from "@/components/meku/CharacterRing";
 import {
   ComposerSkeleton,
   ComposerToolbarSkeleton,
@@ -13,6 +14,8 @@ import {
   SkeletonCrossfade,
 } from "@/components/meku/Skeletons";
 import { toast } from "sonner";
+
+const MAX_CHARS = 280;
 
 const Create = () => {
   const navigate = useNavigate();
@@ -25,8 +28,13 @@ const Create = () => {
   const bodyRef = useRef<HTMLTextAreaElement>(null);
 
   const showSkeleton = authLoading || busy;
+  const overLimit = body.length > MAX_CHARS;
+  const canPublish = body.trim().length > 0 && !overLimit;
 
-  const canPublish = body.trim().length > 0;
+  // Autofocus body on mount (keyboard-first composer). Phase 4 — Pro Max.
+  useEffect(() => {
+    if (!authLoading) requestAnimationFrame(() => bodyRef.current?.focus());
+  }, [authLoading]);
 
   const publish = async () => {
     if (!user) { navigate("/auth"); return; }
@@ -65,7 +73,7 @@ const Create = () => {
           <button
             disabled={!canPublish || busy}
             onClick={publish}
-            className="tap mr-2 inline-flex items-center gap-1 rounded-full bg-primary px-4 py-[8px] text-[13px] font-bold text-primary-foreground disabled:opacity-30"
+            className="tap mr-2 inline-flex items-center gap-1 rounded-full bg-primary px-4 py-[8px] text-[13px] font-bold text-primary-foreground shadow-[0_6px_16px_-8px_hsl(var(--primary)/0.55)] transition-[transform,background-color,opacity] duration-[160ms] ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.96] disabled:opacity-30 disabled:shadow-none motion-reduce:active:scale-100"
           >
             {busy && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
             Publish
@@ -112,18 +120,20 @@ const Create = () => {
           <div className="mx-auto flex h-[56px] max-w-[440px] items-center gap-1 px-3 text-muted-foreground">
             <button
               onClick={() => { setMediaLoading(true); setTimeout(() => setMediaLoading(false), 1200); }}
-              className="tap inline-flex h-[40px] w-[40px] items-center justify-center rounded-full"
+              className="tap inline-flex h-[40px] w-[40px] items-center justify-center rounded-full transition-colors hover:bg-foreground/[0.05] focus-visible:ring-2 focus-visible:ring-primary/40"
               aria-label="Insert image"
             >
               <ImageIcon className="h-[18px] w-[18px]" strokeWidth={1.4} />
             </button>
-            <button className="tap inline-flex h-[40px] w-[40px] items-center justify-center rounded-full" aria-label="Insert hashtag">
+            <button className="tap inline-flex h-[40px] w-[40px] items-center justify-center rounded-full transition-colors hover:bg-foreground/[0.05] focus-visible:ring-2 focus-visible:ring-primary/40" aria-label="Insert hashtag">
               <Hash className="h-[18px] w-[18px]" strokeWidth={1.4} />
             </button>
-            <button onClick={insertAt} className="tap inline-flex h-[40px] w-[40px] items-center justify-center rounded-full" aria-label="Mention user">
+            <button onClick={insertAt} className="tap inline-flex h-[40px] w-[40px] items-center justify-center rounded-full transition-colors hover:bg-foreground/[0.05] focus-visible:ring-2 focus-visible:ring-primary/40" aria-label="Mention user">
               <AtSign className="h-[18px] w-[18px]" strokeWidth={1.4} />
             </button>
-            <span className="ml-auto text-[12px] tabular-nums">{body.length}</span>
+            <div className="ml-auto pr-1">
+              <CharacterRing value={body.length} max={MAX_CHARS} />
+            </div>
           </div>
         )}
       </div>
