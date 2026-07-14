@@ -249,7 +249,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
           </ActionButton>
 
           <ActionButton as="div" aria-label="Like">
-            <HeartLike checked={liked} onChange={(e) => handleLike(e)} size={20} aria-label="Like" />
+            <HeartLike checked={liked} onChange={(e) => handleLike(e)} size={18} aria-label="Like" />
             <AnimatedCount value={likeCount} className={cn("text-[13px]", liked && "text-[#ff5b89]")} />
           </ActionButton>
 
@@ -270,7 +270,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
                 setBookmarked(next);
                 toggleBookmark(user?.id, post.id, next);
               }}
-              size={20}
+              size={18}
               aria-label="Save"
             />
           </ActionButton>

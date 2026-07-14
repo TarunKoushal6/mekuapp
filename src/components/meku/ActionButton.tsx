@@ -27,7 +27,8 @@ export const ActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
     ref,
   ) => {
     const cls = cn(
-      "tap inline-flex h-9 flex-1 basis-0 items-center justify-center gap-1 rounded-full px-2 transition-colors",
+      "tap group inline-flex h-8 flex-1 basis-0 min-w-0 items-center justify-center gap-1.5 rounded-full px-1 text-[13px] leading-none transition-colors",
+      "[&_svg]:h-[18px] [&_svg]:w-[18px] [&_svg]:shrink-0",
       active ? activeClassName : hoverClassName,
       className,
     );
