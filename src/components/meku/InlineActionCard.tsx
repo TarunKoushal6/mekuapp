@@ -34,20 +34,25 @@ export const InlineActionCard = ({ action, postId, commentId }: Props) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [recipientId, setRecipientId] = useState<string | null>(null);
+  const [lookedUp, setLookedUp] = useState(false);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
     supabase
       .from("profiles")
       .select("id")
-      .eq("username", action.handle)
+      .ilike("username", action.handle)
       .maybeSingle()
-      .then(({ data }) => setRecipientId((data as any)?.id ?? null));
+      .then(({ data }) => {
+        setRecipientId((data as any)?.id ?? null);
+        setLookedUp(true);
+      });
   }, [action.handle]);
 
   const isRequest = action.verb === "request";
   const Icon = isRequest ? IconRequest : IconSend;
-  const cta = isRequest ? "Pay request" : "Send now";
+  const notFound = lookedUp && !recipientId;
+  const cta = notFound ? "Handle not found" : isRequest ? "Pay request" : "Send now";
   const headline = isRequest
     ? `@${action.handle} requested ${action.amount} USDC`
     : `Send ${action.amount} USDC to @${action.handle}`;
