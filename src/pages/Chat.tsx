@@ -184,6 +184,7 @@ const Chat = () => {
         <div className="flex items-end gap-2">
           <div className="flex min-h-[44px] flex-1 items-center rounded-3xl border border-border bg-surface-2 px-4 py-2">
             <textarea
+              ref={draftRef}
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); onSend(e as any); } }}
