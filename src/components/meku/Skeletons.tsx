@@ -70,7 +70,7 @@ export const ComposerSkeleton = () => (
 export const MediaPlaceholderSkeleton = ({ className }: { className?: string }) => (
   <div
     className={cn(
-      "relative aspect-[5/4] w-full overflow-hidden rounded-[16px] border border-border bg-surface-2",
+      "relative aspect-[5/4] w-full overflow-hidden rounded-[18px] border border-border bg-surface-2",
       className,
     )}
   >

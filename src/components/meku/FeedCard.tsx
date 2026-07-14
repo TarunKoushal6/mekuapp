@@ -138,7 +138,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
   return (
     <article
       onClick={() => navigate(`/p/${post.id}`)}
-      className="hairline-b animate-fade-in cursor-pointer pl-5 pr-3 pt-3 pb-3.5 transition-colors duration-200 hover:bg-surface/40 active:bg-surface/60"
+      className="hairline-b animate-fade-in cursor-pointer pl-5 pr-3 pt-3 pb-3.5 transition-colors duration-[220ms] ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-foreground/[0.03] active:bg-foreground/[0.05]"
     >
       {post.reposted_by && (
         <Link
@@ -220,8 +220,8 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
           />
         )}
         {post.image_url && (
-          <div className="mt-3 overflow-hidden rounded-[16px] border border-border bg-surface-2">
-            <img src={post.image_url} alt="" loading="lazy" className="aspect-[5/4] w-full object-cover transition-transform duration-500 hover:scale-[1.02]" />
+          <div className="mt-3 overflow-hidden rounded-[18px] border border-border bg-surface-2">
+            <img src={post.image_url} alt="" loading="lazy" className="aspect-[5/4] w-full object-cover transition-transform duration-[500ms] ease-[cubic-bezier(0.23,1,0.32,1)] hover:scale-[1.02]" />
           </div>
         )}
         {(() => {
