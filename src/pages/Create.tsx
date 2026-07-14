@@ -120,18 +120,20 @@ const Create = () => {
           <div className="mx-auto flex h-[56px] max-w-[440px] items-center gap-1 px-3 text-muted-foreground">
             <button
               onClick={() => { setMediaLoading(true); setTimeout(() => setMediaLoading(false), 1200); }}
-              className="tap inline-flex h-[40px] w-[40px] items-center justify-center rounded-full"
+              className="tap inline-flex h-[40px] w-[40px] items-center justify-center rounded-full transition-colors hover:bg-foreground/[0.05] focus-visible:ring-2 focus-visible:ring-primary/40"
               aria-label="Insert image"
             >
               <ImageIcon className="h-[18px] w-[18px]" strokeWidth={1.4} />
             </button>
-            <button className="tap inline-flex h-[40px] w-[40px] items-center justify-center rounded-full" aria-label="Insert hashtag">
+            <button className="tap inline-flex h-[40px] w-[40px] items-center justify-center rounded-full transition-colors hover:bg-foreground/[0.05] focus-visible:ring-2 focus-visible:ring-primary/40" aria-label="Insert hashtag">
               <Hash className="h-[18px] w-[18px]" strokeWidth={1.4} />
             </button>
-            <button onClick={insertAt} className="tap inline-flex h-[40px] w-[40px] items-center justify-center rounded-full" aria-label="Mention user">
+            <button onClick={insertAt} className="tap inline-flex h-[40px] w-[40px] items-center justify-center rounded-full transition-colors hover:bg-foreground/[0.05] focus-visible:ring-2 focus-visible:ring-primary/40" aria-label="Mention user">
               <AtSign className="h-[18px] w-[18px]" strokeWidth={1.4} />
             </button>
-            <span className="ml-auto text-[12px] tabular-nums">{body.length}</span>
+            <div className="ml-auto pr-1">
+              <CharacterRing value={body.length} max={MAX_CHARS} />
+            </div>
           </div>
         )}
       </div>
