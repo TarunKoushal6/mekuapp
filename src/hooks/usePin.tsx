@@ -38,7 +38,8 @@ export const PinProvider = ({ children }: { children: ReactNode }) => {
   const [loadedUserId, setLoadedUserId] = useState<string | null>(null);
   const [lookupFailed, setLookupFailed] = useState(false);
   const [mode, setMode] = useState<Mode>(null);
-  const resolverRef = useRef<((ok: boolean) => void) | null>(null);
+  const resolverRef = useRef<((v: any) => void) | null>(null);
+  const pendingHashRef = useRef<string | null>(null);
   const autoPromptedRef = useRef<string | null>(null);
 
   const refresh = useCallback(async () => {
