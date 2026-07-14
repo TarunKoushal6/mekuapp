@@ -229,7 +229,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
           return action ? <InlineActionCard action={action} postId={post.id} /> : null;
         })()}
 
-        <div className={cn("-ml-2 flex items-center justify-between pr-1 text-muted-foreground", post.image_url ? "mt-2.5" : "mt-3")}>
+        <div className={cn("-ml-2 flex items-center gap-1 pr-1 text-muted-foreground", post.image_url ? "mt-2.5" : "mt-3")}>
           <ActionButton
             aria-label="Comment"
             onClick={(e) => { e.stopPropagation(); navigate(`/p/${post.id}`); }}
