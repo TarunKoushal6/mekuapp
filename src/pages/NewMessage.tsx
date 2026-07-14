@@ -14,7 +14,31 @@ const NewMessage = () => {
   const { user } = useAuth();
   const [q, setQ] = useState("");
   const [results, setResults] = useState<Profile[]>([]);
+  const [following, setFollowing] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(false);
+  const [followingLoading, setFollowingLoading] = useState(true);
+
+  // Load the people the current user follows once — shown by default so users can
+  // message their friends without having to search.
+  useEffect(() => {
+    if (!user?.id) { setFollowingLoading(false); return; }
+    let cancelled = false;
+    (async () => {
+      setFollowingLoading(true);
+      const { data: fl } = await supabase
+        .from("follows")
+        .select("followee_id")
+        .eq("follower_id", user.id);
+      const ids = (fl ?? []).map((r: any) => r.followee_id);
+      if (ids.length === 0) { if (!cancelled) { setFollowing([]); setFollowingLoading(false); } return; }
+      const { data: profs } = await supabase.from("profiles").select("*").in("id", ids).limit(100);
+      if (!cancelled) {
+        setFollowing((profs ?? []) as Profile[]);
+        setFollowingLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [user?.id]);
 
   useEffect(() => {
     const term = q.trim();
