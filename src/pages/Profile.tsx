@@ -1,6 +1,6 @@
 import { AppShell } from "@/components/meku/AppShell";
 import { VerificationBadge } from "@/components/meku/VerificationBadge";
-import { IconBack, IconMore, IconSettings, IconCopy, IconExternal } from "@/components/meku/MekuIcon";
+import { IconBack, IconMore, IconSettings, IconCopy, IconExternal, IconMessages } from "@/components/meku/MekuIcon";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
@@ -227,24 +227,33 @@ const Profile = () => {
                 size="xl"
                 className="h-[128px] w-[128px] ring-4 ring-background"
               />
-              <div className="mb-1">
+              <div className="mb-1 flex items-center gap-2">
                 {isMe ? (
                   <Link to="/settings/profile" className="tap inline-flex h-[36px] items-center rounded-full border border-border bg-transparent px-4 text-[14px] font-bold text-foreground">
                     Edit profile
                   </Link>
                 ) : (
-                  <button
-                    onClick={toggleFollow}
-                    disabled={followBusy || !profile}
-                    className={cn(
-                      "tap inline-flex h-[36px] items-center rounded-full px-5 text-[14px] font-bold disabled:opacity-60",
-                      following
-                        ? "border border-border bg-transparent text-foreground"
-                        : "bg-foreground text-background",
-                    )}
-                  >
-                    {following ? "Following" : "Follow"}
-                  </button>
+                  <>
+                    <Link
+                      to={profile ? `/inbox/${profile.id}` : "#"}
+                      aria-label={`Message ${name}`}
+                      className="tap inline-flex h-[36px] w-[36px] items-center justify-center rounded-full border border-border bg-transparent text-foreground"
+                    >
+                      <IconMessages size={18} />
+                    </Link>
+                    <button
+                      onClick={toggleFollow}
+                      disabled={followBusy || !profile}
+                      className={cn(
+                        "tap inline-flex h-[36px] items-center rounded-full px-5 text-[14px] font-bold disabled:opacity-60",
+                        following
+                          ? "border border-border bg-transparent text-foreground"
+                          : "bg-foreground text-background",
+                      )}
+                    >
+                      {following ? "Following" : "Follow"}
+                    </button>
+                  </>
                 )}
               </div>
             </div>

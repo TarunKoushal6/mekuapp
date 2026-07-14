@@ -14,7 +14,31 @@ const NewMessage = () => {
   const { user } = useAuth();
   const [q, setQ] = useState("");
   const [results, setResults] = useState<Profile[]>([]);
+  const [following, setFollowing] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(false);
+  const [followingLoading, setFollowingLoading] = useState(true);
+
+  // Load the people the current user follows once — shown by default so users can
+  // message their friends without having to search.
+  useEffect(() => {
+    if (!user?.id) { setFollowingLoading(false); return; }
+    let cancelled = false;
+    (async () => {
+      setFollowingLoading(true);
+      const { data: fl } = await supabase
+        .from("follows")
+        .select("followee_id")
+        .eq("follower_id", user.id);
+      const ids = (fl ?? []).map((r: any) => r.followee_id);
+      if (ids.length === 0) { if (!cancelled) { setFollowing([]); setFollowingLoading(false); } return; }
+      const { data: profs } = await supabase.from("profiles").select("*").in("id", ids).limit(100);
+      if (!cancelled) {
+        setFollowing((profs ?? []) as Profile[]);
+        setFollowingLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [user?.id]);
 
   useEffect(() => {
     const term = q.trim();
@@ -57,32 +81,55 @@ const NewMessage = () => {
         </label>
       </div>
 
-      {loading ? (
-        <UserListSkeleton count={6} />
-      ) : q.trim() && results.length === 0 ? (
-        <p className="mt-10 px-6 text-center text-[14px] text-muted-foreground">
-          No people found for "{q}".
-        </p>
-      ) : (
-        <ul>
-          {results.map((p) => (
-            <li key={p.id} className="hairline-b">
-              <button
-                onClick={() => navigate(`/inbox/${p.id}`)}
-                className="tap flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-surface/40"
-              >
-                <Avatar name={p.display_name || p.username || "User"} src={p.avatar_url ?? undefined} size="lg" />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-[15px] font-bold text-foreground">
-                    {p.display_name || p.username || "User"}
-                  </p>
-                  {p.username && <p className="truncate text-[13px] text-muted-foreground">@{p.username}</p>}
-                </div>
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
+      {(() => {
+        // When there's no search term, show the people the user follows.
+        // While searching, show search results.
+        const searching = !!q.trim();
+        const list = searching ? results : following;
+        const isLoading = searching ? loading : followingLoading;
+        if (isLoading) return <UserListSkeleton count={6} />;
+        if (searching && list.length === 0) {
+          return (
+            <p className="mt-10 px-6 text-center text-[14px] text-muted-foreground">
+              No people found for "{q}".
+            </p>
+          );
+        }
+        if (!searching && list.length === 0) {
+          return (
+            <p className="mt-10 px-6 text-center text-[14px] text-muted-foreground">
+              You're not following anyone yet. Search above to start a conversation.
+            </p>
+          );
+        }
+        return (
+          <>
+            {!searching && (
+              <p className="px-4 pb-2 pt-1 text-[12px] font-semibold uppercase tracking-wide text-muted-foreground">
+                Following
+              </p>
+            )}
+            <ul>
+              {list.map((p) => (
+                <li key={p.id} className="hairline-b">
+                  <button
+                    onClick={() => navigate(`/inbox/${p.id}`)}
+                    className="tap flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-surface/40"
+                  >
+                    <Avatar name={p.display_name || p.username || "User"} src={p.avatar_url ?? undefined} size="lg" />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-[15px] font-bold text-foreground">
+                        {p.display_name || p.username || "User"}
+                      </p>
+                      {p.username && <p className="truncate text-[13px] text-muted-foreground">@{p.username}</p>}
+                    </div>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </>
+        );
+      })()}
     </AppShell>
   );
 };
