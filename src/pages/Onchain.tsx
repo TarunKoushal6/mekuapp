@@ -79,10 +79,10 @@ const Onchain = () => {
         const preflightErr = (preflight.data as any)?.error ?? preflight.error?.message;
         if (preflightErr) throw new Error(preflightErr);
 
-        const ok = await requirePin();
-        if (!ok) return;
+        const pinHash = await requirePin();
+        if (!pinHash) return;
         const { data, error } = await supabase.functions.invoke("circle-swap", {
-          body: { chain: "Arc_Testnet", tokenIn: tokenIn.symbol, tokenOut: tokenOut.symbol, amountIn: payAmount, slippageBps: 50 },
+          body: { chain: "Arc_Testnet", tokenIn: tokenIn.symbol, tokenOut: tokenOut.symbol, amountIn: payAmount, slippageBps: 50, pinHash: typeof pinHash === "string" ? pinHash : undefined },
         });
         const errMsg = (data as any)?.error ?? error?.message;
         if (errMsg) throw new Error(errMsg);
