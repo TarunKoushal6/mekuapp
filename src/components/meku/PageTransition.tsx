@@ -20,7 +20,10 @@ export const PageTransition = ({ children }: { children: ReactNode }) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: reduce ? 0.14 : 0.22, ease: [0.23, 1, 0.32, 1] }}
+        transition={{
+          duration: reduce ? 0.12 : 0.22,
+          ease: [0.22, 1, 0.36, 1], // transitions.dev --page-slide-ease
+        }}
       >
         {children}
       </motion.div>
