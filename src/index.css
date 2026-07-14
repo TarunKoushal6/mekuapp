@@ -8,49 +8,49 @@
   :root {
     /* MEKU — Light theme with purple identity */
     --background: 0 0% 100%;
-    --foreground: 260 20% 10%;
-    --surface:    270 30% 98%;
-    --surface-2:  270 22% 95%;
+    --foreground: 240 12% 10%;
+    --surface:    240 22% 98%;
+    --surface-2:  240 18% 95%;
 
-    --muted: 270 20% 96%;
-    --muted-foreground: 260 10% 42%;
+    --muted: 240 16% 96%;
+    --muted-foreground: 240 8% 42%;
 
     --card: 0 0% 100%;
-    --card-foreground: 260 20% 10%;
+    --card-foreground: 240 12% 10%;
     --popover: 0 0% 100%;
-    --popover-foreground: 260 20% 10%;
+    --popover-foreground: 240 12% 10%;
 
-    --primary: 270 82% 56%;
+    --primary: 243 82% 62%;
     --primary-foreground: 0 0% 100%;
-    --primary-soft: 270 90% 97%;
-    --primary-glow: 280 88% 70%;
+    --primary-soft: 243 90% 97%;
+    --primary-glow: 258 88% 72%;
 
-    --secondary: 270 20% 96%;
-    --secondary-foreground: 260 20% 10%;
-    --accent: 270 82% 56%;
+    --secondary: 240 16% 96%;
+    --secondary-foreground: 240 12% 10%;
+    --accent: 243 82% 62%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 78% 58%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 260 14% 91%;
-    --input: 260 14% 91%;
-    --ring: 270 82% 56%;
+    --border: 240 14% 91%;
+    --input: 240 14% 91%;
+    --ring: 243 82% 62%;
 
     --radius: 18px;
 
-    --gradient-purple: linear-gradient(135deg, hsl(270 88% 62%) 0%, hsl(285 78% 52%) 100%);
-    --gradient-card: linear-gradient(135deg, hsl(270 88% 62%) 0%, hsl(285 78% 52%) 100%);
-    --shadow-purple: 0 14px 44px -12px hsl(270 85% 50% / 0.32);
+    --gradient-purple: linear-gradient(135deg, hsl(243 88% 66%) 0%, hsl(258 82% 60%) 100%);
+    --gradient-card: linear-gradient(135deg, hsl(243 88% 66%) 0%, hsl(258 82% 60%) 100%);
+    --shadow-purple: 0 14px 44px -12px hsl(243 85% 55% / 0.32);
 
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 260 20% 10%;
-    --sidebar-primary: 270 82% 56%;
+    --sidebar-foreground: 240 12% 10%;
+    --sidebar-primary: 243 82% 62%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 270 20% 96%;
-    --sidebar-accent-foreground: 260 20% 10%;
-    --sidebar-border: 260 14% 91%;
-    --sidebar-ring: 270 82% 56%;
+    --sidebar-accent: 240 16% 96%;
+    --sidebar-accent-foreground: 240 12% 10%;
+    --sidebar-border: 240 14% 91%;
+    --sidebar-ring: 243 82% 62%;
 
     --ease: cubic-bezier(0.32, 0.72, 0, 1);
     /* Emil / Apple curves — stronger than built-ins */
@@ -63,26 +63,26 @@
 
   .dark {
     --background: 0 0% 100%;
-    --foreground: 260 20% 10%;
-    --surface:    270 30% 98%;
-    --surface-2:  270 22% 95%;
-    --muted: 270 20% 96%;
-    --muted-foreground: 260 10% 42%;
+    --foreground: 240 12% 10%;
+    --surface:    240 22% 98%;
+    --surface-2:  240 18% 95%;
+    --muted: 240 16% 96%;
+    --muted-foreground: 240 8% 42%;
     --card: 0 0% 100%;
-    --card-foreground: 260 20% 10%;
+    --card-foreground: 240 12% 10%;
     --popover: 0 0% 100%;
-    --popover-foreground: 260 20% 10%;
-    --primary: 270 82% 56%;
+    --popover-foreground: 240 12% 10%;
+    --primary: 243 82% 62%;
     --primary-foreground: 0 0% 100%;
-    --primary-soft: 270 90% 97%;
-    --secondary: 270 20% 96%;
-    --secondary-foreground: 260 20% 10%;
-    --accent: 270 82% 56%;
+    --primary-soft: 243 90% 97%;
+    --secondary: 240 16% 96%;
+    --secondary-foreground: 240 12% 10%;
+    --accent: 243 82% 62%;
     --accent-foreground: 0 0% 100%;
-    --border: 260 14% 91%;
-    --input: 260 14% 91%;
-    --ring: 270 82% 56%;
-    --gradient-card: linear-gradient(135deg, hsl(270 88% 62%) 0%, hsl(285 78% 52%) 100%);
+    --border: 240 14% 91%;
+    --input: 240 14% 91%;
+    --ring: 243 82% 62%;
+    --gradient-card: linear-gradient(135deg, hsl(243 88% 66%) 0%, hsl(258 82% 60%) 100%);
   }
 }
 
