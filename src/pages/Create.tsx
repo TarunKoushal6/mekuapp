@@ -28,8 +28,13 @@ const Create = () => {
   const bodyRef = useRef<HTMLTextAreaElement>(null);
 
   const showSkeleton = authLoading || busy;
+  const overLimit = body.length > MAX_CHARS;
+  const canPublish = body.trim().length > 0 && !overLimit;
 
-  const canPublish = body.trim().length > 0;
+  // Autofocus body on mount (keyboard-first composer). Phase 4 — Pro Max.
+  useEffect(() => {
+    if (!authLoading) requestAnimationFrame(() => bodyRef.current?.focus());
+  }, [authLoading]);
 
   const publish = async () => {
     if (!user) { navigate("/auth"); return; }
@@ -68,7 +73,7 @@ const Create = () => {
           <button
             disabled={!canPublish || busy}
             onClick={publish}
-            className="tap mr-2 inline-flex items-center gap-1 rounded-full bg-primary px-4 py-[8px] text-[13px] font-bold text-primary-foreground disabled:opacity-30"
+            className="tap mr-2 inline-flex items-center gap-1 rounded-full bg-primary px-4 py-[8px] text-[13px] font-bold text-primary-foreground shadow-[0_6px_16px_-8px_hsl(var(--primary)/0.55)] transition-[transform,background-color,opacity] duration-[160ms] ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.96] disabled:opacity-30 disabled:shadow-none motion-reduce:active:scale-100"
           >
             {busy && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
             Publish
