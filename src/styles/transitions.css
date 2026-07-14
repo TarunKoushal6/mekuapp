@@ -1,3 +1,5 @@
+/* transitions.dev — motion tokens. Do not edit; regenerate from skill _root.css. */
+:root {
   /* Card resize */
   --resize-dur: 300ms;
   --resize-ease: cubic-bezier(0.22, 1, 0.36, 1);
@@ -162,4 +164,5 @@
   --acc-collapse: 250ms;
   --acc-chevron: 250ms;
   --acc-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
 }
