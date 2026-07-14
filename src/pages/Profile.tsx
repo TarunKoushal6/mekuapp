@@ -211,8 +211,13 @@ const Profile = () => {
         </>
       ) : (
         <div className="meku-page-in">
-          {/* Banner — indigo gradient stand-in until banners exist */}
-          <div className="-mt-[52px] h-[150px] w-full gradient-purple" />
+          {/* Banner with subtle scroll parallax. Reduced motion → static. */}
+          <div className="-mt-[52px] h-[150px] w-full overflow-hidden">
+            <motion.div
+              className="h-full w-full gradient-purple"
+              style={reduce ? undefined : { y: bannerY, scale: bannerScale }}
+            />
+          </div>
 
           <section className="px-4 pb-4">
             <div className="-mt-[64px] flex items-end justify-between">
