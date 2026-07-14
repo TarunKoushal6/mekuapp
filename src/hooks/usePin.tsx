@@ -132,6 +132,7 @@ export const PinProvider = ({ children }: { children: ReactNode }) => {
         await savePin(user.id, pin);
         const h = await hashPin(pin);
         setHash(h);
+        pendingHashRef.current = h;
         // Do NOT close — PinSheet transitions to the recovery step next.
         return null;
       } catch (e: any) {
@@ -142,7 +143,7 @@ export const PinProvider = ({ children }: { children: ReactNode }) => {
     const candidate = await hashPin(pin);
     const stored = hash ?? (await getPinHash(user.id));
     if (stored && candidate === stored) {
-      handleClose(true);
+      handleClose(candidate);
       return null;
     }
     return "Wrong PIN";
