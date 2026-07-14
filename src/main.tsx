@@ -8,6 +8,7 @@ import "@fontsource/sora/800.css";
 // @ts-ignore -- font side-effect import
 import "@fontsource-variable/manrope";
 import "./index.css";
+import "./styles/transitions.css";
 import { AuthProvider } from "./hooks/useAuth.tsx";
 import { ThemeProvider } from "./hooks/useTheme.tsx";
 import { WalletProvider } from "./hooks/useWallet.tsx";

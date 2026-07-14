@@ -130,13 +130,17 @@
 
 @layer components {
   .t-display { font-size: 56px; line-height: 1.02; letter-spacing: -0.035em; font-weight: 800; }
-  .t-h1      { font-size: 40px; line-height: 1.05; letter-spacing: -0.03em; font-weight: 700; }
+  .t-h1      { font-size: 40px; line-height: 1.05; letter-spacing: -0.03em;  font-weight: 700; }
   .t-h2      { font-size: 32px; line-height: 1.08; letter-spacing: -0.025em; font-weight: 700; }
-  .t-h3      { font-size: 24px; line-height: 1.18; letter-spacing: -0.02em; font-weight: 700; }
-  .t-lg      { font-size: 18px; line-height: 1.5; letter-spacing: -0.01em; }
-  .t-body    { font-size: 16px; line-height: 1.55; }
-  .t-caption { font-size: 13px; line-height: 1.45; }
-  .t-eyebrow { font-size: 11px; line-height: 1; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 600; }
+  .t-h3      { font-size: 24px; line-height: 1.18; letter-spacing: -0.02em;  font-weight: 700; }
+  .t-lg      { font-size: 18px; line-height: 1.5;  letter-spacing: -0.01em; }
+  .t-body    { font-size: 16px; line-height: 1.55; letter-spacing: 0; }
+  .t-caption { font-size: 13px; line-height: 1.45; letter-spacing: 0.005em; }
+  .t-micro   { font-size: 11px; line-height: 1.4;  letter-spacing: 0.02em; font-weight: 600; }
+  .t-eyebrow { font-size: 11px; line-height: 1;    letter-spacing: 0.18em; text-transform: uppercase; font-weight: 600; }
+
+  /* Numeric UI — always tabular so counters don't jitter on change. */
+  .num { font-variant-numeric: tabular-nums; }
 
   .hairline-t { border-top: 1px solid hsl(var(--border)); }
   .hairline-b { border-bottom: 1px solid hsl(var(--border)); }
