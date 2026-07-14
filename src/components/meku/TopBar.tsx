@@ -30,19 +30,29 @@ export const TopBar = ({ left, title, right, className, bordered }: TopBarProps)
   return (
     <header
       className={cn(
-        "sticky top-0 z-30 flex h-[56px] items-center justify-between bg-background/85 px-3 backdrop-blur-xl",
+        "sticky top-0 z-30 flex h-[56px] items-center justify-between bg-background/85 px-3 backdrop-blur-xl backdrop-saturate-150",
         className
       )}
     >
       <div className="flex min-w-[40px] items-center">{left}</div>
-      {title && <div className="absolute left-1/2 -translate-x-1/2 t-caption text-foreground">{title}</div>}
+      {title && <div className="absolute left-1/2 -translate-x-1/2 t-caption font-semibold text-foreground">{title}</div>}
       <div className="flex min-w-[40px] items-center justify-end gap-1">{right}</div>
+      {/* Scroll-edge fade — reveals a soft mask instead of a hard hairline. */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 -bottom-3 h-3"
+        style={{
+          background: "linear-gradient(to bottom, hsl(var(--background) / 0.75), hsl(var(--background) / 0))",
+          opacity: showLine ? 1 : 0,
+          transition: "opacity var(--d2) var(--ease-out-strong)",
+        }}
+      />
       <span
         aria-hidden
         className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-border"
         style={{
-          opacity: showLine ? 1 : 0,
-          transition: "opacity 180ms cubic-bezier(0.23,1,0.32,1)",
+          opacity: showLine ? 0.6 : 0,
+          transition: "opacity var(--d2) var(--ease-out-strong)",
         }}
       />
     </header>
