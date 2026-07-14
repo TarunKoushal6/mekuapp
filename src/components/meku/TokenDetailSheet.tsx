@@ -5,6 +5,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { IconExternal, IconSend, IconActivity } from "./MekuIcon";
 import { Loader2 } from "lucide-react";
 import { formatAmount } from "@/lib/format";
+import { AnimatedCount } from "./AnimatedCount";
+import { motion, useReducedMotion } from "framer-motion";
+import { springSheet } from "@/lib/motion";
 
 interface Props {
   open: boolean;
