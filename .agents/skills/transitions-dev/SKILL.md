@@ -1,6 +1,6 @@
 ---
 name: transitions-dev
-description: Production-ready CSS transitions for web apps. Use when adding notification badges, dropdowns, modals, panel reveals, page slides, card resizes, number pop-ins, text/icon swaps, success checks, avatar group hovers, error shakes, input clears, skeleton reveals, shimmer text, sliding tabs, tooltips, staggered text reveals, 3D card tilts, plus-to-menu morphs, or accordions. Every snippet is portable CSS namespaced under `t-*` with semantic custom properties and a `prefers-reduced-motion` guard. Source: Jakubantalik/transitions.dev.
+description: "Production-ready CSS transitions for web apps. Use when adding notification badges, dropdowns, modals, panel reveals, page slides, card resizes, number pop-ins, text/icon swaps, success checks, avatar group hovers, error shakes, input clears, skeleton reveals, shimmer text, sliding tabs, tooltips, staggered text reveals, 3D card tilts, plus-to-menu morphs, or accordions. Every snippet is portable CSS namespaced under `t-*` with semantic custom properties and a `prefers-reduced-motion` guard. Source: Jakubantalik/transitions.dev."
 ---
 
 # Transitions.dev — Distilled
