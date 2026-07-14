@@ -117,6 +117,7 @@ export const TokenDetailSheet = ({ open, onOpenChange, token }: Props) => {
             ))
           )}
         </ul>
+        </motion.div>
       </SheetContent>
     </Sheet>
   );
