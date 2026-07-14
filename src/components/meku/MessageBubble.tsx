@@ -14,6 +14,7 @@ interface Props {
   showTime?: string | null;
   onDelete?: () => void;
   onReact?: (emoji: string) => void;
+  onReply?: (body: string) => void;
 }
 
 const REACTIONS = ["❤️", "😂", "👍", "😮", "😢", "🔥"];
@@ -31,15 +32,23 @@ const cornerFor = (mine: boolean, pos: BubblePos) => {
   return `${base} rounded-tl-md`;
 };
 
-export const MessageBubble = ({ body, mine, pos, showTime, onDelete, onReact }: Props) => {
+export const MessageBubble = ({ body, mine, pos, showTime, onDelete, onReact, onReply }: Props) => {
   const [open, setOpen] = useState(false);
   const timer = useRef<number | null>(null);
+  const moved = useRef(false);
+  const startY = useRef(0);
 
-  const startPress = () => {
+  const startPress = (e: React.PointerEvent) => {
+    moved.current = false;
+    startY.current = e.clientY;
     timer.current = window.setTimeout(() => {
+      if (moved.current) return;
       haptic("medium");
       setOpen(true);
-    }, 380);
+    }, 260);
+  };
+  const trackMove = (e: React.PointerEvent) => {
+    if (Math.abs(e.clientY - startY.current) > 8) moved.current = true;
   };
   const cancelPress = () => {
     if (timer.current) { clearTimeout(timer.current); timer.current = null; }
