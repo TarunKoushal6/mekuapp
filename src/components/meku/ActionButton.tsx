@@ -29,14 +29,16 @@ export const ActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
     // Phase 3 — taste + transitions-dev: springy press, unified radius, tabular counters.
     // Hover backgrounds are gated to true hover devices so touch taps don't leave a
     // translucent square behind on mobile (especially visible in light theme).
+    // Press-scale + hover styles apply to icons directly, but NOT to anything inside a
+    // .heart-container — those SVGs are driven by keyframes (transform: scale) and any
+    // extra transition/transform on them cancels the like animation.
     const cls = cn(
       "tap group inline-flex h-8 flex-1 basis-0 min-w-0 items-center justify-center gap-1.5 rounded-full px-1 text-[13px] leading-none tabular-nums",
       "transition-[background-color,color,transform] duration-[160ms] ease-[cubic-bezier(0.23,1,0.32,1)]",
       "active:scale-[0.94] motion-reduce:active:scale-100",
-      "[&_svg]:h-[18px] [&_svg]:w-[18px] [&_svg]:shrink-0 [&_svg]:transition-transform [&_svg]:duration-[160ms]",
-      "group-active:[&_svg]:scale-[0.92]",
-      // Don't let the group's press-scale hijack the HeartLike keyframe animations.
-      "[&_.heart-container_svg]:!transform-none [&_.heart-container_svg]:!transition-none",
+      "[&>svg]:h-[18px] [&>svg]:w-[18px] [&>svg]:shrink-0",
+      "[&>svg]:transition-transform [&>svg]:duration-[160ms]",
+      "group-active:[&>svg]:scale-[0.92]",
       active ? activeClassName : hoverClassName,
       className,
     );
