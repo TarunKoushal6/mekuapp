@@ -165,9 +165,8 @@ const Chat = () => {
                 toast.error(err?.message ?? "Could not react");
               }
             };
-            const onReply = (body: string) => {
-              const quoted = body.split("\n").map((l) => `> ${l}`).join("\n");
-              setDraft((d) => (d ? d : `${quoted}\n\n`));
+            const onReply = () => {
+              setReplyTo(m);
               setTimeout(() => draftRef.current?.focus(), 30);
             };
             const chips = reactions[m.id] ?? [];
