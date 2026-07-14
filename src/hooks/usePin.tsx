@@ -86,39 +86,39 @@ export const PinProvider = ({ children }: { children: ReactNode }) => {
     if (!user) autoPromptedRef.current = null;
   }, [user]);
 
-  const requirePin = useCallback(async () => {
-    if (!user) return false;
+  const requirePin = useCallback(async (): Promise<string | null> => {
+    if (!user) return null;
     let current: string | null;
     try {
       current = hash ?? (await getPinHash(user.id));
     } catch (e) {
       console.warn("pin lookup failed", e);
       toast.error("Could not check your wallet PIN. Try again.");
-      return false;
+      return null;
     }
     if (!current) {
       setHash(null);
-      return new Promise<boolean>((resolve) => {
-        resolverRef.current = resolve;
-        setMode({ kind: "setup", resolve });
+      return new Promise<string | null>((resolve) => {
+        resolverRef.current = resolve as (v: any) => void;
+        setMode({ kind: "setup", resolve: resolve as (v: any) => void });
       });
     }
-    return new Promise<boolean>((resolve) => {
-      resolverRef.current = resolve;
-      setMode({ kind: "confirm", resolve });
+    return new Promise<string | null>((resolve) => {
+      resolverRef.current = resolve as (v: any) => void;
+      setMode({ kind: "confirm", resolve: resolve as (v: any) => void });
     });
   }, [user, hash]);
 
   const openSetup = useCallback(async () => {
     if (!user) return false;
     return new Promise<boolean>((resolve) => {
-      resolverRef.current = resolve;
-      setMode({ kind: "setup", resolve });
+      resolverRef.current = resolve as (v: any) => void;
+      setMode({ kind: "setup", resolve: resolve as (v: any) => void });
     });
   }, [user]);
 
-  const handleClose = (ok: boolean) => {
-    resolverRef.current?.(ok);
+  const handleClose = (result: boolean | string | null) => {
+    resolverRef.current?.(result as any);
     resolverRef.current = null;
     setMode(null);
   };
