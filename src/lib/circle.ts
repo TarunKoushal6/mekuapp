@@ -51,6 +51,8 @@ export interface SendArgs {
   postId?: string;
   commentId?: string;
   kind?: "send" | "tip" | "request";
+  pin?: string;
+  pinHash?: string;
 }
 
 // Server-signed DCW transfer — no PIN modal needed.
