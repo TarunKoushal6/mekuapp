@@ -33,12 +33,13 @@ export const AppShell = ({ children, hideNav, hideCompose }: AppShellProps) => {
         <motion.button
           aria-label="Create post"
           onClick={() => { haptic("medium"); setComposerOpen(true); }}
-          className="fixed z-40 inline-flex h-[56px] w-[56px] items-center justify-center rounded-full gradient-purple text-primary-foreground shadow-[0_14px_36px_-10px_hsl(252_95%_40%/0.55)] ring-4 ring-background"
+          className="fixed z-40 inline-flex h-[56px] w-[56px] items-center justify-center rounded-full gradient-purple text-primary-foreground ring-4 ring-background"
           style={{
             right: "max(env(safe-area-inset-right), 16px)",
             bottom: "calc(max(env(safe-area-inset-bottom), 6px) + 82px)",
             WebkitTapHighlightColor: "transparent",
             transformOrigin: "bottom right",
+            boxShadow: "0 14px 36px -10px hsl(var(--primary) / 0.55), var(--shadow-2)",
           }}
           initial={reduce ? false : { opacity: 0, scale: 0.6 }}
           animate={{ opacity: 1, scale: 1 }}
