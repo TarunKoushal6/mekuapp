@@ -20,9 +20,11 @@ const Chat = () => {
   const { user } = useAuth();
   const [other, setOther] = useState<Profile | null>(null);
   const [messages, setMessages] = useState<DirectMessage[] | null>(null);
+  const [reactions, setReactions] = useState<Record<string, string[]>>({});
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const draftRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (otherId) getProfile(otherId).then(setOther).catch(() => {});
