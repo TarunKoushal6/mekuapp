@@ -137,11 +137,21 @@ const Chat = () => {
               if (error) return toast.error(error.message);
               setMessages((prev) => prev?.filter((x) => x.id !== m.id) ?? prev);
             };
-            const onReact = (emoji: string) => {
+            const onReact = async (emoji: string) => {
+              // Optimistic: flip the chip immediately, snapshot the previous state so
+              // we can roll back if the (future) persistence call rejects.
+              const prevReactions = reactions;
               setReactions((r) => {
                 const list = r[m.id] ?? [];
                 return { ...r, [m.id]: list.includes(emoji) ? list.filter((x) => x !== emoji) : [...list, emoji] };
               });
+              try {
+                // Placeholder for server persistence; reactions are local-only today.
+                await Promise.resolve();
+              } catch (err: any) {
+                setReactions(prevReactions);
+                toast.error(err?.message ?? "Could not react");
+              }
             };
             const onReply = (body: string) => {
               const quoted = body.split("\n").map((l) => `> ${l}`).join("\n");
