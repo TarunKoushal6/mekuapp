@@ -138,7 +138,7 @@ export const FeedCard = ({ post, onChanged }: FeedCardProps) => {
   return (
     <article
       onClick={() => navigate(`/p/${post.id}`)}
-      className="hairline-b animate-fade-in cursor-pointer pl-5 pr-3 pt-3 pb-3.5 transition-colors duration-200 hover:bg-surface/40 active:bg-surface/60"
+      className="hairline-b animate-fade-in cursor-pointer pl-5 pr-3 pt-3 pb-3.5 transition-colors duration-[220ms] ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-foreground/[0.03] active:bg-foreground/[0.05]"
     >
       {post.reposted_by && (
         <Link
