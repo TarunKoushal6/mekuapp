@@ -3,6 +3,7 @@ import { VerificationBadge } from "@/components/meku/VerificationBadge";
 import { IconBack, IconMore, IconSettings, IconCopy, IconExternal } from "@/components/meku/MekuIcon";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect, useCallback, useMemo } from "react";
+import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/meku/Avatar";
 import { EmptyState } from "@/components/meku/EmptyState";
