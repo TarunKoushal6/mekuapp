@@ -3,13 +3,13 @@
 import type { Transition } from "framer-motion";
 
 /** Default UI spring — critically damped, snappy. Use for most transitions. */
-export const springUI: Transition = { type: "spring", bounce: 0, duration: 0.32 };
+export const springUI: Transition = { type: "spring", bounce: 0, duration: 0.22 };
 
 /** Momentum spring — slight overshoot. Use after a flick/drag/release. */
-export const springMomentum: Transition = { type: "spring", bounce: 0.18, duration: 0.34 };
+export const springMomentum: Transition = { type: "spring", bounce: 0.18, duration: 0.26 };
 
 /** Sheet spring — used for drawers/sheets pulled up from the edge. */
-export const springSheet: Transition = { type: "spring", bounce: 0.14, duration: 0.42 };
+export const springSheet: Transition = { type: "spring", bounce: 0.14, duration: 0.32 };
 
 /** Strong ease-out curve for enter transitions (Emil / Apple). */
 export const easeOutStrong = [0.23, 1, 0.32, 1] as const;
