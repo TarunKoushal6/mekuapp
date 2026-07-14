@@ -236,6 +236,23 @@
     }
   }
 
+  /* Phase 10 — focus rings visible in every theme, GPU-only ring, no layout shift. */
+  :where(button, a, [role="button"], input, textarea, select, [tabindex]):focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 2px hsl(var(--background)),
+      0 0 0 4px hsl(var(--ring) / 0.9);
+    border-radius: inherit;
+  }
+
+  /* Phase 10 — high-contrast users: thicken hairlines + strengthen focus. */
+  @media (prefers-contrast: more) {
+    .hairline-t, .hairline-b { border-color: hsl(var(--foreground)); }
+    :where(button, a, [role="button"]):focus-visible {
+      box-shadow: 0 0 0 3px hsl(var(--foreground));
+    }
+  }
+
   .gradient-purple { background: var(--gradient-purple); }
   .gradient-card { background: var(--gradient-card); }
   .shadow-purple { box-shadow: var(--shadow-purple); }
