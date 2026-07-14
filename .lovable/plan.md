@@ -100,5 +100,5 @@ Reference bar: X (density), Apple (physics), Linear (keyboard-grade speed), Arc 
 - [x] Phase 6 — Profile
 - [x] Phase 7 — Wallet
 - [x] Phase 8 — Messages
-- [ ] Phase 9 — Micro-interactions
-- [ ] Phase 10 — QA polish
+- [x] Phase 9 — Micro-interactions
+- [x] Phase 10 — QA polish
