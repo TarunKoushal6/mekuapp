@@ -119,13 +119,15 @@ const Inbox = () => {
               <li key={t.otherId} className="hairline-b">
                 <Link
                   to={`/inbox/${t.otherId}`}
-                  className="tap flex w-full items-start gap-3 px-4 py-3.5 text-left transition-colors hover:bg-surface/40"
+                  className="tap group flex w-full items-start gap-3 px-4 py-3.5 text-left transition-colors hover:bg-surface/40 active:scale-[0.985] transition-transform duration-150 ease-out motion-reduce:active:scale-100"
                 >
-                  <Avatar name={name} src={t.other?.avatar_url ?? undefined} size="lg" />
+                  <span className="inline-block transition-transform duration-200 ease-out group-hover:-translate-y-0.5 motion-reduce:group-hover:transform-none">
+                    <Avatar name={name} src={t.other?.avatar_url ?? undefined} size="lg" />
+                  </span>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-baseline justify-between gap-2">
                       <span className="truncate text-[15px] font-bold text-foreground">{name}</span>
-                      <span className="shrink-0 text-[12.5px] text-muted-foreground tabular-nums">{timeAgo(t.last.created_at)}</span>
+                      <span className="shrink-0 text-[11.5px] text-muted-foreground tabular-nums tracking-[0.01em]">{timeAgo(t.last.created_at)}</span>
                     </div>
                     <p className={`mt-0.5 truncate text-[14px] ${t.unread > 0 ? "font-semibold text-foreground" : "text-muted-foreground"}`}>
                       {t.last.sender_id === (me?.id) ? "You: " : ""}{t.last.body}
