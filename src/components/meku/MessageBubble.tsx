@@ -90,16 +90,16 @@ export const MessageBubble = ({ body, mine, pos, showTime, onDelete, onReact, on
           {reply && (
             <div
               className={cn(
-                "mb-1.5 overflow-hidden rounded-lg border-l-[3px] pl-2 pr-2 py-1.5 text-[12.5px] leading-tight",
+                "mb-2 overflow-hidden rounded-lg border-l-[3px] px-2.5 py-1.5 text-[12.5px] leading-tight",
                 mine
                   ? "border-primary-foreground/70 bg-primary-foreground/10 text-primary-foreground/85"
                   : "border-primary bg-primary/10 text-foreground/80",
               )}
             >
-              <p className={cn("truncate font-semibold text-[12px]", mine ? "text-primary-foreground" : "text-primary")}>
-                @{reply.quotedName}
+              <p className={cn("truncate text-[11.5px] font-semibold tracking-[-0.005em]", mine ? "text-primary-foreground" : "text-primary")}>
+                Replying to @{reply.quotedName}
               </p>
-              <p className="line-clamp-2 opacity-90">{reply.quotedText}</p>
+              <p className="mt-0.5 line-clamp-2 opacity-90">{reply.quotedText}</p>
             </div>
           )}
           {reply ? reply.rest : body}
