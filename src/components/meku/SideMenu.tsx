@@ -71,7 +71,11 @@ export const SideMenu = ({ open, onOpenChange }: Props) => {
             </div>
           </Link>
 
-          <nav className="mt-2 flex-1 overflow-y-auto px-2">
+          <div className="mt-4 flex justify-center">
+            <AnimatedWalletCard onClick={() => onOpenChange(false)} />
+          </div>
+
+          <nav className="mt-3 flex-1 overflow-y-auto px-2">
             <ul className="flex flex-col">
               {items.map(({ to, label, icon: Icon }) => (
                 <li key={to}>
