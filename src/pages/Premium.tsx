@@ -64,9 +64,15 @@ const Card = ({
 );
 
 const Premium = () => {
+  const navigate = useNavigate();
   return (
     <AppShell hideNav>
-      <ScreenHeader title="Premium" showBack />
+      <header className="sticky top-0 z-30 flex h-[56px] items-center gap-2 bg-background/90 px-2 backdrop-blur-xl">
+        <button onClick={() => navigate(-1)} aria-label="Back" className="tap inline-flex h-10 w-10 items-center justify-center rounded-full">
+          <ChevronLeft className="h-[22px] w-[22px]" strokeWidth={1.75} />
+        </button>
+        <p className="text-[15px] font-bold text-foreground">Premium</p>
+      </header>
       <div className="mx-auto w-full max-w-[440px] px-4 pb-24 pt-2">
         <motion.div
           initial={{ opacity: 0, y: 8 }}
