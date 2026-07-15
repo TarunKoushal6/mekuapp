@@ -1,5 +1,6 @@
 import { AppShell } from "@/components/meku/AppShell";
-import { ScreenHeader } from "@/components/meku/ScreenHeader";
+import { useNavigate } from "react-router-dom";
+import { ChevronLeft } from "lucide-react";
 import { VerificationBadge } from "@/components/meku/VerificationBadge";
 import { motion } from "framer-motion";
 import { Check, Eye, Sparkles, ShieldCheck, Zap } from "lucide-react";
