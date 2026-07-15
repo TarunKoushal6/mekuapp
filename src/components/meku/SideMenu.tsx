@@ -19,7 +19,6 @@ interface Props {
 
 const items = [
   { to: "/profile", label: "Profile", icon: IconProfile },
-  { to: "/wallet", label: "Wallet", icon: IconWallet },
   { to: "/explore", label: "Friends", icon: IconCommunity },
   { to: "/bookmarks", label: "Bookmarks", icon: (p: any) => <Bookmark size={p.size ?? 20} strokeWidth={1.8} /> },
   { to: "/notifications", label: "Notifications", icon: IconBell },
