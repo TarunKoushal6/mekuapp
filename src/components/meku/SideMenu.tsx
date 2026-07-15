@@ -1,6 +1,6 @@
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Link } from "react-router-dom";
-import { Bookmark } from "lucide-react";
+import { Bookmark, Sparkles } from "lucide-react";
 import { Avatar } from "./Avatar";
 import { VerificationBadge } from "./VerificationBadge";
 import {

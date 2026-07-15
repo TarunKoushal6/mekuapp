@@ -22,6 +22,7 @@ import Wallet from "./pages/Wallet.tsx";
 import PostDetail from "./pages/PostDetail.tsx";
 import Browser from "./pages/Browser.tsx";
 import Bookmarks from "./pages/Bookmarks.tsx";
+import Premium from "./pages/Premium.tsx";
 import AdminOverview from "./pages/admin/AdminOverview.tsx";
 import AdminUsers from "./pages/admin/AdminUsers.tsx";
 import AdminVerification from "./pages/admin/AdminVerification.tsx";
@@ -58,6 +59,7 @@ const AnimatedRoutes = () => {
         <Route path="/wallet" element={<RequireAuth><Wallet /></RequireAuth>} />
         <Route path="/browser" element={<Browser />} />
         <Route path="/bookmarks" element={<RequireAuth><Bookmarks /></RequireAuth>} />
+        <Route path="/premium" element={<Premium />} />
         <Route path="/admin" element={<RequireAuth><AdminOverview /></RequireAuth>} />
         <Route path="/admin/users" element={<RequireAuth><AdminUsers /></RequireAuth>} />
         <Route path="/admin/verification" element={<RequireAuth><AdminVerification /></RequireAuth>} />
