@@ -4,6 +4,7 @@ import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Copy, Reply, Trash2 } from "lucide-react";
 import { haptic } from "@/lib/haptics";
 import { toast } from "sonner";
+import { motion } from "framer-motion";
 
 export type BubblePos = "single" | "first" | "middle" | "last";
 
@@ -89,16 +90,16 @@ export const MessageBubble = ({ body, mine, pos, showTime, onDelete, onReact, on
           {reply && (
             <div
               className={cn(
-                "mb-1.5 overflow-hidden rounded-lg border-l-[3px] pl-2 pr-2 py-1.5 text-[12.5px] leading-tight",
+                "mb-2 overflow-hidden rounded-lg border-l-[3px] px-2.5 py-1.5 text-[12.5px] leading-tight",
                 mine
                   ? "border-primary-foreground/70 bg-primary-foreground/10 text-primary-foreground/85"
                   : "border-primary bg-primary/10 text-foreground/80",
               )}
             >
-              <p className={cn("truncate font-semibold text-[12px]", mine ? "text-primary-foreground" : "text-primary")}>
-                @{reply.quotedName}
+              <p className={cn("truncate text-[11.5px] font-semibold tracking-[-0.005em]", mine ? "text-primary-foreground" : "text-primary")}>
+                Replying to @{reply.quotedName}
               </p>
-              <p className="line-clamp-2 opacity-90">{reply.quotedText}</p>
+              <p className="mt-0.5 line-clamp-2 opacity-90">{reply.quotedText}</p>
             </div>
           )}
           {reply ? reply.rest : body}
@@ -112,14 +113,25 @@ export const MessageBubble = ({ body, mine, pos, showTime, onDelete, onReact, on
         >
           <div className="mx-auto mt-2 h-1 w-10 rounded-full bg-muted" />
           <div className="flex justify-around px-4 py-4">
-            {REACTIONS.map((e) => (
-              <button
+            {REACTIONS.map((e, i) => (
+              <motion.button
                 key={e}
+                initial={{ opacity: 0, y: 14, scale: 0.6 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{
+                  delay: 0.02 * i,
+                  type: "spring",
+                  stiffness: 520,
+                  damping: 22,
+                  mass: 0.6,
+                }}
+                whileHover={{ scale: 1.22, y: -3 }}
+                whileTap={{ scale: 0.88 }}
                 onClick={() => { onReact?.(e); haptic("light"); setOpen(false); }}
-                className="tap flex h-11 w-11 items-center justify-center rounded-full text-[22px] transition-transform hover:scale-110 active:scale-95"
+                className="tap flex h-12 w-12 items-center justify-center rounded-full text-[24px]"
               >
                 {e}
-              </button>
+              </motion.button>
             ))}
           </div>
           <div className="hairline-t">
