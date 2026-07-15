@@ -10,6 +10,7 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect, useState } from "react";
 import { getProfile, getFollowCounts, type Profile } from "@/lib/social";
+import { AnimatedWalletCard } from "./AnimatedWalletCard";
 
 interface Props {
   open: boolean;
