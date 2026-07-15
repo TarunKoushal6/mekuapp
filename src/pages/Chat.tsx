@@ -182,12 +182,28 @@ const Chat = () => {
                   onReply={onReply}
                 />
                 {chips.length > 0 && (
-                  <div className={`mt-0.5 flex ${mine ? "justify-end" : "justify-start"}`}>
-                    <div className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2 py-0.5 text-[13px] shadow-sm">
-                      {chips.map((c) => (
-                        <span key={c}>{c}</span>
-                      ))}
-                    </div>
+                  <div className={`-mt-1 flex ${mine ? "justify-end" : "justify-start"}`}>
+                    <motion.div
+                      layout
+                      initial={{ opacity: 0, scale: 0.6, y: -4 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      transition={{ type: "spring", stiffness: 520, damping: 24, mass: 0.6 }}
+                      className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2 py-0.5 text-[13px] shadow-[0_2px_8px_hsl(var(--foreground)/0.08)]"
+                    >
+                      <AnimatePresence initial={false}>
+                        {chips.map((c) => (
+                          <motion.span
+                            key={c}
+                            initial={{ scale: 0.4, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.4, opacity: 0 }}
+                            transition={{ type: "spring", stiffness: 600, damping: 22 }}
+                          >
+                            {c}
+                          </motion.span>
+                        ))}
+                      </AnimatePresence>
+                    </motion.div>
                   </div>
                 )}
               </div>
