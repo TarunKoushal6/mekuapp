@@ -89,6 +89,34 @@ export const SideMenu = ({ open, onOpenChange }: Props) => {
 
             <div className="mx-3 my-2 h-px bg-border" />
 
+            {/* Premium section — rules for blue vs purple tick. */}
+            <Link
+              to="/premium"
+              onClick={() => onOpenChange(false)}
+              className="tap group relative mx-1 mb-1 block overflow-hidden rounded-[var(--r3)] border border-border p-3.5"
+              style={{
+                background:
+                  "linear-gradient(135deg, hsl(212 100% 55% / 0.10), hsl(270 95% 60% / 0.14))",
+              }}
+            >
+              <div className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-[radial-gradient(circle,hsl(270_95%_60%/0.25),transparent_70%)] blur-2xl" />
+              <div className="relative flex items-center gap-2">
+                <Sparkles size={15} className="text-primary" strokeWidth={2} />
+                <p className="text-[13px] font-bold tracking-[-0.005em] text-foreground">MEKU Premium</p>
+              </div>
+              <div className="relative mt-2 space-y-1.5 text-[11.5px] leading-snug">
+                <div className="flex items-start gap-1.5">
+                  <VerificationBadge kind="verified" size={12} />
+                  <span className="text-foreground/80"><span className="font-semibold">Blue</span> — reach 50% of MEKU.</span>
+                </div>
+                <div className="flex items-start gap-1.5">
+                  <VerificationBadge kind="premium" size={12} />
+                  <span className="text-foreground/80"><span className="font-semibold">Purple</span> — reach 100% of MEKU.</span>
+                </div>
+              </div>
+              <p className="relative mt-2 text-[11px] font-semibold text-primary">See the rules →</p>
+            </Link>
+
             <Link
               to="/settings"
               onClick={() => onOpenChange(false)}
